@@ -6,7 +6,7 @@ Print the SSL certificate chain of all HTTPS connections from a particular host.
 
 Sample run
 
-''''
+````
 C:\Users\Vivek\Documents\devbo\us\certxtrp>ruby csx.rb demo2.trisul.org 12001 192.168.1.105 https
 Enter PEM pass phrase:
 
@@ -34,4 +34,4 @@ Certificate chain for 198.232.168.144 to 192.168.1.105
              (VeriSign, Inc.)
                (VeriSign, Inc.)
 
-''''
+````
