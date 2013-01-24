@@ -24,3 +24,14 @@ files and other content.
 Ruby with Unsniff Network Analyzer API ( http://www.unleashnetworks.com/unsniffwiki/docs/doku.php?id=start ) 
 
 *Note* Scripts using the Unsniff API run only on Windows systems.
+
+
+How to run these samples ?
+-------------------------
+
+You need to have :
+
+- A running instance of Trisul 
+- Download the sample client certificate + private key file in same directory
+
+Complete instructions are in the "Step by step guide" http://trisul.org/docs/trp/trpgemsteps.html
