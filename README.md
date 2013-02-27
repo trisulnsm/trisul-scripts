@@ -3,9 +3,23 @@ Trisul Scripts
 
 Ready to use scripts for network monitoring, forensics, and security.
 
-The scripts fall into two categories.
+How to run these samples ?
+-------------------------
 
-### 1. Network Monitoring using Trisul 
+You need to have :
+
+- A running instance of Trisul 
+- Download the sample client certificate + private key file
+
+## Getting started
+Complete instructions are in the "Step by step guide" http://trisul.org/docs/trp/trpgemsteps.html
+
+
+The NSM strategy followed by Trisul is 
+* Big picture and zoom out with Trisul 
+* Content, protocol and zoom in  with Unsniff
+
+### 1. Network Security Monitoring using Trisul 
 
 Search traffic, flows, alerts, resource, and packets. Analyze patterns 
 isolate flows and pull out raw packets in PCAP format. This is a fast
@@ -25,13 +39,3 @@ Ruby with Unsniff Network Analyzer API ( http://www.unleashnetworks.com/unsniffw
 
 *Note* Scripts using the Unsniff API run only on Windows systems.
 
-
-How to run these samples ?
--------------------------
-
-You need to have :
-
-- A running instance of Trisul 
-- Download the sample client certificate + private key file in same directory
-
-Complete instructions are in the "Step by step guide" http://trisul.org/docs/trp/trpgemsteps.html
