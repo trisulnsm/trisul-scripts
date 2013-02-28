@@ -49,6 +49,28 @@ Resource 1:315
 
 ```
 
+search_text.rb  (Search for a string match)
+-------------------------------------------
+
+Input is a string (the longer the better). Reassembles all TCP and
+normalizes all HTTP while searching. Did I say longer the better ?
+
+The output : Trisul flow ids
+
+
+Once you have the flow-ids you can pull out packets or related flows/alerts etc.
+
+```
+ruby ../trisul-scripts/apt1-detect/search_text.rb  127.0.0.1  12001 "kontera"
+Enter PEM pass phrase:
+Found 7 matches
+Flow 1:354  xt/javascript" src="http://kona.kontera.com/javascript/lib/KonaLibInlin 
+Flow 1:361  .NET CLR 2.0.50727)\x0D\x0AHost: kona.kontera.com\x0D\x0AConnection: Keep-Alive\x0D\x0ACo 
+Flow 1:360  .NET CLR 2.0.50727)\x0D\x0AHost: kona.kontera.com\x0D\x0AConnection: Keep-Alive\x0D\x0ACo 
+...
+
+```
+
 
 Advanced versions _adv.rb
 =========================
