@@ -9,7 +9,7 @@ How to run these samples ?
 You need to have :
 
 - A running instance of Trisul 
-- Download the sample client certificate + private key file
+- Download the sample client certificate + private key file http://trisul.org/docs/trp/trpgemsteps.html#getting_the_certificate_and_private_key_file
 
 ## Getting started
 Complete instructions are in the "Step by step guide" http://trisul.org/docs/trp/trpgemsteps.html
