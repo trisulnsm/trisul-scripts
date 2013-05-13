@@ -58,6 +58,7 @@ The script is quite straightforward.
 4. For each cert, use the SHA1 to send a DNS txt query to {sha1}.notary.icsi.berkeley.edu
 5. If you get a NXDOMAIN response - log the offending cert & print subject name
 6. If you get a TXT response, check for validated=1 and print subject name if not 
+7. We use a caching scheme so we dont check the same cert twice 
 
 
 Sample output 
@@ -86,3 +87,6 @@ d559a586669b08f46a30a133f8a9ed3d038e2ea8.notary.icsi.berkeley.edu....[OK VALID]
 
 
 ````
+
+Some of the validation failures maybe due to the fact that we are checking root CAs also. You can modify the code as you please to only check the servers certificate.
+
