@@ -1,34 +1,28 @@
 #!/usr/local/bin/ruby
 # Trisul Remote Protocol TRP Demo script
 #
-# Run all certs in past 24 hrs past  the ICSI Certificate Notary 
-# --> notary.icsi.berkeley.edu 
+# Consume an Intelligence feed in OpenIOC format 
+# then automatically scan past traffic for matches
+# for network based indicators 
 #
-# 
 # Example 
-#  ruby checknotary.rb 192.168.1.22 12001 
+#  ruby iocsweep.rb 192.168.1.22 12001  openioc-file.ioc
 #
 #
 require 'trisulrp'
-require 'dnsruby'
+require 'nokogiri'
 
-USAGE = "Usage:   checknotary.rb  TRP-SERVER TRP-PORT \n" \
-        "Example: ruby checknotary.rb 192.168.1.12 12001 " 
+USAGE = "Usage:   iocsweep.rb  TRP-SERVER TRP-PORT ioc-file.ioc\n" \
+        "Example: ruby iocsweep.rb 192.168.1.12 12001 469aed6f-941c-4a1e-b471-3a3e80cbcc2e.ioc" 
 
 # usage 
-raise  USAGE  unless ARGV.size==2
-
-# setup up a DNS resolver
-dnss = Dnsruby::DNS.open 
-
-# local cache 
-cache = {} 
+raise  USAGE  unless ARGV.size==3
 
 
 # open a connection to Trisul server from command line args
 conn  = connect(ARGV[0],ARGV[1],"Demo_Client.crt","Demo_Client.key")
 
-# get recent 24 hrs
+# get recent 24 hrs (in production, sweep over time)
 tmarr  = TrisulRP::Protocol.get_available_time(conn)
 tmarr[0] = tmarr[1] - 24*3600 
 
