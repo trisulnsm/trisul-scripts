@@ -1,16 +1,19 @@
 APT1 detector MD5 and FQDN
 ==============================
 
-Sample script to scan all your traffic for MD5 content matches and FQDNs easily.
+Sample scripts to scan all your traffic for MD5 content matches, IP Ranges, Text, and DNS names.
 
+This directory  includes four scripts 
 
-The big news this month in the field of network security monitoring is
-the APT1 indicators released by Mandiant. It is clear that tools today 
-must have the ability to search for things such as content matches etc.
+* search_md5.rb - Reassemble all files and check their MD5s against a list 
+* search_fqdn.rb - Check list of DNS domains
+* search_text.rb,  - Reassemble all files and search for arbitrary text/binary patterns
+* search_keyspace.rb - Check for activity from multiple IP blocks 
 
+You can use these four sample scripts as a building block to cover a majority of 
+network based indicators of compromise.
 
-This directory  includes two scripts search_md5.rb , and search_fqdn.rb 
-We already have another sample that extracts TLS certs. see the cert-extract directory.
+Also see the cert-extract directory for additional scripts to process SSL/TLS certificates.
 
 search_md5.rb (scan all HTTP content for MD5 match)
 -------------
@@ -103,5 +106,23 @@ Run the "_adv.rb" version of the scripts with the same command line.
 
 
 
+search_keyspace.rb  (Search for a IP ranges)
+-------------------------------------------
+
+See the ip-ranges.txt file for a sample input file. 
+You an search ranges or a single IP.
+
+````
+$ ruby search_keyspace.rb 192.168.1.8 12001 ip-ranges.txt 
+Enter PEM pass phrase:
+
+Found 53 matches
+Hit Key  C0.A8.01.01 
+Hit Key  C0.A8.01.08 
+Hit Key  C0.A8.01.16 
+Hit Key  C0.A8.01.21 
+Hit Key  CA.4F.D2.79 
+
+````
 
 
