@@ -125,11 +125,11 @@
       </IndicatorItem>
       <IndicatorItem id="de121137-fb98-2fa5-7e37-840415234b24" condition="contains">
         <Context document="Network" search="Network/DNS" type="mir" />
-        <Content type="string">imapupdate.com			</Content>
+        <Content type="string">imapupdate.com</Content>
       </IndicatorItem>
       <IndicatorItem id="fa47db59-4424-78fd-3f6a-772854ce6675" condition="contains">
         <Context document="Network" search="Network/DNS" type="mir" />
-        <Content type="string">inwpvpn.com???		</Content>
+        <Content type="string">inwpvpn.com</Content>
       </IndicatorItem>
       <IndicatorItem id="307d9654-a3dd-de23-58bf-a11b9e09bee1" condition="contains">
         <Context document="Network" search="Network/DNS" type="mir" />

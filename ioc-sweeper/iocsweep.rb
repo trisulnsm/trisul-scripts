@@ -19,68 +19,164 @@ USAGE = "Usage:   iocsweep.rb  TRP-SERVER TRP-PORT ioc-file.ioc\n" \
 raise  USAGE  unless ARGV.size==3
 
 
+ioc_doc = Nokogiri::XML(File.read(ARGV[2]))
+
+
+NETWORK_INDICATORS = %w(PortItem/remoteIP 
+					    Network/DNS 
+						Network/URI  
+						Network/String  
+						FileItem/Md5sum)
+
+# grab the indicators
+indicator_data = {}
+NETWORK_INDICATORS.each do |ind|
+	indicator_data[ind]=
+		ioc_doc.xpath("//xmlns:IndicatorItem/xmlns:Context[@search='#{ind}']")
+			   .collect do |a|
+				  a.parent.at_xpath("xmlns:Content").text
+	end
+end
+
+
+# what we found
+print "--------------------+-----------\n"
+print "Indicator            Count      \n"
+print "--------------------+-----------\n"
+indicator_data.each do |ind,val|
+	print "#{ind.ljust(20)} #{val.size} items \n"
+end
+print "--------------------+-----------\n"
+
+
 # open a connection to Trisul server from command line args
 conn  = connect(ARGV[0],ARGV[1],"Demo_Client.crt","Demo_Client.key")
 
-# get recent 24 hrs (in production, sweep over time)
+# get recent 24 hrs (in production, sweep over months, one day at a time)
+# need to sweep in small intervals so you can stop and continue to get feedback
 tmarr  = TrisulRP::Protocol.get_available_time(conn)
 tmarr[0] = tmarr[1] - 24*3600 
+time_interval =  mk_time_interval(tmarr)
 
-# send resource group request 
-# we want resource group RG_SSL  identified by GUID {D1E2..} see docs 
+
+############################################################
+# Sweep for IPs 
+# Need to normalize IPs into a range compatible with TRP
+print "Sweeping for IPs...stand by\n"
+ipspaces = indicator_data["PortItem/remoteIP"].collect do |a|
+		TRP::KeySpaceRequest::KeySpace.new(
+				:from => make_key(a), :to => make_key(a))
+end
 req = TrisulRP::Protocol.mk_request(
-                TRP::Message::Command::RESOURCE_GROUP_REQUEST,
-				:resource_group => RG_SSLCERTS,
-				:time_interval => mk_time_interval(tmarr),
-				:maxitems => 10000)
+                TRP::Message::Command::KEYSPACE_REQUEST,
+				:counter_group => CG_HOST,
+				:time_interval => time_interval,
+				:spaces => ipspaces )
 
-# for each resource, check against the notary 
+# print hits 
 get_response(conn,req) do |resp|
-	puts "Found #{resp.resources.size} matches"
-	resp.resources.each do | res  |
-
-		req2 = TrisulRP::Protocol.mk_request(
-                TRP::Message::Command::RESOURCE_ITEM_REQUEST,
-				:resource_group => RG_SSLCERTS,
-				:resource_ids  => [res] )
-
-		resp2 = get_response(conn,req2)
-		resp2.items.each do | resitem |
-
-			cchain = resitem.uri.split("---")
-			cchain.each do | cert |
-				
-				cparts = cert.split("\n")
-
-				cert_sha =  cparts[1][5..-1]
-				cert_name =  cparts[2]
-
-				next if cache.has_key? cert_sha
-				cache.store(cert_sha,1)
-
-
-				begin
-					domn = "#{cert_sha}.notary.icsi.berkeley.edu"
-					print "#{domn}"
-					resp = dnss.getresource(domn,"txt")
-					if resp.to_s =~ /validated=1/
-						print "....[OK VALID]\n"
-					else 
-						print "....[OK]\n"
-						print "    ^-- not validated #{cert_name}\n\n"
-					end 
-
-				rescue Dnsruby::NXDomain
-					print "....[FAIL - NXDOMAIN]\n"
-					print "    ^-- failed #{cert_name}\n\n"
-				end
-
-			end
-
-
-
-		end
-
+	if resp.hits.empty?
+		puts "Its clean"
+	else 
+		puts "Uhoh..Found #{resp.hits.size} these hits, check further"
+		resp.hits.each do | res  |
+			puts "Hit Key  #{res} "
+		end 
 	end 
 end
+print "\n\n"
+############################################################
+
+
+############################################################
+# Sweep for Domains  
+print "Sweeping for domains...stand by\n"
+req = TrisulRP::Protocol.mk_request(
+                TRP::Message::Command::RESOURCE_GROUP_REQUEST,
+				:resource_group => RG_DNS,
+				:time_interval => time_interval,
+				:uri_list => indicator_data["Network/DNS"])
+
+# print hits 
+get_response(conn,req) do |resp|
+	if resp.resources.empty?
+		puts "We are clean on domains"
+	else 
+		puts "Uhoh..Found #{resp.resources.size} these hits, check further"
+	end 
+end
+print "\n\n"
+############################################################
+
+############################################################
+# Sweep for URI  
+print "Sweeping for url content...stand by\n"
+req = TrisulRP::Protocol.mk_request(
+                TRP::Message::Command::RESOURCE_GROUP_REQUEST,
+				:resource_group => RG_URL,
+				:time_interval => time_interval,
+				:uri_list => indicator_data["Network/URI"])
+
+# print hits 
+get_response(conn,req) do |resp|
+	if resp.resources.empty?
+		puts "All good on HTTP URLs "
+	else 
+		puts "Uhoh..Found #{resp.resources.size} these hits, check further"
+	end 
+end
+print "\n\n"
+############################################################
+
+
+
+
+############################################################
+# Check all content for one pattern at a time.
+# Currently Trisul 3.0.1325 does not support multiple str searches
+
+
+indicator_data["Network/String"].each do |patt|
+
+	print "Checking for [#{patt}]. Get a beverage, its going to be a while..\n"
+	
+
+	req = TrisulRP::Protocol.mk_request(TRP::Message::Command::GREP_REQUEST,
+										:time_interval => mk_time_interval(tmarr),
+										:pattern => patt   )
+
+	# print matching flows if any 
+	get_response(conn,req) do |resp|
+		if resp.sessions.empty?
+			puts "All good, nothing to see here"
+		else 
+			puts "Found #{resp.sessions.size} matches"
+			resp.sessions.each_with_index  do | sess, idx  |
+				puts "Flow #{sess.slice_id}:#{sess.session_id} #{resp.hints[idx]} "
+			end 
+		end
+
+	end
+
+	print "\n"
+
+
+end
+
+############################################################
+# Check all content for MD5 match
+print "Checking all files after reassembly for MD5 match ...get lunch. Could take a while\n"
+req = TrisulRP::Protocol.mk_request(TRP::Message::Command::GREP_REQUEST,
+                                    :time_interval => time_interval,
+									:md5list => indicator_data["FileItem/Md5sum"] )
+get_response(conn,req) do |resp|
+	if resp.sessions.empty?
+		puts "Whew! All files MD5 are clean, also check your endpoints"
+	else 
+		puts "Dang..MD5 matches #{resp.sessions.size}, log into Trisul and check further"
+	end 
+end
+
+print "\n\n"
+############################################################
 
