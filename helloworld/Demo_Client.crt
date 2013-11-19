@@ -1,0 +1,73 @@
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number: 4 (0x4)
+        Signature Algorithm: sha1WithRSAEncryption
+        Issuer: C=IN, ST=TN, L=Gowrivakkam, O=UNLEASH NETWORKS, OU=TRISUL TESTING, CN=unleashnetworks.com/emailAddress=info@unleashnetworks.com
+        Validity
+            Not Before: Feb 19 07:43:36 2013 GMT
+            Not After : Feb 19 07:43:36 2014 GMT
+        Subject: C=IN, ST=TN, O=Unleash Networks, OU=Trisul Client Test Cert, CN=trisul.client/emailAddress=info@unleashnetworks.com
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                Public-Key: (1024 bit)
+                Modulus:
+                    00:bc:83:85:6a:12:97:9e:bd:07:cc:f0:ab:cd:97:
+                    03:fa:74:01:48:a5:51:d2:03:82:24:b9:33:5b:6f:
+                    55:24:3d:ae:bb:69:8d:f2:98:fc:d0:01:d7:f2:8c:
+                    1e:f9:67:ad:33:46:58:0f:d3:5d:f8:a6:00:7d:a5:
+                    4d:00:60:f5:46:a5:7a:0a:3c:8f:13:a8:4e:2f:cb:
+                    44:19:b0:f2:08:76:51:aa:fb:c4:5c:99:b7:2a:f8:
+                    0c:92:1a:62:aa:52:e6:3a:ff:a1:43:7e:36:c8:b3:
+                    f5:ec:ac:1b:b9:4d:f4:61:2d:c7:9c:97:95:24:9a:
+                    5e:dc:1f:09:2c:ca:18:c3:87
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Basic Constraints: 
+                CA:FALSE
+            Netscape Comment: 
+                OpenSSL Generated Certificate For Trisul PKI
+            X509v3 Subject Key Identifier: 
+                26:43:4F:FD:80:2C:E9:FF:CF:58:25:61:1F:89:C0:2D:34:32:C0:20
+            X509v3 Authority Key Identifier: 
+                keyid:99:B6:6A:A4:7A:E7:C6:6F:ED:D3:6A:47:73:2A:99:60:5E:A5:D4:18
+
+    Signature Algorithm: sha1WithRSAEncryption
+        aa:f2:97:23:bb:93:ce:5d:31:78:ad:62:cf:af:ff:36:d7:9d:
+        00:a7:46:40:d1:24:d5:b2:b6:06:20:87:1a:b2:fd:57:5b:f8:
+        cc:ce:a7:51:c3:37:f0:98:2b:fd:43:e4:66:ab:4c:af:fd:d1:
+        60:14:25:6f:1b:04:46:56:13:7e:5e:bf:8f:bb:1a:ab:4a:69:
+        aa:04:01:02:6b:49:ca:8d:3b:4c:90:f0:fb:57:f7:41:85:7b:
+        7f:22:d3:05:99:04:d6:b6:6b:44:56:b7:d5:9d:5f:b7:8b:a6:
+        9d:96:98:d6:e0:c2:55:68:a7:8f:29:a4:61:93:8d:bb:2f:bc:
+        76:4d:87:a8:54:d9:c6:86:8d:62:88:80:67:9a:8c:8d:88:42:
+        70:c4:dd:62:8c:29:cc:4b:2d:b0:4b:7c:f0:59:6c:3a:7f:cc:
+        f2:b5:6b:ed:ee:14:e4:09:1d:ba:9f:ef:c3:3d:a0:b0:68:d6:
+        16:9a:7f:37:21:d1:50:19:d2:fd:75:0e:3c:8c:1c:2f:37:b9:
+        c2:60:a0:a3:86:69:bb:e4:7e:5c:01:62:fc:ca:fe:57:fc:4a:
+        70:bb:7c:da:a4:f2:f3:d4:9c:6d:c2:11:73:a6:a1:a0:fe:d3:
+        bb:64:65:b9:08:7d:5e:e7:65:43:86:63:90:66:93:e0:6e:1c:
+        bb:e6:bb:a5
+-----BEGIN CERTIFICATE-----
+MIIDyDCCArCgAwIBAgIBBDANBgkqhkiG9w0BAQUFADCBqzELMAkGA1UEBhMCSU4x
+CzAJBgNVBAgTAlROMRQwEgYDVQQHEwtHb3dyaXZha2thbTEZMBcGA1UEChMQVU5M
+RUFTSCBORVRXT1JLUzEXMBUGA1UECxMOVFJJU1VMIFRFU1RJTkcxHDAaBgNVBAMT
+E3VubGVhc2huZXR3b3Jrcy5jb20xJzAlBgkqhkiG9w0BCQEWGGluZm9AdW5sZWFz
+aG5ldHdvcmtzLmNvbTAeFw0xMzAyMTkwNzQzMzZaFw0xNDAyMTkwNzQzMzZaMIGY
+MQswCQYDVQQGEwJJTjELMAkGA1UECAwCVE4xGTAXBgNVBAoMEFVubGVhc2ggTmV0
+d29ya3MxIDAeBgNVBAsMF1RyaXN1bCBDbGllbnQgVGVzdCBDZXJ0MRYwFAYDVQQD
+DA10cmlzdWwuY2xpZW50MScwJQYJKoZIhvcNAQkBFhhpbmZvQHVubGVhc2huZXR3
+b3Jrcy5jb20wgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBALyDhWoSl569B8zw
+q82XA/p0AUilUdIDgiS5M1tvVSQ9rrtpjfKY/NAB1/KMHvlnrTNGWA/TXfimAH2l
+TQBg9Ualego8jxOoTi/LRBmw8gh2Uar7xFyZtyr4DJIaYqpS5jr/oUN+Nsiz9eys
+G7lN9GEtx5yXlSSaXtwfCSzKGMOHAgMBAAGjgYswgYgwCQYDVR0TBAIwADA7Bglg
+hkgBhvhCAQ0ELhYsT3BlblNTTCBHZW5lcmF0ZWQgQ2VydGlmaWNhdGUgRm9yIFRy
+aXN1bCBQS0kwHQYDVR0OBBYEFCZDT/2ALOn/z1glYR+JwC00MsAgMB8GA1UdIwQY
+MBaAFJm2aqR658Zv7dNqR3MqmWBepdQYMA0GCSqGSIb3DQEBBQUAA4IBAQCq8pcj
+u5POXTF4rWLPr/82150Ap0ZA0STVsrYGIIcasv1XW/jMzqdRwzfwmCv9Q+Rmq0yv
+/dFgFCVvGwRGVhN+Xr+PuxqrSmmqBAECa0nKjTtMkPD7V/dBhXt/ItMFmQTWtmtE
+VrfVnV+3i6adlpjW4MJVaKePKaRhk427L7x2TYeoVNnGho1iiIBnmoyNiEJwxN1i
+jCnMSy2wS3zwWWw6f8zytWvt7hTkCR26n+/DPaCwaNYWmn83IdFQGdL9dQ48jBwv
+N7nCYKCjhmm75H5cAWL8yv5X/Epwu3zapPLz1JxtwhFzpqGg/tO7ZGW5CH1e52VD
+hmOQZpPgbhy75rul
+-----END CERTIFICATE-----
