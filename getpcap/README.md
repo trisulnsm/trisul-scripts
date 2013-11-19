@@ -8,7 +8,7 @@ Get all packets between Sep 20 2013 an Sep 30 2013
 Steps
 -----
 
-1. First we construct a TimeInterval message  to represent the desired interval
+### First we construct a TimeInterval message  to represent the desired interval
 
 See http://trisul.org/docs/ref/trpprotomessages.html#timeinterval
 
@@ -23,7 +23,7 @@ tint=TRP::TimeInterval.new ( {
 ````
 
 
-2. Second we use a filter expression
+### Second we use a filter expression
 
 The TRP command we are going to use to retrieve packets is FILTERED DATAGRAMS 
 ( http://trisul.org/docs/ref/trpprotomessages.html#filtereddatagram ). You can 
@@ -34,16 +34,16 @@ The filter expression we are using is Get All IP Packets - this translates to
 get all packets where the LinkLayer counter group is 0x0800 (this is IP Ethertype)
 
 You can get the GUID for the LinkLayer counter group from
-# Customize > Counters > Meters
+* Customize > Counters > Meters
 or
-# From the list of well known GUIDS here 	http://trisul.org/docs/ref/guid.html
+* From the list of well known GUIDS here 	http://trisul.org/docs/ref/guid.html
 
 
 The expression is 
 	"{9F5AD3A9-C74D-46D8-A8A8-DCDD773730BA}=0800" 
 
 
-3. Get and save the packets
+### Get and save the packets
 
 Construct the FilteredDatagrams command and get the packets for the timeframe and
 filter  expression.
