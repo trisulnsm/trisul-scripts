@@ -5,6 +5,7 @@ This script demonstrates the following
 
 Get all packets between Sep 20 2013 an Sep 30 2013 
 
+
 Steps
 -----
 
@@ -12,6 +13,8 @@ Steps
 
 See http://trisul.org/docs/ref/trpprotomessages.html#timeinterval
 
+You can ofcourse wrap this in a convenient helper method. 
+We want to show you how to construct raw TRP objects.
 
 ````
 

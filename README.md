@@ -1,7 +1,10 @@
 Trisul Scripts
 ==============
 
-Ready to use scripts for network monitoring, forensics, and security.
+
+Repository of small but powerful network and security monitoring scripts for use with Trisul Network Analytics (trisul.org) 
+
+
 
 How to run these samples ?
 -------------------------
@@ -9,7 +12,9 @@ How to run these samples ?
 You need to have :
 
 - A running instance of Trisul 
-- Download the sample client certificate + private key file http://trisul.org/docs/trp/trpgemsteps.html#getting_the_certificate_and_private_key_file
+- Git clone this repo, if you havent already `git clone https://github.com/vivekrajan/trisul-scripts.git ` 
+- Go to the `trisul-scripts/helloworld` directory
+- Run the hello.rb script ( ruby hello.rb 192.168.1.222 ) replace that IP with your Trisul's IP. The password for the private key file is `client` 
 
 ## Getting started
 Complete instructions are in the "Step by step guide" http://trisul.org/docs/trp/trpgemsteps.html
