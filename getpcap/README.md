@@ -3,7 +3,25 @@ Get all packets for a specified timeframe
 
 This script demonstrates the following
 
-Get all packets between Sep 20 2013 an Sep 30 2013 
+Get all packets between Sep 20 2013 an Sep 30 2013  
+
+````
+$ ruby getpackets.rb 192.168.1.8 12001
+Enter PEM pass phrase: xxxxxx 
+Number of bytes = 96594930
+Number of pkts  = 138921
+Hash            = a4015b399db9835435397843671e91674e2523b3
+Saved on server = /tmp/TFILT-23890-1385038634.pcap
+````
+
+
+### Save on server vs Download
+
+You can use the optional `disposition` field to indicate if you want to 
+save the resulting PCAP on the server or if you want to download it to the 
+client. You may want to save on the server, if the files are too big to be
+hauled around the network.
+
 
 
 Steps
@@ -55,6 +73,7 @@ filter  expression.
 
 req = TrisulRP::Protocol.mk_request(
 			TRP::Message::Command::FILTERED_DATAGRAMS_REQUEST,
+			:disposition => TRP::PcapDisposition::SAVE_ON_SERVER,
 			:filter_expression =>
 				 TRP::FilteredDatagramRequest::ByFilterExpr.new( 
 					:time_interval  => tint,
