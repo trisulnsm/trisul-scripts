@@ -4,6 +4,9 @@ Hourly Statistics of any item
 
 This script allows you to draw a neat hourly chart of traffic of any item.
 
+- hourlystats.rb : gets the raw timeseries data (30s) and adds it up 
+- hourlystats2.rb : uses the volumes_only flag to avoid getting raw timeseries
+
 
 ```
 [vivek@localhost trp]$ ruby hourlystats.rb  192.168.1.22 12001 {C51B48D4-7876-479E-B0D9-BD9EFF03CE2E} p-0050 0

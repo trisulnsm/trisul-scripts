@@ -19,7 +19,7 @@ conn = TrisulRP::Protocol.connect(ARGV.shift,ARGV.shift,"Demo_Client.crt","Demo_
 # for demo we get ALL packets between sep 20 2013 and sep 30 2013
 #
 tint=TRP::TimeInterval.new ( {
-  :from => TRP::Timestamp.new(:tv_sec => Time.new(2013,9,30).tv_sec ),
+  :from => TRP::Timestamp.new(:tv_sec => Time.new(2013,9,20).tv_sec ),
   :to => TRP::Timestamp.new(:tv_sec => Time.new(2013,9,30).tv_sec )
 } )
 
