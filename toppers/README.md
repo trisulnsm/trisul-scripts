@@ -8,7 +8,16 @@ Trisul has an ever expanding list of counter groups and meters.
 
 To see the current list 
 - Login and navigate to Customize -> Counters -> Meters
-- To see common counters and meters - check "Well known GUIDs" at http://trisul.org/docs/ref/guid.html
+- To see common counters and meters - check [Well known GUIDs](http://trisul.org/docs/ref/guid.html)
+
+### TRP Messages used
+
+The above script uses the following TRP Messages
+1. [CounterGroupInfo](http://trisul.org/docs/ref/trpprotomessages.html#countergroupinfo)  - to retrieve bucketsizes of a counter group
+2. [CounterGroup](http://trisul.org/docs/ref/trpprotomessages.html#countergroup)  - to retrieve toppers for a group and meter 
+
+
+### Sample run
 
 
 The following run displays the top Apps counter group, meter 0.
