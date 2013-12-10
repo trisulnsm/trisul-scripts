@@ -53,7 +53,7 @@ intervals.each do |dh|
                                                 :meter=>ARGV[4].to_i,
                                                 :key=>ARGV[3],
                                                 :time_interval => hourly_interval,
-												:volumes_only => 1 )
+												                        :volumes_only => 1 )
     get_response(conn,req) do |resp|
           volume  = resp.stats.meters[0].values[0].val
           print volume.to_s.rjust(10) + "|"

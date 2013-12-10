@@ -44,13 +44,13 @@ req = TrisulRP::Protocol.mk_request(TRP::Message::Command::COUNTER_ITEM_REQUEST,
                                     :counter_group=> target_guid ,
                                     :key=> target_key ,
                                     :time_interval => mk_time_interval(tmarr),
-									:volumes_only => 1 )
+                  :volumes_only => 1 )
 
 # print volume for each meter
 get_response(conn,req) do |resp|
-	volume = resp.stats.meters.each do | meter|
-		vol_bytes = meter.values[0].val * target_bucket_size 
-	  	print "Volume of Meter #{meter.meter} = #{vol_bytes } bytes  \n"
-	end 
+  volume = resp.stats.meters.each do | meter|
+    vol_bytes = meter.values[0].val * target_bucket_size 
+      print "Volume of Meter #{meter.meter} = #{vol_bytes } bytes  \n"
+  end 
 end
 
