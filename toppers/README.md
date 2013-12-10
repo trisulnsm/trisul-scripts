@@ -13,6 +13,7 @@ To see the current list
 ### TRP Messages used
 
 The above script uses the following TRP Messages
+
 1. [CounterGroupInfo](http://trisul.org/docs/ref/trpprotomessages.html#countergroupinfo)  - to retrieve bucketsizes of a counter group
 2. [CounterGroup](http://trisul.org/docs/ref/trpprotomessages.html#countergroup)  - to retrieve toppers for a group and meter 
 
