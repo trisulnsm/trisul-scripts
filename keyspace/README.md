@@ -13,10 +13,10 @@ This directory has two scripts
 
 ### TRP Messages used
 
-The above script uses the following TRP Messages
+The scripts uses the following TRP Messages
 
 1. [KeySpace](http://trisul.org/docs/ref/trpprotomessages.html#keyspace)  - to retrieve keys in a range 
-
+2. [KeyLookup](http://trisul.org/docs/ref/trpprotomessages.html#keylookup)  - used by active_keys2.rb to convert keys into human readable resolved format 
 
 
 ### Sample run
