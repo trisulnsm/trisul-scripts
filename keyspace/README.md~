@@ -1,0 +1,50 @@
+Active keys in a range
+======================
+
+The KEYSPACE_REQUEST command is used to retrieve the active keys in a range.
+
+For example : This request can be used to retrieve all IPs seen in the 10.x.x.x private IP range.
+The key space is this case is  10.0.0.0 to 11.0.0.0.
+
+
+### TRP Messages used
+
+The above script uses the following TRP Messages
+
+1. [KeySpace](http://trisul.org/docs/ref/trpprotomessages.html#keyspace)  - to retrieve keys in a range 
+
+
+### Sample run
+
+
+The following run displays the all IPs seen in the 192.168.0.0/16 range
+Note that "Hosts" counter group has the GUID {C-4CD...} and the keys are in Trisul Key Format.
+
+The active_keys2.rb script extends the base script to convert human readable keys into Trisul Key Format. We've separated the two scripts to highlight use of the KeySpace message.
+
+
+```
+[vivek@longdog trp]$ ruby toppers.rb 192.168.1.22 12001 {C51B48D4-7876-479E-B0D9-BD9EFF03CE2E} 0
+Enter PEM pass phrase:
+
+Counter Group = {C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}
+Meter = 0
+
+Key = SYS:GROUP_TOTALS Label = SYS:GROUP_TOTALS  Metric= 65541000
+Key = p-0050 Label = http  Metric= 38824800
+Key = p-01BB Label = https  Metric= 25761900
+Key = p-0035 Label = domain  Metric= 718800
+Key = p-03E1 Label = imaps  Metric= 93900
+Key = p-076C Label = ssdp  Metric= 71400
+Key = p-146C Label = p-146C  Metric= 35100
+Key = p-000D Label = daytime  Metric= 12600
+Key = p-0016 Label = ssh  Metric= 10500
+Key = p-0043 Label = bootps  Metric= 4200
+
+```
+
+
+## A word on metrics
+
+If you see the topper.rb code we multiply the "metric" field in the response by 300 or topper_bucket_size. This is because the metric returned for Stat 0 is Bytes/sec to convert it into volume we multiply by topper bucket size - default is 5 min or 300 sec.
+
