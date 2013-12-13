@@ -24,7 +24,7 @@ raise %q{
 
 
 # open a connection to Trisul server from command line args
-conn  = connect(ARGV[0],ARGV[1],"Demo_Client.crt","Demo_Client.key")
+conn  = connect_nonsecure(ARGV[0],ARGV[1])
 
 # get all time..then for this demo script  crop to latest 1 day, 
 tmarr  = TrisulRP::Protocol.get_available_time(conn)
