@@ -3,9 +3,6 @@
 #
 # Print all active keys in given range and time interval 
 #
-# Example 
-#  ruby search_keyspace.rb 192.168.1.12 12001 cgguid from-key-pattern to-key-pattern 
-#
 #
 require 'trisulrp'
 
