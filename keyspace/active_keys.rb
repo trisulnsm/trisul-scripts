@@ -24,11 +24,11 @@ raise %q{
 
 
 # open a connection to Trisul server from command line args
-conn  = connect_nonsecure(ARGV[0],ARGV[1])
+conn  = connect(ARGV[0],ARGV[1],"Demo_Client.crt","Demo_Client.key")
 
 # get all time..then for this demo script  crop to latest 1 day, 
 tmarr  = TrisulRP::Protocol.get_available_time(conn)
-tmarr[0] = tmarr[1]-86400
+tmarr[0] = tmarr[1]-3*86400
 
 # arguments
 cgguid = ARGV[2]
@@ -45,7 +45,7 @@ req = TrisulRP::Protocol.mk_request(
 				:counter_group => cgguid ,
 				:time_interval => mk_time_interval(tmarr),
 				:spaces => [space] ,
-				:maxitems => 100 )
+				:maxitems => 5 )
 
 
 # print hits 
