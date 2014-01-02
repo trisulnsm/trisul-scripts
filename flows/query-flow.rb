@@ -2,11 +2,10 @@
 #!/usr/local/bin/ruby
 # Trisul Remote Protocol TRP Demo script
 #
-# Query by flow id , every flow in Trisul has a unique id 
-# of the form slice:session. Eg 1:999 
+# Any query ..  time window last 2 days 
 #
 # Example 
-#  ruby query-by-flowid TRPHOST TRPPORT  id
+#  ruby query-flow TRPHOST TRPPORT <opts> 
 #
 require 'trisulrp'
 
@@ -14,30 +13,43 @@ require 'trisulrp'
 raise %q{
 
 
-  query-by-flowid.rb - Query flow by id
+  query-flow.rb - Query flow by any params 
 
   Usage 
-  query-by-flowid.rb  trisul-ip trp-port flowid
+  query-flow.rb  trisul-ip trp-port <opts>
+
+  <opts x=y>
+  x=sourceip,destip,
+
 
   Example
-  ruby query-by-flowid.rb 192.168.1.22 12001  1:801 
+  ruby query-flow.rb 192.168.1.22 12001 source_ip=C0.A8.01.01 
 
-} unless ARGV.length==3
+} unless ARGV.length>3
 
 
 # open a connection to Trisul server from command line args
-conn  = connect(ARGV[0],ARGV[1],"Demo_Client.crt","Demo_Client.key")
+conn  = connect(ARGV.shift,ARGV.shift,"Demo_Client.crt","Demo_Client.key")
 
-# arguments convert to a SessionID object 
-flowid  = ARGV[2].split(':').collect{|a|a.to_i}
-sessid  = TRP::SessionID.new( {:slice_id=>flowid[0],
-                               :session_id=>flowid[1]} )
+# process arguments 
+qhash = ARGV.inject({}) do |acc,i|
+	qparts = i.split("=")
+	acc.store( qparts[0].to_sym, qparts[1])
+	acc
+end
 
+# get 24 hours latest time window 
+tmarr  = TrisulRP::Protocol.get_available_time(conn)
+tmarr[0] = tmarr[1] - 24*3600
 
 # send keyspace request 
 req = TrisulRP::Protocol.mk_request(
-                TRP::Message::Command::SESSION_ITEM_REQUEST,
-				:session_ids  => [sessid] )
+                TRP::Message::Command::QUERY_SESSIONS_REQUEST,
+				qhash.merge( { 
+					:time_interval => mk_time_interval(tmarr),
+					:resolve_keys => false
+				})
+				)
 
 
 # print matching flows using the print_session_details helper  
