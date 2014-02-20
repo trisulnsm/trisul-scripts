@@ -1,7 +1,46 @@
-Get all packets for a specified timeframe 
-=========================================
+Work with PCAPS 
+===============
 
-This script demonstrates the following
+The scripts in this directory describe how you can export Trisul data into PCAPs.
+
+The three scripts here are
+
+- getpackets.rb  : Downloads as a pcap file, all packets in a timeframe 
+- getpackets2.rb : Explains how to save PCAPs remotely on your server instead of downloading
+- daypcaps.rb    : For any month, save 1 PCAP per day neatly on the Trisul server
+
+The main TRP message used in all these scenarios is
+FILTERED_DATAGRAMS
+
+
+### Save on server vs Download
+
+The FILTERED_DATAGRAMS method allows you to download a PCAP or to keep it on the server.
+
+Use the `disposition` field to indicate if you want to 
+save the resulting PCAP on the server or if you want to download it to the 
+client. This is useful for archival purposes.
+
+
+#### Save on server location
+
+If you choose to save the PCAPs on the server, they are stored in the `/tmp` directory under 
+filenames that look like the following
+
+````
+$ ls -lrt /tmp
+-rw------- 1 nsmdemo nsmdemo  41287806957 Feb 20 17:39 TFILT-15864-1392898081.pcap
+-rw------- 1 nsmdemo nsmdemo  22274971817 Feb 20 17:40 TFILT-15864-1392898165.pcap
+-rw------- 1 nsmdemo nsmdemo  51247056544 Feb 20 17:41 TFILT-15864-1392898218.pcap
+````
+
+The filename format is TFILE-{TRP Instance}-{Timestamp}.pcap
+
+*Security Note* : Trisul does not allow you to control the filename or the location.
+
+
+Sample run
+-----
 
 Get all packets between Sep 20 2013 an Sep 30 2013  
 
@@ -15,16 +54,7 @@ Saved on server = /tmp/TFILT-23890-1385038634.pcap
 ````
 
 
-### Save on server vs Download
-
-You can use the optional `disposition` field to indicate if you want to 
-save the resulting PCAP on the server or if you want to download it to the 
-client. You may want to save on the server, if the files are too big to be
-hauled around the network.
-
-
-
-Steps
+Code explanation
 -----
 
 ### First we construct a TimeInterval message  to represent the desired interval
