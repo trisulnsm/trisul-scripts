@@ -97,12 +97,8 @@ TrisulPlugin = {
 						final_key,
 						1, 1 )
 			end
-
 		end,
-
-
 	 },
-
 }
 
 
