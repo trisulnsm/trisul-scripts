@@ -10,3 +10,10 @@ retrieve the information you seek.
 
 
 
+tcphdr.lua
+----------
+
+Prints the TCP header to stdout. This demonstrates how you can extract numbers in 
+network to host order and also how to extract bits such as the TCP flags. 
+
+
