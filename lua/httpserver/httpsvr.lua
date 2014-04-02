@@ -31,7 +31,6 @@ TrisulPlugin = {
 		--   Use an online guid generator to create two unique guids
 		control = {
 			guid="{0e4281ed-5545-4bf2-94f2-c4027fbc9afa}",
-			protocol_guid="{f189ccda-80d3-45ed-9dee-fb1c98943f49}",
 			name = "Web Server",
 			description = "Web Server from Server field in HTTP header",
 			bucketsize = 30,

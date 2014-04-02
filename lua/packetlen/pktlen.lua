@@ -32,7 +32,6 @@ TrisulPlugin = {
 		--   Id of the counter group 
 		control = {
 			guid = "{6ecb4ebb-d53b-470c-aca6-2f326b4c6c91}",
-			protocol_guid = "{0A2C724B-5B9F-4ba6-9C97-B05080558574}",
 			name = "Packet Length",
 			description = "Packet length distribution",
 			bucketsize = 30,
@@ -52,6 +51,11 @@ TrisulPlugin = {
 
 	simplecounter = {
 
+		--
+		-- we want to listen in at the IP protocol layer 
+		-- see trisul.org/docs/ref/guid.html 
+		--
+		protocol_guid = "{0A2C724B-5B9F-4ba6-9C97-B05080558574}",
 
 		-- onpacket
 		-- 	Called each packet at IP layer 
