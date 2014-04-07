@@ -16,10 +16,14 @@ TrisulPlugin = {
   },
 
 
+
   onload = function () 
 
     P = TrisulPlugin
 
+	-- 
+	-- we log the date, user-agent, host, referrer
+	--
 	P.regexes   =  {
 		T.re2("User-Agent\\s*:\\s*(.*)\r\n"),
 		T.re2("Host\\s*:\\s*(.*)\r\n"),
@@ -46,7 +50,11 @@ TrisulPlugin = {
 
 	     if attribute_name == "HTTP-Header" then
 
-
+			--
+			-- write to output 
+			--
+			P.outfile:write(os.date("%c",timestamp))
+			P.outfile:write("\t")
 			for i,v in ipairs( P.regexes) do 
 				local status, match = v:partial_match_c1(attribute_value)
 				if status then
