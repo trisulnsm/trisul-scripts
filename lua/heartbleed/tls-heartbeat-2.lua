@@ -1,7 +1,12 @@
 -- tls-heartbleed.lua
 --
--- Detects TLS heartbeats  (builds on tls-heartbeat.lua) 
---	This one saves the stuff in Heartbeat response 
+-- Detects TLS heartbeats 
+--	alert if you see a heartbeat  mismatch 
+-- 
+-- content types in 
+-- http://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-5
+--
+-- Remember -> you cant look inside the heartbeat (it is encrypted) 
 -- 
 
 TrisulPlugin = {
@@ -25,26 +30,27 @@ TrisulPlugin = {
 		 	local  content_type = valbuff:hval_8(0)
 
 			if content_type == 24 then
-				local hb_len = valbuff:hval_16(6) 
+				local req_len  = pending_hb_requests[flow:id()]
 
-				if valbuff:hval_8(5) == 1  then 
-
-					-- save size of outstanding TLS hb request 
-					pending_hb_requests[flow:id()] = valbuff:size()
-
-				else
-
+				-- found pending inflight request, compare sizes and alert 
+				if req_len then 
 					local req_len  = pending_hb_requests[flow:id()]
-					if reqlen and req_len ~= hb_len then
 
-						-- mismatch between HB request and response sizes
-						-- write out the payload 
-						local of = io.open("/tmp/hb-"..flow:id()..".dump","w")
-						local payload = valbuff:tostring(9,valbuff:size()-9)
-						of:write(payload)
-						of:close()
+					if req_len ~= hb_len then
+
+						engine:add_alert_full( 
+						"{9AFD8C08-07EB-47E0-BF05-28B4A7AE8DC9}", -- GUID for IDS 
+						flow:id(), 								  -- flow 
+						"sid-8000002",							  -- a sigid (private range)
+						"trisul-lua-gen",			  			  -- classification
+						"sn-1",                                   -- priority 1, 
+						"Possible heartbleed situation ")		  -- message 
 
 					end
+					pending_hb_requests[flow:id()] = nil 
+				else
+					-- save size of inflight  TLS hb request 
+					pending_hb_requests[flow:id()] = valbuff:size()
 				end
 			end
 

@@ -17,9 +17,7 @@ TrisulPlugin = {
   countergroup = {
     control = {
       guid = "{fc970d3a-5a39-4e31-a687-672c5174a58e}",
-      name = "TLSRec",
-      description = "Record types",
-      bucketsize = 30,
+      name = "TLSRec", description = "Record types", bucketsize = 30,
     },
 
     meters = {
@@ -29,7 +27,7 @@ TrisulPlugin = {
   },
 
  
-  -- the "key format" is contentype/handshaketype  
+  -- the "key format" is contentype
   --
   flowmonitor  = {
 
@@ -37,12 +35,9 @@ TrisulPlugin = {
 
 
 	     if nm == "TLS:RECORD" then
-		 	local  content_type = valbuff:hval_8(0)
-			local  handshake_type = 0
+		 	local content_type = valbuff:hval_8(0)
 
-			if content_type == 22 then handshake_type = valbuff:hval_8(5) end 
-
-			local keystr = string.format("%d/%d", content_type, handshake_type)
+			local keystr = string.format("%02x", content_type )
 
 			engine:update_counter("{fc970d3a-5a39-4e31-a687-672c5174a58e}", 
 						keystr, 0, 1)
