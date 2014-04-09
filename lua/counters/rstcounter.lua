@@ -1,4 +1,4 @@
--- rstcounter.lua
+-- .lua
 --
 -- A new countergroup with 2 meters
 -- 
