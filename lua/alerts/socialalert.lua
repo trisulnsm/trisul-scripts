@@ -40,7 +40,7 @@ TrisulPlugin = {
 
 			if attribute_name == "TLS:O" then
 
-				local v = attribute_value:lower()
+				local v = attribute_value:tostring():lower()
 
 				if TrisulPlugin.k:partial_match( v) then 
 					--

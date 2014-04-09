@@ -50,13 +50,15 @@ TrisulPlugin = {
 
 	     if attribute_name == "HTTP-Header" then
 
+			local val = attribute_value:tostring() 
+
 			--
 			-- write to output 
 			--
 			P.outfile:write(os.date("%c",timestamp))
 			P.outfile:write("\t")
 			for i,v in ipairs( P.regexes) do 
-				local status, match = v:partial_match_c1(attribute_value)
+				local status, match = v:partial_match_c1(val)
 				if status then
 					P.outfile:write(match)
 					P.outfile:write("\t")

@@ -57,9 +57,11 @@ TrisulPlugin = {
   flowmonitor  = {
 
 	onflowattribute = function(engine,flow,timestamp,
-							   nm, val)
+							   nm, valobj)
 
 	     if nm == "HTTP-Header" then
+
+		 	local val = valobj:tostring() 
 
 		 	local flowkey = flow:id()
 			P.flowmap[flowkey] = P.flowmap[flowkey] or queue.new()
@@ -69,14 +71,11 @@ TrisulPlugin = {
 
 				local a =  q:popfirst()
 
-
-
 				-- response 
 				for i,v in ipairs( P.regex.responses) do 
 					local status, match = v:partial_match_c1(val)
 					if status then a[#a+1] = match end
 				end
-				
 
 				-- log everything 
 				P.outfile:write(os.date("%c ",timestamp))

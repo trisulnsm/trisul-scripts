@@ -22,7 +22,7 @@ TrisulPlugin = {
 								   aname, avalue)
 
 			if aname == "User-Agent" then
-				if avalue:find("Mozilla/[123]") then 
+				if avalue:tostring():find("Mozilla/[123]") then 
 					engine:tag_flow( flow:id(), "oldmoz")
 				end
 			end

@@ -55,7 +55,7 @@ TrisulPlugin = {
   flowmonitor  = {
 
 	onflowattribute = function(engine,flow,timestamp,
-							   nm, val)
+							   nm, valobj)
 
 		 if nm == "^D" then
 		 	local flowkey = flow:id()
@@ -65,17 +65,19 @@ TrisulPlugin = {
 
 	     if nm == "HTTP-Header" then
 
+		 	local val = valobj:tostring() 
+
 		 	local flowkey = flow:id()
 			P.flowmap[flowkey] = P.flowmap[flowkey] or queue.new()
 			local q = P.flowmap[flowkey]
 
 		 	if val:find("^HTTP/") then
 
+				-- response 
 
 				local a =  q:popfirst()
 
 				if not a then return end 
-
 
 				local matches = 	P.ahoc.responses:match_all(val)
 
@@ -100,6 +102,8 @@ TrisulPlugin = {
 
 			else
 
+				-- request, save it 
+				
 				local a = { } 
 
 				local matches = 	P.ahoc.requests:match_all(val)

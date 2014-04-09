@@ -54,13 +54,14 @@ TrisulPlugin = {
 		onflowattribute = function(engine,flow,timestamp,
 									attribute_name, attribute_value)
 
-			local hdr = attribute_value
+			-- attribute_value is a Buffer object, convert to string
+			local hdr = attribute_value:tostring() 
 
 
 			local h = {}
 			local htcmd = ""
 			if attribute_name == "HTTP-Header" then
-				for line  in attribute_value:gmatch("([^\r\n]+)") do 
+				for line  in hdr:gmatch("([^\r\n]+)") do 
 					local 	k,v = get_kv(line)
 					if v == nil then 
 						htcmd = v 
