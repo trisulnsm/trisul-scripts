@@ -33,10 +33,9 @@ TrisulPlugin = {
 				local req_len  = pending_hb_requests[flow:id()]
 
 				-- found pending inflight request, compare sizes and alert 
-				if req_len then 
-					local req_len  = pending_hb_requests[flow:id()]
+				if req_len  then 
 
-					if req_len ~= hb_len then
+					if req_len ~= valbuff:size()  then
 
 						engine:add_alert_full( 
 						"{9AFD8C08-07EB-47E0-BF05-28B4A7AE8DC9}", -- GUID for IDS 
