@@ -1,7 +1,9 @@
 -- tls-heartbleed.lua
 --
 -- Detects TLS heartbeats 
---	alert if you see a heartbeat  mismatch 
+--  simple method - if HB resp size != req size
+--  take advantage of RFC 6520 that limits inflight heartbeats to 1 
+--  alert if you see a heartbeat  mismatch 
 -- 
 -- content types in 
 -- http://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-5
@@ -18,48 +20,49 @@ TrisulPlugin = {
   },
 
   onload = function()
-	pending_hb_requests = { } 
+    pending_hb_requests = { } 
   end,
 
 
   flowmonitor  = {
 
-	onflowattribute = function(engine,flow,timestamp, nm, valbuff)
+    onflowattribute = function(engine,flow,timestamp, nm, valbuff)
 
-	     if nm == "TLS:RECORD" then
-		 	local  content_type = valbuff:hval_8(0)
+      if nm == "TLS:RECORD" then
+        local  content_type = valbuff:hval_8(0)
 
-			if content_type == 24 then
-				local req_len  = pending_hb_requests[flow:id()]
+        -- heartbeats have content_type (unencrypted always as 24)
+        if content_type == 24 then
+          local req_len  = pending_hb_requests[flow:id()]
 
-				-- found pending inflight request, compare sizes and alert 
-				if req_len  then 
+          -- found pending inflight request, compare sizes and alert 
+          -- on mismatch
+          if req_len  then 
+            if req_len ~= valbuff:size()  then
 
-					if req_len ~= valbuff:size()  then
+              engine:add_alert_full( 
+                "{9AFD8C08-07EB-47E0-BF05-28B4A7AE8DC9}", -- GUID for IDS 
+                flow:id(),                                -- flow 
+                "sid-8000002",                            -- a sigid (private range)
+                "trisul-lua-gen",                         -- classification
+                "sn-1",                                   -- priority 1, 
+                "Possible heartbleed situation ")         -- message 
 
-						engine:add_alert_full( 
-						"{9AFD8C08-07EB-47E0-BF05-28B4A7AE8DC9}", -- GUID for IDS 
-						flow:id(), 								  -- flow 
-						"sid-8000002",							  -- a sigid (private range)
-						"trisul-lua-gen",			  			  -- classification
-						"sn-1",                                   -- priority 1, 
-						"Possible heartbleed situation ")		  -- message 
+            end
+            pending_hb_requests[flow:id()] = nil 
+          else
+            -- save size of inflight  TLS hb request 
+            pending_hb_requests[flow:id()] = valbuff:size()
+          end
 
-					end
-					pending_hb_requests[flow:id()] = nil 
-				else
-					-- save size of inflight  TLS hb request 
-					pending_hb_requests[flow:id()] = valbuff:size()
-				end
-			end
+        end
+      elseif  nm == "^D" then 
+        -- ^D is sent when a connection closes 
+        -- connection closed, free up map so it can be garbage collected 
+        pending_hb_requests[flow:id()]=nil 
+      end
 
-	 	 elseif  nm == "^D" then 
-		 	-- connection closed, free up map so it can be garbage collected 
-		 	pending_hb_requests[flow:id()]=nil 
-		 end
-		 
     end,
-
   },
 
 }
