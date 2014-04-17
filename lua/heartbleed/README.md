@@ -21,11 +21,34 @@ We present two scripts here
   in TLSRecord counter group. If we have this in place...
 
 
+tls-heartbeat-2.lua
+-------------------
+
+Simple script to detect the heartbleed attack. 
+
+This is not signature based, rather just compares the sizes of two consecutive TLS Heartbeat records. If they are both rogue requests, that is still an attack because the TLS RFC 6502 only allows one inflight heartbeat record.
+
+
+If an attack is detected, this script generates an ALERT, that looks just like a Snort/Suricata alert with its own private SIGID. 
+
 
 
 tls-monitor.lua
 ---------------
 
+Would you like to know if you ever received a heartbeat record in your network? What about other kinds of records like SessionTickets? 
+
+In keeping with Trisul's statistical approach, the heartbleed attack and others like that are an opportunity for you to meter SSL/TLS deeper. Add this little Lua script to the plugins/lua directory to start monitoring TLS Record Types in your Network. 
+
+Go to Retro Counters > Select TLSRec for any period of time to visualize record types.
+
 ![Monitor SSL](https://raw.githubusercontent.com/vivekrajan/trisul-scripts/master/lua/heartbleed/tlsrec2.png)
+
+
+Total number of various types of records, newly spiking record types can call for deeper investigation
+
+![Monitor SSL](https://raw.githubusercontent.com/vivekrajan/trisul-scripts/master/lua/heartbleed/tlsrec1.png)
+
+
 
 
