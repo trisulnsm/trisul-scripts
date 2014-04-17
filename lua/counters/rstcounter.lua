@@ -65,11 +65,7 @@ TrisulPlugin = {
 	  -- 
 	  -- get the TCP header to count RST 
 	  --
-      local buff = layer:rawbytes()
-      local flag_bytes = buff:hval_16(12)
-      local resetflag = bit32.extract(flag_bytes,2)
-
-      if tonumber(resetflag) == 1 then
+      if layer:testbit(109) then
 	  	 --
 		 -- Update meter 1, we found RST flag 
          engine:update_counter(TrisulPlugin.countergroup.control.guid, sipkey, 1, 1)
