@@ -25,7 +25,7 @@ raise %q{
   Example
   ruby query-flow.rb 192.168.1.22 12001 source_ip=C0.A8.01.01 
 
-} unless ARGV.length>3
+} unless ARGV.length>=3
 
 
 # open a connection to Trisul server from command line args
