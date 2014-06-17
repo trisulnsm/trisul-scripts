@@ -4,6 +4,12 @@
 # Save a PCAP containing all flows that generated a
 # priority 1 alert 
 #
+# We have previously set up a flow tagger that marked
+# all flows with the alert priority. We simply query
+# those flows and use the TRP Method FILTERED_DATAGRAMS
+# to retrieve a merged PCAP of those flows 
+#
+#
 # Example 
 #  ruby save-pcap TRPHOST TRPPORT 
 #
@@ -23,36 +29,22 @@ raise %q{
 } unless ARGV.length==2
 
 
-
-# helper method, save a given flow to a pcap 
-def savepcap(conn,  sessid)
-
-	req = TrisulRP::Protocol.mk_request(
-		  TRP::Message::Command::FILTERED_DATAGRAMS_REQUEST,
-		  :session =>
-			 TRP::FilteredDatagramRequest::BySession.new( 
-			  :session_id   => sessid
-			)
-		  )
-
-	TrisulRP::Protocol.get_response(conn,req) do |fdr|
-		  File.open("#{fdr.sha1}.pcap","wb") do |f|
-			f.write(fdr.contents)
-		  end
-		  print "Saved to #{fdr.sha1}.pcap\n"
-	end
-
-end
-
-
 # open a connection to Trisul server from command line args
+# you need password of private key (hint: it is 'client' by default) 
 conn  = connect(ARGV.shift,ARGV.shift,"Demo_Client.crt","Demo_Client.key")
+
 
 # get 24 hours latest time window 
 tmarr  = TrisulRP::Protocol.get_available_time(conn)
 tmarr[0] = tmarr[1] - 24*3600
 
-# query flows tagged with sn-1 (represents priority 1 alert)
+
+# Create a TRP Request  
+# get all the flows tagged with "sn-1"
+# you need to set up a flow tagger to mark flows in this manner
+# we mark resolve_keys to false, because we arent interested in
+# host and application names as such
+#
 req = TrisulRP::Protocol.mk_request(
                 TRP::Message::Command::QUERY_SESSIONS_REQUEST,
 				 { 
@@ -63,30 +55,31 @@ req = TrisulRP::Protocol.mk_request(
 				)
 
 
-# print matching flows using the print_session_details helper  
-get_response(conn,req) do |resp|
-	 resp.sessions.each do |item|
-	 	savepcap(conn,item.session_id)
-	 end
-end
+# Get a response and collect all the session_id in the
+# variable sids 
+resp  = get_response(conn,req) 
+sids = resp.sessions.collect { | e |   e.session_id } 
 
-def savepcap(conn,  sessid)
 
-	req = TrisulRP::Protocol.mk_request(
-		  TRP::Message::Command::FILTERED_DATAGRAMS_REQUEST,
-		  :session =>
-			 TRP::FilteredDatagramRequest::BySession.new( 
-			  :SessionID  => sessid
-			)
-		  )
+# Create a TRP Request
+# Get all packets belonging to marked flows 
+req = TrisulRP::Protocol.mk_request(
+	  TRP::Message::Command::FILTERED_DATAGRAMS_REQUEST,
+	  :session =>
+		 TRP::FilteredDatagramRequest::BySession.new( 
+		  :session_ids   => sids
+		)
+	  )
 
-	TrisulRP::Protocol.get_response(conn,req) do |fdr|
-		  File.open("#{fdr.sha1}.pcap","wb") do |f|
-			f.write(fdr.contents)
-		  end
-		  print "Saved to #{fdr.sha1}.pcap\n"
-	end
 
+# Process the response
+# Save the matching packets into a file whose name
+# is the SHA1 hash of the file contents 
+TrisulRP::Protocol.get_response(conn,req) do |fdr|
+	  File.open("#{fdr.sha1}.pcap","wb") do |f|
+		f.write(fdr.contents)
+	  end
+	  print "Saved to #{fdr.sha1}.pcap\n"
 end
 
 
