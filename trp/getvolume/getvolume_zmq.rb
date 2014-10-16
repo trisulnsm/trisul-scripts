@@ -40,9 +40,8 @@ req = TrisulRP::Protocol.mk_request(TRP::Message::Command::COUNTER_ITEM_REQUEST,
 
 # print volume for each meter
 get_response_zmq(zmq_endpt,req) do |resp|
-  volume = resp.stats.meters.each do | meter|
-    vol_bytes = meter.values[0].val * target_bucket_size 
-      print "Volume of Meter #{meter.meter} = #{vol_bytes } bytes  \n"
-  end 
+  resp.stats.meters[0].values.each do |val|
+  	p "#{Time.at(val.ts.tv_sec)} = #{val.val}"
+  end
 end
 
