@@ -9,6 +9,7 @@ require 'trisulrp'
 require 'readline'
 require 'rb-readline'
 require 'terminal-table'
+require 'matrix'
 
 # Check arguments
 raise %q{
@@ -26,6 +27,7 @@ raise %q{
 zmq_endpt   = ARGV.shift
 
 
+DEFAULT_PROMPT="iTRP> "
 
 print("\n\niTRP Interactive TRP Shell for Trisul\n");
 
@@ -36,10 +38,11 @@ class Dispatches
 	attr_reader :prompt 
 	attr_reader :tmarr 
 	attr_reader :cgguid 
+	attr_reader :cgname 
 
 	def initialize(zmq)
 		@zmq_endpt = zmq
-		@prompt = "iTRP> "
+		@prompt = DEFAULT_PROMPT
 
 		# get entire time window  
 		@tmarr= TrisulRP::Protocol.get_available_time(@zmq_endpt)
@@ -64,15 +67,23 @@ class Dispatches
 
 		when "";  
 		when "quit"; bye()
+		when "up"; up()
 		when "cglist"; cglist()
 		when /set cg/; setcg(cmdline.strip)
 		when /toppers/; toppers(cmdline.strip)
 		when "meters"; meters()
+		when /set key/; setkey(cmdline.strip)
+		when /traffic/; traffic(cmdline.strip)
 
 		end
 
 	end
 
+	def up
+		@cgguid=nil
+		@cgname=nil
+		@prompt=DEFAULT_PROMPT
+	end
 
 	def setcg(cgid)
 
@@ -87,6 +98,7 @@ class Dispatches
 				 	print("\nContext set to counter group [#{group_detail.name}] [#{group_detail.guid}]\n\n")
 					@prompt = "iTRP (#{patt})> "
 					@cgguid = group_detail.guid 
+					@cgname = group_detail.name 
 					return
 				 end
 			  end
@@ -96,9 +108,77 @@ class Dispatches
 	end
 
 
+	def setkey(key)
+		if @cgguid.nil?
+			puts("Err: need to do [set cg <countergroup>] first")
+			return
+		end
+
+		patt = key.scan(/set key (.*)/).flatten.first 
+
+		@cgkey=patt
+		@prompt = "iTRP (#{@cgname}/#{@cgkey})> "
+
+	end
+
+
+	def traffic(meterlist)
+
+		patt = meterlist.scan(/traffic (.*)/).flatten.first 
+		patt ||= "0"
+		showmeters = patt.split(',').map(&:to_i)
+
+
+		# meter names 
+		req =mk_request(TRP::Message::Command::COUNTER_GROUP_INFO_REQUEST,
+						 :counter_group => @cgguid,
+						 :get_meter_info => true )
+
+		colnames   = ["Timestamp"]
+		get_response_zmq(@zmq_endpt,req) do |resp|
+			  resp.group_details.each do |group_detail|
+			  	group_detail.meters.each do |meter|
+					colnames  <<  meter.name  
+				end
+			  end
+		end
+
+
+		req =TrisulRP::Protocol.mk_request(TRP::Message::Command::COUNTER_ITEM_REQUEST,
+			 :counter_group => @cgguid,
+			 :key => @cgkey,
+			 :time_interval =>  mk_time_interval(@tmarr) )
+
+		rows  = [] 
+
+	
+		TrisulRP::Protocol.get_response_zmq(@zmq_endpt,req) do |resp|
+			  print "Counter Group = #{resp.stats.counter_group}\n"
+			  print "Key           = #{resp.stats.key}\n"
+			  
+			  tseries  = {}
+			  resp.stats.meters.each do |meter|
+				meter.values.each do |val|
+					tseries[ val.ts.tv_sec ] ||= []
+					tseries[ val.ts.tv_sec ]  << val.val 
+				end
+			  end
+
+
+			  rows = []
+			  tseries.each do |ts,valarr|
+			  	rows << [ ts, valarr ].flatten 
+			  end
+
+			  table = Terminal::Table.new(:headings => colnames,  :rows => rows )
+			  puts(table) 
+		end
+
+	end
+
+
 
 	def cglist
-
 		req =mk_request(TRP::Message::Command::COUNTER_GROUP_INFO_REQUEST)
 
 		rows = []
@@ -174,8 +254,8 @@ class Dispatches
 			  resp.group_details.each do |group_detail|
 			  	group_detail.meters.each do |meter|
 					rows << [ meter.id, 
-							  meter.description,
 							  meter.name,
+							  meter.description,
 							  meter.type,
 							  meter.topcount,
 							  meter.units] 
