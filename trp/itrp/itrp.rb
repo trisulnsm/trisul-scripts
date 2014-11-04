@@ -74,6 +74,7 @@ class Dispatches
 		when "meters"; meters()
 		when /set key/; setkey(cmdline.strip)
 		when /traffic/; traffic(cmdline.strip)
+		when /volume/; volume()
 
 		end
 
@@ -176,6 +177,58 @@ class Dispatches
 
 	end
 
+
+	# counter item with volumes_only flag set 
+	def volume
+
+
+		# meter names 
+		req =mk_request(TRP::Message::Command::COUNTER_GROUP_INFO_REQUEST,
+						 :counter_group => @cgguid,
+						 :get_meter_info => true )
+
+		colnames   = ["Timestamp"]
+		get_response_zmq(@zmq_endpt,req) do |resp|
+			  resp.group_details.each do |group_detail|
+			  	group_detail.meters.each do |meter|
+					colnames  <<  meter.name  
+				end
+			  end
+		end
+
+
+		req =TrisulRP::Protocol.mk_request(TRP::Message::Command::COUNTER_ITEM_REQUEST,
+			 :counter_group => @cgguid,
+			 :key => @cgkey,
+			 :time_interval =>  mk_time_interval(@tmarr),
+			 :volumes_only => 1 )
+
+		rows  = [] 
+
+	
+		TrisulRP::Protocol.get_response_zmq(@zmq_endpt,req) do |resp|
+			  print "Counter Group = #{resp.stats.counter_group}\n"
+			  print "Key           = #{resp.stats.key}\n"
+			  
+			  tseries  = {}
+			  resp.stats.meters.each do |meter|
+				meter.values.each do |val|
+					tseries[ val.ts.tv_sec ] ||= []
+					tseries[ val.ts.tv_sec ]  << val.val 
+				end
+			  end
+
+
+			  rows = []
+			  tseries.each do |ts,valarr|
+			  	rows << [ ts, valarr ].flatten 
+			  end
+
+			  table = Terminal::Table.new(:headings => colnames,  :rows => rows )
+			  puts(table) 
+		end
+
+	end
 
 
 	def cglist
