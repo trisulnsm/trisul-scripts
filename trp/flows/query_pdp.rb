@@ -41,7 +41,8 @@ tmarr[0] = tmarr[1] - 24*3600
 req = TrisulRP::Protocol.mk_request(
                 TRP::Message::Command::QUERY_PDP_REQUEST,
 				qhash.merge( { 
-					:time_interval => mk_time_interval(tmarr)
+					:time_interval => mk_time_interval(tmarr),
+					:maxitems => 10
 				})
 				)
 
@@ -52,7 +53,8 @@ get_response_zmq(conn,req) do |resp|
 		print "#{item.session_id.slice_id}:#{item.session_id.session_id} "
 		print "#{Time.at(item.time_interval.from.tv_sec)} "
 		print "#{item.time_interval.to.tv_sec-item.time_interval.from.tv_sec} ".rjust(8)
-		print "#{item.msisdn}".ljust(12)
+		print "#{item.msisdn}".ljust(14)
+		print "#{item.mccmnc}".ljust(10)
 		print "#{item.ipa}".ljust(14)
 		print "#{item.imei}".ljust(18)
 		print "#{item.imsi}".ljust(18)
@@ -60,7 +62,8 @@ get_response_zmq(conn,req) do |resp|
 		print "#{item.rai}".ljust(11)
 		print "#{item.rat}".ljust(11)
 		print "#{item.uli}".ljust(14)
-		print "#{item.cause}".ljust(4)
+		print "[#{item.cause}]".ljust(4)
+		print "#{item.trace}"
 		print "\n"
 	 end
 end
