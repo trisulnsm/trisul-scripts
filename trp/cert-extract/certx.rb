@@ -14,54 +14,51 @@ require 'trisulrp'
 #   3. Search for all HTTPS flows for a particular host
 #   4. Print the cert chain of each flow 
 #
-def investigate_certs(trisul_probe_host, trisul_probe_port, target_host, target_app)
+def investigate_certs(zmq_endpt, target_host, target_app)
 
 
     # open a TRP connection to the trisul server
     #
-    conn = TrisulRP::Protocol.connect(trisul_probe_host, 
-                      trisul_probe_port,
-                      "Demo_Client.crt","Demo_Client.key")
-
+    zmq_endpt = zmq_endpt
 
     # user wants to see flows for this  hostname
     #
-    target_ip   = mk_trisul_key(conn,CG_HOST,  target_host )
-    target_port = mk_trisul_key(conn,CG_APP,   target_app )
+    target_ip   = mk_trisul_key(zmq_endpt,CG_HOST,  target_host )
+    target_port = mk_trisul_key(zmq_endpt,CG_APP,   target_app )
 
 
     # get available time window , tmarr contains [from_time, to_time]
-    tmarr  = TrisulRP::Protocol.get_available_time(conn)
+    tmarr  = TrisulRP::Protocol.get_available_time(zmq_endpt)
 
 
     # send request for sessions for key
     req = TrisulRP::Protocol.mk_request(TRP::Message::Command::KEY_SESS_ACTIVITY_REQUEST,
-            :key => target_ip ,
-            :key2 => target_port ,
-            :maxitems => 20 ,
-            :time_interval => mk_time_interval(tmarr))
+                                          :key => target_ip ,
+                                          :key2 => target_port ,
+                                          :maxitems => 20 ,
+                                          :time_interval => mk_time_interval(tmarr))
 
 
     # response 
-    TrisulRP::Protocol.get_response(conn,req) do |resp|
+    get_response_zmq(zmq_endpt,req) do |resp|
 
 
       # for each flow get first 20K pcap
       resp.sessions.each do |sess|
 
         getpackets  = TrisulRP::Protocol.mk_request(TRP::Message::Command::FILTERED_DATAGRAMS_REQUEST,
-                :max_bytes => 20000,
-                :session => TRP::FilteredDatagramRequest::BySession.new( :session_id =>  sess))
+                                                    :max_bytes => 20000,
+                                                    :session => TRP::FilteredDatagramRequest::BySession.new( :session_id =>  sess))
 
 
-        TrisulRP::Protocol.get_response(conn,getpackets) do |fdr|
+        get_response_zmq(zmq_endpt,getpackets) do |fdr|
             pcapf = fdr.sha1 + ".pcap"
             File.open(pcapf, "wb" ) do |f|
                 f.write(fdr.contents)
             end
             print_cert_stack(pcapf)
         end
-     end 
+      end 
     end
 end
 
@@ -157,10 +154,15 @@ end
 
 
 
+USAGE = "Usage   : certx.rb  ZMQ_ENDPOINT host port\n"\
+        "Examples: 1) ruby certx.rb tcp://localhost:5555 host port\n "\
+        "         2) ruby certx.rb ipc:///usr/local/var/lib/trisul/CONTEXT0/run/trp_0  host port"
 
-raise "Usage : flows_for_ip trp_host trp_port host port " unless ARGV.length==4
-
+# usage 
+unless ARGV.size==3
+  abort USAGE
+end
 
 # kick this off 
-investigate_certs(ARGV.shift, ARGV.shift, ARGV.shift,ARGV.shift) 
+investigate_certs(ARGV.shift,ARGV.shift,ARGV.shift) 
 

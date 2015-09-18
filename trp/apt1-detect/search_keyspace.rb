@@ -13,7 +13,7 @@
 #
 require 'trisulrp'
 
-USAGE = "Usage   : search_keyspace.rb  ZMQ_CONNECTION NAMES-FILE\n"\
+USAGE = "Usage   : search_keyspace.rb  ZMQ_ENDPOINT NAMES-FILE\n"\
         "Examples: 1) ruby search_keyspace.rb tcp://localhost:5555 ip-ranges.txt \n "\
         "         2) ruby search_keyspace.rb ipc:///usr/local/var/lib/trisul/CONTEXT0/run/trp_0 ip-ranges.txt"
 

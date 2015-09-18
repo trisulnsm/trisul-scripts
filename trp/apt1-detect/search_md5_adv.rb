@@ -12,7 +12,7 @@
 #
 require 'trisulrp'
 
-USAGE = "Usage   : search_md5_adv.rb  ZMQ_CONNECTION NAMES-FILE\n"\
+USAGE = "Usage   : search_md5_adv.rb  ZMQ_ENDPOINT NAMES-FILE\n"\
         "Examples: 1) ruby search_md5_adv.rb tcp://localhost:5555 md5s.txt \n "\
         "         2) ruby search_md5_adv.rb ipc:///usr/local/var/lib/trisul/CONTEXT0/run/trp_0 md5s.txt"
 

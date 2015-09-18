@@ -10,7 +10,7 @@
 #
 require 'trisulrp'
 
-USAGE = "Usage   : search_text.rb  ZMQ_CONNECTION \"hello this is a test\"\n"\
+USAGE = "Usage   : search_text.rb  ZMQ_ENDPOINT \"hello this is a test\"\n"\
         "Examples: 1) ruby search_text.rb tcp://localhost:5555 \"hello this is a test\"\n "\
         "         2) ruby search_text.rb ipc:///usr/local/var/lib/trisul/CONTEXT0/run/trp_0 \"hello this is a test\""
 

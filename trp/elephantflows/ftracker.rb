@@ -9,43 +9,38 @@
 require 'trisulrp'
 
 # Check arguments
-raise %q{
 
+USAGE = "Usage   : ftracker.rb ZMQ_ENDPOINT trackerid\n"\
+        "Example : 1) ruby ftracker.rb ipc:///usr/local/var/lib/trisul/CONTEXT0/run/trp_0 1\n"\
+        "          2) ruby ftracker.rb tcp://localhost:5555 1"
 
-  ftracker.rb - Print flow tracker (0=volume) for past 24 hours
+#usage
+unless ARGV.size ==2 
+  abort USAGE
+end
 
-  Usage 
-  ftracker.rb  trisul-ip trp-port tracker-id 
-
-  Example
-  ruby ftracker.rb 192.168.1.22 12001 1
-
-} unless ARGV.length==3
-
-
-# open a connection to Trisul server from command line args
-conn  = connect(ARGV[0],ARGV[1],"Demo_Client.crt","Demo_Client.key")
-#conn  = connect_nonsecure(ARGV[0],ARGV[1])
+#zmq end point
+zmq_endpt = ARGV[0]
 
 # get all time..then for this demo script  crop to latest 1 day, 
-tmarr  = TrisulRP::Protocol.get_available_time(conn)
+tmarr  = TrisulRP::Protocol.get_available_time(zmq_endpt)
 tmarr[0] = tmarr[1]-86400
 
 # arguments
-trackerid = ARGV[2]
+trackerid = ARGV[1]
 
 # send keyspace request 
 req = TrisulRP::Protocol.mk_request(
                 TRP::Message::Command::SESSION_TRACKER_REQUEST,
-				:tracker_id  => trackerid.to_i,
-				:time_interval => mk_time_interval(tmarr))
+                  :tracker_id  => trackerid.to_i,
+                  :time_interval => mk_time_interval(tmarr))
 
 
 # print matching flows using the print_session_details helper  
-get_response(conn,req) do |resp|
-	print_session_details_header()
-	resp.sessions.each do |s|
-		print_session_details(s)
-	end
+get_response_zmq(zmq_endpt,req) do |resp|
+  print_session_details_header()
+  resp.sessions.each do |s|
+    print_session_details(s)
+  end
 end
 

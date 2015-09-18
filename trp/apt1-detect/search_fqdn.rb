@@ -8,7 +8,7 @@
 #
 require 'trisulrp'
 
-USAGE = "Usage   : search_fqdn.rb  ZMQ_CONNECTION NAMES-FILE\n"\
+USAGE = "Usage   : search_fqdn.rb  ZMQ_ENDPOINT NAMES-FILE\n"\
         "Examples: 1) ruby search_fqdn.rb tcp://localhost:5555 dns_list.txt \n "\
         "         2) ruby search_fqdn.rb ipc:///usr/local/var/lib/trisul/CONTEXT0/run/trp_0 dns_list.txt"
 
