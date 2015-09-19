@@ -9,22 +9,26 @@
 #  - Key identifying the entity 
 #
 # Example 
-#  ruby hstats.rb 192.168.1.12 12001 {C51B48D4-7876-479E-B0D9-BD9EFF03CE2E} p-0050 0
+#  ruby hstats.rb ZMQ_ENDPOINT {C51B48D4-7876-479E-B0D9-BD9EFF03CE2E} p-0050 0
 #
 # Will print out hourly stats of HTTP (p-0050) within Apps (GUID C-51..) and meter Total(0)
 #
 require 'trisulrp'
 
 
-# usage 
-raise "Usage: hourlystats.rb  TRP-SERVER TRP-PORT CGGUID CGKEY METER" unless ARGV.size==5
+USAGE = "Usage:   hourlystats.rb  ZMQ_ENDPT CGGUID CGKEY METER \n" \
+        "Example: 1) ruby hourlystats.rb tcp://localhost:5555  {C51B48D4-7876-479E-B0D9-BD9EFF03CE2E} p-0050 0 \n"\
+        "         2) ruby hourlystats.rb ipc:///usr/local/var/lib/trisul/CONTEXT0/run/trp_0  {C51B48D4-7876-479E-B0D9-BD9EFF03CE2E} p-0050 0" 
+unless ARGV.size == 4
+  abort USAGE
+end
 
-# open a connection to Trisul server from command line args
-conn = TrisulRP::Protocol.connect(ARGV[0],ARGV[1],"Demo_Client.crt","Demo_Client.key")
+# zeromq end point
+zmq_endpt = ARGV[0]
 
 # storage bins of width 3 hours each 
 BINSIZEHOURS = 3 
-tmarr  = TrisulRP::Protocol.get_available_time(conn)
+tmarr  = TrisulRP::Protocol.get_available_time(zmq_endpt)
 end_date=Time.at(tmarr[1])
 
 
@@ -54,17 +58,22 @@ intervals.each do |dh|
   end
 
   print Time.at(dh.last.to.tv_sec).strftime("%F").rjust(10) + "|"
+
   dh.reverse.each do |hourly_interval|
     req = TrisulRP::Protocol.mk_request(TRP::Message::Command::COUNTER_ITEM_REQUEST,
-                                                :counter_group=> ARGV[2],
-                                                :meter=>ARGV[4].to_i,
-                                                :key=>ARGV[3],
+                                                :counter_group=> ARGV[1],
+                                                :meter=>ARGV[3].to_i,
+                                                :key=>ARGV[2],
                                                 :time_interval => hourly_interval)
-    get_response(conn,req) do |resp|
-          volume  = resp.stats.meters[0].values.inject(0) do |acc,stat|
-            acc + stat.val * 30
-          end
-          print volume.to_s.rjust(10) + "|"
+    get_response_zmq(zmq_endpt,req) do |resp|
+      unless  resp.stats.meters[0].nil?
+        volume  = resp.stats.meters[0].values.inject(0) do |acc,stat|
+          acc + stat.val * 30
+        end
+      else
+        volume = 0
+      end
+      print volume.to_s.rjust(10) + "|"
     end 
   end
 

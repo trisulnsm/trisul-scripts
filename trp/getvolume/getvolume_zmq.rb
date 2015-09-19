@@ -9,14 +9,16 @@
 #
 require 'trisulrp'
 
-USAGE = \
-    "Usage:   getvolume.rb  ZMQ_ENDPT CGGUID CGKEY \n" \
-	"Example: ruby getvolume.rb tcp://localhost:5555  {C51B48D4-7876-479E-B0D9-BD9EFF03CE2E} p-0050" 
+USAGE = "Usage:   getvolume.rb  ZMQ_ENDPT CGGUID CGKEY \n" \
+        "Example: 1) ruby getvolume.rb tcp://localhost:5555  {C51B48D4-7876-479E-B0D9-BD9EFF03CE2E} p-0050\n"\
+        "         2) ruby getvolume.rb ipc:///usr/local/var/lib/trisul/CONTEXT0/run/trp_0  {C51B48D4-7876-479E-B0D9-BD9EFF03CE2E} p-0050" 
 
 # usage 
-raise  USAGE  unless ARGV.size==3
+unless ARGV.size==3
+  abort USAGE
+end
 
-zmq_endpt 	 = ARGV[0]
+zmq_endpt    = ARGV[0]
 target_guid  = ARGV[1] 
 target_key   = ARGV[2]
 
@@ -41,7 +43,7 @@ req = TrisulRP::Protocol.mk_request(TRP::Message::Command::COUNTER_ITEM_REQUEST,
 # print volume for each meter
 get_response_zmq(zmq_endpt,req) do |resp|
   resp.stats.meters[0].values.each do |val|
-  	p "#{Time.at(val.ts.tv_sec)} = #{val.val}"
+    p "#{Time.at(val.ts.tv_sec)} = #{val.val}"
   end
 end
 

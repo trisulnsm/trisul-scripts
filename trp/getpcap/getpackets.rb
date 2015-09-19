@@ -4,15 +4,19 @@
 # Save all packets in timeframe to a PCAP file 
 #
 # 
-require 'rubygems' if RUBY_VERSION < '1.9'
 require 'trisulrp'
 
+USAGE = "Usage:   getpackets.rb  ZMQ_ENDPOINT \n" \
+        "Example: 1) ruby getpackets.rb ipc:///usr/local/var/lib/trisul/CONTEXT0/run/trp_0\n"\
+        "         2) ruby getpackets.rb tcp://localhost:5555" 
 
-raise "Usage : getpackets trp_host trp_port " unless ARGV.length==2
+# usage 
+unless ARGV.length==1
+  abort USAGE
+end
 
-# open a TRP connection to the trisul server
-#
-conn = TrisulRP::Protocol.connect(ARGV.shift,ARGV.shift,"Demo_Client.crt","Demo_Client.key")
+
+zmq_endpt = ARGV[0]
 
 
 # timeinterval 
@@ -31,7 +35,7 @@ tint=TRP::TimeInterval.new ( {
 #
 req = TrisulRP::Protocol.mk_request(
       TRP::Message::Command::FILTERED_DATAGRAMS_REQUEST,
-	  :disposition => TRP::PcapDisposition::SAVE_ON_SERVER,
+    :disposition => TRP::PcapDisposition::SAVE_ON_SERVER,
       :filter_expression =>
          TRP::FilteredDatagramRequest::ByFilterExpr.new( 
           :time_interval  => tint,
@@ -42,18 +46,18 @@ req = TrisulRP::Protocol.mk_request(
 
 # get the response and save pcap 
 #
-TrisulRP::Protocol.get_response(conn,req) do |fdr|
+get_response_zmq(zmq_endpt,req) do |fdr|
   print "Number of bytes = #{fdr.num_bytes}\n"
   print "Number of pkts  = #{fdr.num_datagrams}\n"
   print "Hash            = #{fdr.sha1}\n"
 
   if fdr.disposition == TRP::PcapDisposition::DOWNLOAD
-	  File.open("filtered000.pcap","wb") do |f|
-		f.write(fdr.contents)
-	  end
-	  print "Saved to filtered000.pcap\n"
+    File.open("filtered000.pcap","wb") do |f|
+    f.write(fdr.contents)
+    end
+    print "Saved to filtered000.pcap\n"
   elsif fdr.disposition == TRP::PcapDisposition::SAVE_ON_SERVER
-	  print "Saved on server = #{fdr.path}\n"
+    print "Saved on server = #{fdr.path}\n"
   end
 end
 
