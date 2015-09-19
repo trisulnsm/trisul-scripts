@@ -4,32 +4,29 @@
 #
 #
 # Usage  
-#  ruby pcap-for-resourceid  TRPHOST TRPPORT sliceid:resid 
+#  ruby pcap-for-resourceid  ZMQ_ENDPOINT sliceid:resid 
 #
 require 'trisulrp'
 
-# Check arguments
-raise %q{
-  pcap-for-resourceid.rb - Download a PCAP for a list of resources
+USAGE = "Usage:   pcap-for-resourceid.rb  ZMQ_ENDPOINT sliceid:flowid \n" \
+        "Example: 1) ruby pcap-for-resourceid.rb ipc:///usr/local/var/lib/trisul/CONTEXT0/run/trp_0 2:23232\n"\
+        "         2) ruby pcap-for-resourceid.rb tcp://localhost:5555 2:1111,1:23232" 
 
-  Resources are TLS Certs, HTTP URLs, DNS 
-
-
-  Example
-  ruby pcap-for-resid   192.168.1.22 12001 1:6,1:7,1:19,1:21  
-
-} unless ARGV.length==3
+# usage 
+unless ARGV.size==2
+  abort USAGE
+end
 
 
-# open a connection to Trisul server from command line args
-conn  = connect(ARGV.shift,ARGV.shift,"Demo_Client.crt","Demo_Client.key")
+#ZMQ connection end point
+zmq_endpt= ARGV.shift
 
-by = 	TRP::FilteredDatagramRequest::ByResource.new( 
-	:resource_group => "{4EF9DEB9-4332-4867-A667-6A30C5900E9E}",
-	:resource_ids  => ARGV.shift.split(',').collect do | sid |
-					sessid = sid.split(':').map(&:to_i) 
-					TRP::ResourceID.new({ :slice_id => sessid[0], :resource_id  => sessid[1]})  
-				end
+by =  TRP::FilteredDatagramRequest::ByResource.new( 
+  :resource_group => "{4EF9DEB9-4332-4867-A667-6A30C5900E9E}",
+  :resource_ids  => ARGV.shift.split(',').collect do | sid |
+          sessid = sid.split(':').map(&:to_i) 
+          TRP::ResourceID.new({ :slice_id => sessid[0], :resource_id  => sessid[1]})  
+        end
 )
 
 
@@ -38,10 +35,10 @@ req = TrisulRP::Protocol.mk_request(
   :resource  => by  
   )
 
-TrisulRP::Protocol.get_response(conn,req) do |fdr|
-	  File.open("#{fdr.sha1}.pcap","wb") do |f|
-		f.write(fdr.contents)
-	  end
-	  print "Saved to #{fdr.sha1}.pcap\n"
+get_response_zmq(zmq_endpt,req) do |fdr|
+    File.open("#{fdr.sha1}.pcap","wb") do |f|
+    f.write(fdr.contents)
+    end
+    print "Saved to #{fdr.sha1}.pcap\n"
 end
 

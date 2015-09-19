@@ -3,31 +3,23 @@
 #
 # SAME AS query-flow.rb but uses ZMQ transport 
 # Example 
-#  ruby query-flow zmq:endpoint <opts> 
+#  ruby query-flow_zmq zmq:endpoint <opts> 
 #
 require 'trisulrp'
 
-# Check arguments
-raise %q{
+USAGE = "Usage:   query-flow_zmq.rb  ZMQ_ENDPOINT key=value \n" \
+        "Example: 1) ruby query-flow_zmq.rb ipc:///usr/local/var/lib/trisul/CONTEXT0/run/trp_0 source_ip=C0.A8.01.01\n"\
+        "         2) ruby query-flow_zmq.rb tcp://localhost:5555 source_ip=C0.A8.01.01" 
+
+# usage 
+unless ARGV.length>=2
+  abort USAGE
+end
 
 
-  query-flow.rb - Query flow by any params 
+#ZMQ connection end point
+zmq_endpt= ARGV.shift
 
-  Usage 
-  query-flow.rb  trisul-ip trp-port <opts>
-
-  <opts x=y>
-  x=sourceip,destip,
-
-
-  Example
-  ruby query-flow.rb 192.168.1.22 12001 source_ip=C0.A8.01.01 
-
-} unless ARGV.length>=2
-
-
-# open a connection to Trisul server from command line args
-conn  = ARGV.shift
 
 # process arguments 
 qhash = ARGV.inject({}) do |acc,i|
@@ -37,7 +29,7 @@ qhash = ARGV.inject({}) do |acc,i|
 end
 
 # get 24 hours latest time window 
-tmarr  = TrisulRP::Protocol.get_available_time(conn)
+tmarr  = TrisulRP::Protocol.get_available_time(zmq_endpt)
 tmarr[0] = tmarr[1] - 24*3600
 
 # send keyspace request 
@@ -51,7 +43,7 @@ req = TrisulRP::Protocol.mk_request(
 
 
 # print matching flows using the print_session_details helper  
-get_response_zmq(conn,req) do |resp|
+get_response_zmq(zmq_endpt,req) do |resp|
 	 resp.sessions.each do |item|
 		print "#{item.session_id.slice_id}:#{item.session_id.session_id} "
 		print "#{Time.at(item.time_interval.from.tv_sec)} "
