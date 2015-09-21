@@ -75,6 +75,7 @@ class Dispatches
 		when /set key/; setkey(cmdline.strip)
 		when /traffic/; traffic(cmdline.strip)
 		when /volume/; volume()
+		when /refresh/; refresh()
 
 		end
 
@@ -323,6 +324,15 @@ class Dispatches
 		puts(table) 
 
 	end
+
+
+	def refresh
+		# get entire time window  
+		@tmarr= TrisulRP::Protocol.get_available_time(@zmq_endpt)
+		print("Connected to #{@zmq_endpt}\n");
+		print("Available time window is now = #{tmarr[1]-tmarr[0]} seconds \n\n");
+	end
+
 
 end
 
