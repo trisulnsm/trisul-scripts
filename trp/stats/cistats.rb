@@ -11,17 +11,13 @@
 require 'trisulrp'
 
 # Check arguments
-raise %q{
-
-
-  cistats.rb - Dump all stats 
-
-  Usage   : cistats.rb  trisul-zmq-endpt cgguid key 
-  Example : ruby cistats.rb tcp://192.168.1.8:5555  {393B5EBC-AB41-4387-8F31-8077DB917336} TOTALBW
-
-  Dumps all TOTALBW in AGGREGATES counter group - the total bandwidth seen 
-
-} unless ARGV.length==3
+USAGE = "cistats.rb - Dump all stats \n"\
+        "Usage   : cistats.rb  trisul-zmq-endpt cgguid key\n"\
+        "Example : 1) ruby cistats.rb tcp://192.168.1.8:5555  {393B5EBC-AB41-4387-8F31-8077DB917336} TOTALBW\n"\
+        "          2) ruby cistats.rb ipc:///usr/local/var/lib/trisul/CONTEXT0/run/trp_0  {393B5EBC-AB41-4387-8F31-8077DB917336} TOTALBW"
+unless ARGV.length==3
+  abort USAGE
+end
 
 # parameters 
 zmq_endpt   = ARGV.shift

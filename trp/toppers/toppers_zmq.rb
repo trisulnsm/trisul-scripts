@@ -7,21 +7,16 @@
 #  ruby topper_zmq.rb 192.168.1.45 12001 {C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}
 #
 require 'trisulrp'
+USAGE = " toppers_zmq.rb - Retrieve toppers for any counter and stat \n"\
+        "Usage   : toppers_zmq.rb  trisul-zmq-endpt cgguid meter-id\n"\
+        "Example : 1) ruby toppers_zmq.rb tcp://localhost:5555 {C51B48D4-7876-479E-B0D9-BD9EFF03CE2E} 0\n"\
+        "          2) ruby toppers_zmq.rb ipc:///usr/local/var/lib/trisul/CONTEXT0/run/trp_0 {C51B48D4-7876-479E-B0D9-BD9EFF03CE2E} 0"
 
-# Check arguments
-raise %q{
+unless ARGV.length==3
+  abort USAGE
+end
 
 
-  topper_zmq.rb - Retrieve toppers for any counter and stat
-
-  Usage   : topper.rb  trisul-zmq-endpt cgguid meter-id
-  Example : ruby topper.rb tcp://192.168.1.8:5555 {C51B48D4-7876-479E-B0D9-BD9EFF03CE2E} 0
-
-  The example retrieves toppers for Apps (guid {C51..}) and meter 0 (total bytes)
-
-} unless ARGV.length==3
-
-# parameters 
 zmq_endpt   = ARGV.shift
 target_guid  = ARGV.shift
 target_meter = ARGV.shift

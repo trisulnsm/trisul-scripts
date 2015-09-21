@@ -10,36 +10,27 @@
 #
 require 'trisulrp'
 
-# Check arguments
-raise %q{
+USAGE = "Usage : ruby active_keys2.rb ZMQ_ENDPOINT CGGUID KFROM KTO \n"\
+        "Example : 1) ruby active_keys2.rb tcp://localhost:5555 {C51B48D4-7876-479E-B0D9-BD9EFF03CE2E} p-0000 p-FFFF\n"\
+        "          2) ruby active_keys2.rb ipc:///usr/local/var/lib/trisul/CONTEXT0/run/trp_0 {C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}  p-0000 p-FFFF"
 
 
-  active_keys2.rb - keys active in a range. Use to print all hosts seen in subnet etc
+unless ARGV.size == 4
+  abort USAGE
+end
 
-  Usage 
-  active_keys2.rb  trisul-ip trp-port cgguid kfrom kto 
+#Get ZeroMQ end point
+zmq_endpt = ARGV[0]
 
-  Example
-  ruby active_keys2.rb 192.168.1.45 12001 host 192.168.0.0 192.169.0.0 
-
-  The example retrieves all ports seen in last 24 hours 
-
-} unless ARGV.length==5
-
-
-# open a connection to Trisul server from command line args
-conn  = connect(ARGV[0],ARGV[1],"Demo_Client.crt","Demo_Client.key")
-
-# get all time..then for this demo script  crop to latest 1 day, 
-tmarr  = TrisulRP::Protocol.get_available_time(conn)
-tmarr[0] = tmarr[1]-86400
-
+# get 24 hours latest time window 
+tmarr  = TrisulRP::Protocol.get_available_time(zmq_endpt)
+tmarr[0] = tmarr[1] - 86400
 # arguments
-cgguid = ARGV[2]
+cgguid = ARGV[1]
 
 # we use the make_key helper function to convert human to key format 
-from_key = make_key(ARGV[3])
-to_key = make_key(ARGV[4])
+from_key = make_key(ARGV[2])
+to_key = make_key(ARGV[3])
 
 
 # space message 
@@ -55,7 +46,7 @@ req = TrisulRP::Protocol.mk_request(
 				:spaces => [space] ,
 				:maxitems => 100 )
 
-resp = get_response(conn,req) 
+resp = get_response_zmq(zmq_endpt,req) 
 puts "Found #{resp.hits.size} matches"
 
 # Request 2 : key lookup to convert keys 
@@ -66,7 +57,7 @@ req2 = TrisulRP::Protocol.mk_request(
 				:counter_group => cgguid ,
 				:keys => resp.hits)
 
-resp2 = get_response(conn,req2) 
+resp2 = get_response_zmq(zmq_endpt,req2) 
 	
 resp2.key_details.each do | kdetail  |
 	puts "Hit Key  #{kdetail.key}  #{kdetail.label} "

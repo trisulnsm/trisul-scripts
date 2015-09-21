@@ -4,21 +4,30 @@
 # Save PCAPs of all YouTube videos in last 24 hours 
 # Change the file name of each video to the Title of the video 
 #
-require 'rubygems' if RUBY_VERSION < '1.9'
+
 require 'trisulrp'
 require 'win32ole'
 require 'nokogiri'
 
-raise "Usage : ruby youtube_titles.rb trp_host trp_port" unless ARGV.length==2
+require 'trisulrp'
 
-# open a TRP connection to the trisul server
-#
-conn = connect(ARGV.shift,ARGV.shift,"Demo_Client.crt","Demo_Client.key")
+USAGE = "Usage   : youtube_titles.rb  ZMQ_ENDPOINT\n"\
+        "Examples: 1) ruby youtube_titles.rb tcp://localhost:5555\n "\
+        "          2) ruby youtube_titles.rb ipc:///usr/local/var/lib/trisul/CONTEXT0/run/trp_0"
+
+# usage 
+unless ARGV.size==1
+  abort USAGE
+end
+
+
+# ZMQ_ENDPOINT
+zmq_endpt = ARGV.shift
 
 
 # get available time window , tmarr contains [from_time, to_time]
 # then set the time window to be latest 24 hours
-tmarr  = get_available_time(conn)
+tmarr  = get_available_time(zmq_endpt)
 tmarr[0] = tmarr[1] - 48*3600
 
 
@@ -30,7 +39,7 @@ req = mk_request(TRP::Message::Command::RESOURCE_GROUP_REQUEST,
             :time_interval => mk_time_interval(tmarr))
 
 
-get_response(conn,req) do | matching_resources |
+get_response_zmq(zmq_endpt,req) do | matching_resources |
 
     # matching_resources is a ResourceGroupResponse object
     # containing an array of ResourceItem matches
@@ -88,7 +97,7 @@ get_response(conn,req) do | matching_resources |
                                     :resource_id   => vidpages.resources.first)
                         )
                                 
-        pcap = get_response(conn,pcap_req) 
+        pcap = get_response_zmq(zmq_endpt,pcap_req) 
         File.open("watch.pcap", "wb" ) do |f|
             f.write(pcap.contents)
         end

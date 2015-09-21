@@ -6,20 +6,25 @@
 # for network based indicators 
 #
 # Example 
-#  ruby iocsweep.rb 192.168.1.22 12001  openioc-file.ioc
+#  ruby iocsweep.rb ZMQ_ENDPOINT  openioc-file.ioc
 #
 #
 require 'trisulrp'
 require 'nokogiri'
 
-USAGE = "Usage:   iocsweep.rb  TRP-SERVER TRP-PORT ioc-file.ioc\n" \
-        "Example: ruby iocsweep.rb 192.168.1.12 12001 469aed6f-941c-4a1e-b471-3a3e80cbcc2e.ioc" 
+USAGE = "Usage:   iocsweep.rb  ZMQ_ENDPOINT ioc-file.ioc\n" \
+        "Example: 1) ruby iocsweep.rb tcp://localhost:5555 469aed6f-941c-4a1e-b471-3a3e80cbcc2e.ioc\n"\
+        "         2) ruby iocsweep.rb ipc:///usr/local/var/lib/trisul/CONTEXT0/run/trp_0 469aed6f-941c-4a1e-b471-3a3e80cbcc2e.ioc" 
+ 
+
 
 # usage 
-raise  USAGE  unless ARGV.size==3
+unless ARGV.size==2
+  abort USAGE
+end
 
 
-ioc_doc = Nokogiri::XML(File.read(ARGV[2]))
+ioc_doc = Nokogiri::XML(File.read(ARGV[1]))
 
 
 NETWORK_INDICATORS = %w(PortItem/remoteIP 
@@ -31,10 +36,10 @@ NETWORK_INDICATORS = %w(PortItem/remoteIP
 # grab the indicators
 indicator_data = {}
 NETWORK_INDICATORS.each do |ind|
-    indicator_data[ind]=
-        ioc_doc.xpath("//xmlns:IndicatorItem/xmlns:Context[@search='#{ind}']")
-               .collect do |a|
-                  a.parent.at_xpath("xmlns:Content").text
+  indicator_data[ind]=
+    ioc_doc.xpath("//xmlns:IndicatorItem/xmlns:Context[@search='#{ind}']")
+      .collect do |a|
+        a.parent.at_xpath("xmlns:Content").text
     end
 end
 
@@ -49,12 +54,12 @@ end
 print "--------------------+-----------\n"
 
 
-# open a connection to Trisul server from command line args
-conn  = connect(ARGV[0],ARGV[1],"Demo_Client.crt","Demo_Client.key")
+#Get ZeroMQ end point
+zmq_endpt = ARGV[0]
 
 # get recent 24 hrs (in production, sweep over months, one day at a time)
 # need to sweep in small intervals so you can stop and continue to get feedback
-tmarr  = TrisulRP::Protocol.get_available_time(conn)
+tmarr  = TrisulRP::Protocol.get_available_time(zmq_endpt)
 tmarr[0] = tmarr[1] - 24*3600 
 time_interval =  mk_time_interval(tmarr)
 
@@ -74,7 +79,7 @@ req = TrisulRP::Protocol.mk_request(
                 :spaces => ipspaces )
 
 # print hits 
-get_response(conn,req) do |resp|
+get_response_zmq(zmq_endpt,req) do |resp|
     if resp.hits.empty?
         puts "Its clean"
     else 
@@ -98,7 +103,7 @@ req = TrisulRP::Protocol.mk_request(
                 :uri_list => indicator_data["Network/DNS"])
 
 # print hits 
-get_response(conn,req) do |resp|
+get_response_zmq(zmq_endpt,req) do |resp|
     if resp.resources.empty?
         puts "We are clean on domains"
     else 
@@ -118,7 +123,7 @@ req = TrisulRP::Protocol.mk_request(
                 :uri_list => indicator_data["Network/URI"])
 
 # print hits 
-get_response(conn,req) do |resp|
+get_response_zmq(zmq_endpt,req) do |resp|
     if resp.resources.empty?
         puts "All good on HTTP URLs "
     else 
@@ -146,7 +151,7 @@ indicator_data["Network/String"].each do |patt|
                                         :pattern => patt   )
 
     # print matching flows if any 
-    get_response(conn,req) do |resp|
+    get_response_zmq(zmq_endpt,req) do |resp|
         if resp.sessions.empty?
             puts "All good, nothing to see here"
         else 
@@ -169,7 +174,7 @@ print "Checking all files after reassembly for MD5 match ...get lunch. Could tak
 req = TrisulRP::Protocol.mk_request(TRP::Message::Command::GREP_REQUEST,
                                     :time_interval => time_interval,
                                     :md5list => indicator_data["FileItem/Md5sum"] )
-get_response(conn,req) do |resp|
+get_response_zmq(zmq_endpt,req) do |resp|
     if resp.sessions.empty?
         puts "Whew! All files MD5 are clean, also check your endpoints"
     else 
