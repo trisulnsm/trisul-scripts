@@ -49,10 +49,11 @@ class Dispatches
 		print("Connected to #{@zmq_endpt}\n");
 		print("Available time window = #{tmarr[1]-tmarr[0]} seconds \n\n");
 
-		list = ['cglist', 'set cg', 'set time'  ]
+		list = ['cglist', 'set cg', 'set time', 'set rg', 'search'  ]
 		Readline.completion_proc = proc do |s| 
 			case Readline.line_buffer()
 				when /^set cg /;  match_cg(s)
+				when /^set rg /;  match_rg(s)
 				else ; list.grep( /^#{Regexp.escape(s)}/) 
 			end
 		end
@@ -76,6 +77,8 @@ class Dispatches
 		when /traffic/; traffic(cmdline.strip)
 		when /volume/; volume()
 		when /refresh/; refresh()
+		when /set rg/; setrg(cmdline.strip)
+        when "search"; search(cmdline.strip)
 
 		end
 
@@ -108,6 +111,15 @@ class Dispatches
 
 
 	end
+
+
+    def setrg(rgid)
+        patt = rgid.scan(/set rg ({.*}) (.*$)/).flatten 
+        @prompt = "iTRP (#{patt.join('')})> "
+        @cgguid = patt[0]
+        @cgname = patt[1]
+
+    end 
 
 
 	def setkey(key)
@@ -266,6 +278,15 @@ class Dispatches
 
 	end
 
+	def match_rg(patt)
+
+        [ '{4EF9DEB9-4332-4867-A667-6A30C5900E9E} HTTP URIs',
+          '{D1E27FF0-6D66-4E57-BB91-99F76BB2143E} DNS Resources',
+          '{5AEE3F0B-9304-44BE-BBD0-0467052CF468} SSL Certs',
+        ].grep( /#{Regexp.escape(patt)}/i)  
+
+    end
+
 	def bye
 		exit(1)
 	end
@@ -333,6 +354,29 @@ class Dispatches
 		print("Available time window is now = #{tmarr[1]-tmarr[0]} seconds \n\n");
 	end
 
+
+    def search(patt)
+
+		# meter names 
+		req =mk_request(TRP::Message::Command::RESOURCE_GROUP_REQUEST,
+						 :resource_group => @cgguid,
+                         :time_interval =>  mk_time_interval(@tmarr),
+						 :destination_port => 'p-0050'  )
+
+
+		get_response_zmq(@zmq_endpt,req) do |resp|
+
+            req2 =mk_request(TRP::Message::Command::RESOURCE_ITEM_REQUEST,
+                             :resource_group => @cgguid,
+                             :resource_ids => resp.resources   )
+
+            get_response_zmq(@zmq_endpt,req2) do |resp|
+
+
+            end
+		end
+	
+    end
 
 end
 
