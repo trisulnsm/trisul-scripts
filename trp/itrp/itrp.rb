@@ -364,6 +364,8 @@ class Dispatches
 						 :destination_port => 'p-0050'  )
 
 
+        rows = [] 
+
 		get_response_zmq(@zmq_endpt,req) do |resp|
 
             req2 =mk_request(TRP::Message::Command::RESOURCE_ITEM_REQUEST,
@@ -372,10 +374,30 @@ class Dispatches
 
             get_response_zmq(@zmq_endpt,req2) do |resp|
 
+                resp.items.each do | res |
 
+                rows << [ "#{res.resource_id.slice_id}:#{res.resource_id.resource_id}",
+                          Time.at( res.time.tv_sec).to_s(),
+                          res.source_ip,
+                          res.source_port,
+                          res.destination_ip,
+                          res.destination_port,
+                          wrap(res.uri,50),
+                          wrap(res.userlabel,40)
+                ]
+                end
             end
 		end
 	
+		table = Terminal::Table.new( 
+				:headings => %w(ID Time SourceIP Port DestIP Port URI Label ),
+				:rows => rows)
+		puts(table) 
+
+    end
+
+    def wrap(str,width)
+      str.gsub!(/(.{1,#{width}})( +|$\n?)|(.{1,#{width}})/, "\\1\\3\n")
     end
 
 end
