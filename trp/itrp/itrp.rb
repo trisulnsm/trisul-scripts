@@ -39,6 +39,7 @@ class Dispatches
 	attr_reader :tmarr 
 	attr_reader :cgguid 
 	attr_reader :cgname 
+	attr_reader :cgtype 
 
 	def initialize(zmq)
 		@zmq_endpt = zmq
@@ -49,11 +50,12 @@ class Dispatches
 		print("Connected to #{@zmq_endpt}\n");
 		print("Available time window = #{tmarr[1]-tmarr[0]} seconds \n\n");
 
-		list = ['cglist', 'set cg', 'set time', 'set rg', 'search'  ]
+		list = ['cglist', 'set cg', 'set time', 'set rg', 'search', 'set ag'   ]
 		Readline.completion_proc = proc do |s| 
 			case Readline.line_buffer()
 				when /^set cg /;  match_cg(s)
 				when /^set rg /;  match_rg(s)
+				when /^set ag /;  match_ag(s)
 				else ; list.grep( /^#{Regexp.escape(s)}/) 
 			end
 		end
@@ -78,6 +80,7 @@ class Dispatches
 		when /volume/; volume()
 		when /refresh/; refresh()
 		when /set rg/; setrg(cmdline.strip)
+		when /set ag/; setag(cmdline.strip)
         when "search"; search(cmdline.strip)
 
 		end
@@ -115,12 +118,19 @@ class Dispatches
 
     def setrg(rgid)
         patt = rgid.scan(/set rg ({.*}) (.*$)/).flatten 
-        @prompt = "iTRP (#{patt.join('')})> "
+        @prompt = "iTRP (Resources / #{patt[1]})> "
         @cgguid = patt[0]
         @cgname = patt[1]
-
+        @cgtype = :resources
     end 
 
+    def setag(rgid)
+        patt = rgid.scan(/set ag ({.*}) (.*$)/).flatten 
+        @prompt = "iTRP (Alerts / #{patt[1]})> "
+        @cgguid = patt[0]
+        @cgname = patt[1]
+        @cgtype = :alerts
+    end 
 
 	def setkey(key)
 		if @cgguid.nil?
@@ -287,6 +297,15 @@ class Dispatches
 
     end
 
+    def match_ag(patt)
+        [  "{9AFD8C08-07EB-47E0-BF05-28B4A7AE8DC9} External IDS",
+           "{5E97C3A3-41DB-4E34-92C3-87C904FAB83E} Blacklist activity",
+           "{03AC6B72-FDB7-44c0-9B8C-7A1975C1C5BA} Threshold Crossing",
+           "{18CE5961-38FF-4AEa-BAF8-2019F3A09063} System Alerts",
+           "{0E7E367D-4455-4680-BC73-699D81B7CBE0} Threshold Band Alerts"
+        ].grep( /#{Regexp.escape(patt)}/i)  
+    end
+
 	def bye
 		exit(1)
 	end
@@ -356,9 +375,17 @@ class Dispatches
 
 
     def search(patt)
+        
+        case @cgtype
+            when :resources ; search_resources(patt)
+            when :alerts ; search_alerts(patt)
+        end
+    end
+
+    def search_resources(patt)
 
 		# meter names 
-		req =mk_request(TRP::Message::Command::RESOURCE_GROUP_REQUEST,
+		req =mk_request(TRP::Message::Command::QUERY_RESOURCES_REQUEST,
 						 :resource_group => @cgguid,
                          :time_interval =>  mk_time_interval(@tmarr),
 						 :destination_port => 'p-0050'  )
@@ -368,29 +395,59 @@ class Dispatches
 
 		get_response_zmq(@zmq_endpt,req) do |resp|
 
-            req2 =mk_request(TRP::Message::Command::RESOURCE_ITEM_REQUEST,
-                             :resource_group => @cgguid,
-                             :resource_ids => resp.resources   )
+            resp.resources.each do | res |
 
-            get_response_zmq(@zmq_endpt,req2) do |resp|
-
-                resp.items.each do | res |
-
-                rows << [ "#{res.resource_id.slice_id}:#{res.resource_id.resource_id}",
-                          Time.at( res.time.tv_sec).to_s(),
-                          res.source_ip,
-                          res.source_port,
-                          res.destination_ip,
-                          res.destination_port,
-                          wrap(res.uri,50),
-                          wrap(res.userlabel,40)
-                ]
-                end
+            rows << [ "#{res.resource_id.slice_id}:#{res.resource_id.resource_id}",
+                      Time.at( res.time.tv_sec).to_s(),
+                      res.source_ip.key,
+                      res.source_port.key,
+                      res.destination_ip.key,
+                      res.destination_port.key,
+                      wrap(res.uri,50),
+                      wrap(res.userlabel,40)
+            ]
             end
-		end
-	
+
+        end
+
 		table = Terminal::Table.new( 
 				:headings => %w(ID Time SourceIP Port DestIP Port URI Label ),
+				:rows => rows)
+		puts(table) 
+
+    end
+
+    def search_alerts(patt)
+
+		# meter names 
+		req =mk_request(TRP::Message::Command::QUERY_ALERTS_REQUEST,
+						 :alert_group  => @cgguid,
+                         :time_interval =>  mk_time_interval(@tmarr),
+						 :sigid => 'sid-384'  )
+
+
+        rows = [] 
+
+		get_response_zmq(@zmq_endpt,req) do |resp|
+
+            resp.alerts.each do | res |
+
+            rows << [ "#{res.alert_id.slice_id}:#{res.alert_id.alert_id}",
+                      Time.at( res.time.tv_sec).to_s(),
+                      res.source_ip.key,
+                      res.source_port.key,
+                      res.destination_ip.key,
+                      res.destination_port.key,
+                      res.sigid.key,
+                      res.priority.key,
+                      res.classification.key
+            ]
+            end
+
+        end
+
+		table = Terminal::Table.new( 
+				:headings => %w(ID Time SourceIP Port DestIP Port SigID Prio Class ),
 				:rows => rows)
 		puts(table) 
 
