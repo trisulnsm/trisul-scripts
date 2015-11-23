@@ -81,7 +81,7 @@ class Dispatches
 		when /refresh/; refresh()
 		when /set rg/; setrg(cmdline.strip)
 		when /set ag/; setag(cmdline.strip)
-        when "search"; search(cmdline.strip)
+        when /^search/; search(cmdline.strip)
 
 		end
 
@@ -419,25 +419,42 @@ class Dispatches
 
     def search_alerts(patt)
 
+	   terms=patt.split(' ')
+	   terms.shift
+
+	   qparams = terms.inject({}) { |acc,t| acc.store( t.split('=')[0].to_sym,t.split('=')[1]);acc}
+
+	   [:maxitems].each do |a|
+	   	qparams[a] = qparams[a].to_i if qparams.key? a
+	   end
+
+	   p qparams 
+
 		# meter names 
 		req =mk_request(TRP::Message::Command::QUERY_ALERTS_REQUEST,
-						 :alert_group  => @cgguid,
-                         :time_interval =>  mk_time_interval(@tmarr),
-						 :sigid => 'sid-384'  )
+						 { 	:alert_group  => @cgguid,
+                         	:time_interval =>  mk_time_interval(@tmarr),
+						 }.merge(qparams))
 
 
         rows = [] 
+
+		labelfmt = lambda do |fld|
+			fld.label.empty? ? fld.key : fld.label
+		end
 
 		get_response_zmq(@zmq_endpt,req) do |resp|
 
             resp.alerts.each do | res |
 
+
             rows << [ "#{res.alert_id.slice_id}:#{res.alert_id.alert_id}",
                       Time.at( res.time.tv_sec).to_s(),
-                      res.source_ip.key,
-                      res.source_port.key,
-                      res.destination_ip.key,
-                      res.destination_port.key,
+					  res.occurrances, 
+                      labelfmt.call(res.source_ip),
+                      labelfmt.call(res.source_port),
+                      labelfmt.call(res.destination_ip),
+                      labelfmt.call(res.destination_port),
                       res.sigid.key,
                       res.priority.key,
                       res.classification.key
@@ -447,7 +464,7 @@ class Dispatches
         end
 
 		table = Terminal::Table.new( 
-				:headings => %w(ID Time SourceIP Port DestIP Port SigID Prio Class ),
+				:headings => %w(ID Time Count SourceIP Port DestIP Port SigID Prio Class ),
 				:rows => rows)
 		puts(table) 
 
