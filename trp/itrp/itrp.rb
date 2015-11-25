@@ -23,6 +23,8 @@ raise %q{
 } unless ARGV.length==1
 
 
+HISTFILE=File.expand_path("~/.itrp_history")
+
 # parameters 
 zmq_endpt   = ARGV.shift
 
@@ -45,17 +47,24 @@ class Dispatches
 		@zmq_endpt = zmq
 		@prompt = DEFAULT_PROMPT
 
+        if File.exist? HISTFILE
+            File.readlines(HISTFILE).each do |l|
+                Readline::HISTORY.push(l.chop)
+            end
+        end
+
 		# get entire time window  
 		@tmarr= TrisulRP::Protocol.get_available_time(@zmq_endpt)
 		print("Connected to #{@zmq_endpt}\n");
 		print("Available time window = #{tmarr[1]-tmarr[0]} seconds \n\n");
 
-		list = ['cglist', 'set cg', 'set time', 'set rg', 'search', 'set ag'   ]
+		list = ['cglist', 'set cg', 'set time', 'set rg', 'search', 'set ag', 'timeslices', 'set fts' ]
 		Readline.completion_proc = proc do |s| 
 			case Readline.line_buffer()
 				when /^set cg /;  match_cg(s)
 				when /^set rg /;  match_rg(s)
 				when /^set ag /;  match_ag(s)
+				when /^set fts /;  match_fts(s)
 				else ; list.grep( /^#{Regexp.escape(s)}/) 
 			end
 		end
@@ -81,7 +90,10 @@ class Dispatches
 		when /refresh/; refresh()
 		when /set rg/; setrg(cmdline.strip)
 		when /set ag/; setag(cmdline.strip)
+		when /set fts/; setfts(cmdline.strip)
         when /^search/; search(cmdline.strip)
+        when /timeslices/; timeslices()
+        when /delete/; delete(cmdline.strip)
 
 		end
 
@@ -130,6 +142,14 @@ class Dispatches
         @cgguid = patt[0]
         @cgname = patt[1]
         @cgtype = :alerts
+    end 
+
+    def setfts(rgid)
+        patt = rgid.scan(/set fts ({.*}) (.*$)/).flatten 
+        @prompt = "iTRP (FTS / #{patt[1]})> "
+        @cgguid = patt[0]
+        @cgname = patt[1]
+        @cgtype = :fts
     end 
 
 	def setkey(key)
@@ -306,7 +326,19 @@ class Dispatches
         ].grep( /#{Regexp.escape(patt)}/i)  
     end
 
+    def match_fts(patt)
+        [ "{28217924-E7A5-4523-993C-44B52758D5A8} HTTP Headers",
+          "{9FEB8ADE-ADBB-49AD-BC68-C6A02F389C71} SSL Certs",
+        ].grep( /#{Regexp.escape(patt)}/i)  
+    end
+
 	def bye
+        File.open( HISTFILE, "w") do |h|
+            Readline::HISTORY.to_a.uniq.each do |l|
+                h.write(l + "\n" ) 
+            end
+        end
+
 		exit(1)
 	end
 
@@ -379,6 +411,7 @@ class Dispatches
         case @cgtype
             when :resources ; search_resources(patt)
             when :alerts ; search_alerts(patt)
+            when :fts ; search_fts(patt)
         end
     end
 
@@ -428,7 +461,7 @@ class Dispatches
 	   	qparams[a] = qparams[a].to_i if qparams.key? a
 	   end
 
-	   p qparams 
+	    p qparams 
 
 		# meter names 
 		req =mk_request(TRP::Message::Command::QUERY_ALERTS_REQUEST,
@@ -470,6 +503,90 @@ class Dispatches
 
     end
 
+    def search_fts(patt)
+
+	   terms=patt.split(' ')
+	   terms.shift
+
+	   qparams = terms.inject({}) { |acc,t| acc.store( t.split('=')[0].to_sym,t.split('=')[1]);acc}
+
+	   [:maxitems].each do |a|
+	   	qparams[a] = qparams[a].to_i if qparams.key? a
+	   end
+
+	    p qparams 
+
+		# meter names 
+		req =mk_request(TRP::Message::Command::QUERY_FTS_REQUEST,
+						 { 	:fts_group  => @cgguid,
+                         	:time_interval =>  mk_time_interval(@tmarr),
+						 }.merge(qparams))
+
+
+        rows = [] 
+
+		labelfmt = lambda do |fld|
+			fld.label.empty? ? fld.key : fld.label
+		end
+
+		get_response_zmq(@zmq_endpt,req) do |resp|
+
+            resp.documents.each do | doc |
+
+                p doc
+
+            end
+
+        end
+
+    end
+
+    def timeslices
+
+		req =mk_request(TRP::Message::Command::TIMESLICES_REQUEST,{:context=>0}) 	
+
+        rows = [] 
+
+		get_response_zmq(@zmq_endpt,req) do |resp|
+            resp.slices.each do | window |
+                rows << [ Time.at(window.from.tv_sec), Time.at(window.to.tv_sec) ]
+            end
+        end 
+
+		table = Terminal::Table.new( 
+				:headings => %w(From  To),
+				:rows => rows)
+		puts(table) 
+
+    end
+
+
+    def delete(patt)
+
+	   terms=patt.split(' ')
+	   terms.shift
+
+	   qparams = terms.inject({}) { |acc,t| acc.store( t.split('=')[0].to_sym,t.split('=')[1]);acc}
+
+	   [:maxitems].each do |a|
+	   	qparams[a] = qparams[a].to_i if qparams.key? a
+	   end
+
+	    p qparams 
+
+		# meter names 
+		req =mk_request(TRP::Message::Command::DELETE_ALERTS_REQUEST,
+						 { 	:alert_group  => @cgguid,
+                         	:time_interval =>  mk_time_interval(@tmarr),
+						 }.merge(qparams))
+
+
+		resp = get_response_zmq(@zmq_endpt,req)
+
+        puts(resp.message)
+
+    end
+
     def wrap(str,width)
       str.gsub!(/(.{1,#{width}})( +|$\n?)|(.{1,#{width}})/, "\\1\\3\n")
     end
@@ -479,6 +596,7 @@ end
 
 dispatches = Dispatches.new(zmq_endpt)
 while cmd = Readline.readline(dispatches.prompt, true)
-	dispatches.invoke(cmd)
+        dispatches.invoke(cmd)
+        Readline::HISTORY.push(cmd)
 end
 
