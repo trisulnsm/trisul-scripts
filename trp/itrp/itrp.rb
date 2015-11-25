@@ -50,7 +50,7 @@ class Dispatches
 		print("Connected to #{@zmq_endpt}\n");
 		print("Available time window = #{tmarr[1]-tmarr[0]} seconds \n\n");
 
-		list = ['cglist', 'set cg', 'set time', 'set rg', 'search', 'set ag'   ]
+		list = ['cglist', 'set cg', 'set time', 'set rg', 'search', 'set ag', 'timeslices'   ]
 		Readline.completion_proc = proc do |s| 
 			case Readline.line_buffer()
 				when /^set cg /;  match_cg(s)
@@ -81,6 +81,7 @@ class Dispatches
 		when /refresh/; refresh()
 		when /set rg/; setrg(cmdline.strip)
 		when /set ag/; setag(cmdline.strip)
+		when /timeslices/; timeslices(cmdline.strip)
         when /^search/; search(cmdline.strip)
 
 		end
