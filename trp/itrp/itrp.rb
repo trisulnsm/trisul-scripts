@@ -523,19 +523,9 @@ class Dispatches
 						 }.merge(qparams))
 
 
-        rows = [] 
-
-		labelfmt = lambda do |fld|
-			fld.label.empty? ? fld.key : fld.label
-		end
-
 		get_response_zmq(@zmq_endpt,req) do |resp|
 
-            resp.documents.each do | doc |
-
-                p doc
-
-            end
+		p resp
 
         end
 
