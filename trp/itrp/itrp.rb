@@ -627,7 +627,11 @@ end
 
 dispatches = Dispatches.new(zmq_endpt)
 while cmd = Readline.readline(dispatches.prompt, true)
+    begin
         dispatches.invoke(cmd)
         Readline::HISTORY.push(cmd)
+    rescue Exception => e 
+        puts "Error " + e.message 
+    end
 end
 
