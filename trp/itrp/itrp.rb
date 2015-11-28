@@ -58,7 +58,8 @@ class Dispatches
 		print("Connected to #{@zmq_endpt}\n");
 		print("Available time window = #{tmarr[1]-tmarr[0]} seconds \n\n");
 
-		list = ['cglist', 'set cg', 'set time', 'set rg', 'search', 'set ag', 'timeslices', 'set fts' , 'resolve' ]
+		list = ['cglist', 'set cg', 'set time', 'set rg', 'search', 'set ag', 'timeslices', 'set fts' , 'resolve',
+                'getkey', 'getlabel'  ]
 		Readline.completion_proc = proc do |s| 
 			case Readline.line_buffer()
 				when /^set cg /;  match_cg(s)
@@ -84,6 +85,8 @@ class Dispatches
 		when /set cg/; setcg(cmdline.strip)
 		when /resolve/; resolve(cmdline.strip)
 		when /toppers/; toppers(cmdline.strip)
+		when /getkey/; getkey(cmdline.strip)
+		when /getlabel/; getlabel(cmdline.strip)
 		when "meters"; meters()
 		when /set key/; setkey(cmdline.strip)
 		when /traffic/; traffic(cmdline.strip)
@@ -192,10 +195,57 @@ class Dispatches
 
     end
 
+    def getkey(keylist)
 
-	def traffic(meterlist)
+        patt = keylist.scan(/getkey (.*)/).flatten
 
-		patt = meterlist.scan(/traffic (.*)/).flatten.first 
+        print("Search [#{patt[0]}]\n")
+        req =mk_request(TRP::Message::Command::SEARCH_KEYS_REQUEST,
+                         :counter_group => @cgguid,
+                         :label  => patt[0])
+
+
+        rows = []
+        get_response_zmq(@zmq_endpt,req) do |resp|
+            resp.keys.each do |k|
+                rows << [ k.key, k.label, k.readable ]
+            end
+        end
+
+
+        table = Terminal::Table.new( :headings => %w(Key  Label Readable ), :rows => rows)
+        puts(table) 
+
+    end
+
+    def getlabel(keylist)
+
+        patt = keylist.scan(/getlabel (.*)/).flatten
+
+        print("Search [#{patt[0]}]\n")
+        req =mk_request(TRP::Message::Command::SEARCH_KEYS_REQUEST,
+                         :counter_group => @cgguid,
+                         :pattern  => patt[0])
+
+
+        rows = []
+        get_response_zmq(@zmq_endpt,req) do |resp|
+            resp.keys.each do |k|
+                rows << [ k.key, k.label, k.readable ]
+            end
+        end
+
+
+        table = Terminal::Table.new( :headings => %w(Key  Label Readable ), :rows => rows)
+        puts(table) 
+
+    end
+
+
+
+    def traffic(meterlist)
+
+            patt = meterlist.scan(/traffic (.*)/).flatten.first 
 		patt ||= "0"
 		showmeters = patt.split(',').map(&:to_i)
 
@@ -321,7 +371,6 @@ class Dispatches
 	def match_cg(patt)
 
 		req =mk_request(TRP::Message::Command::COUNTER_GROUP_INFO_REQUEST)
-
 		cgdtls = []
 
 		get_response_zmq(@zmq_endpt,req) do |resp|
@@ -387,10 +436,11 @@ class Dispatches
 			  resp.keys.each do |key|
 			  		rows << [ key.key,
 							  key.label,
+							  key.readable,
 							  key.metric ] 
 			  end
 
-			table = Terminal::Table.new :headings => ["Key", "Label", "Metric"], :rows => rows
+			table = Terminal::Table.new :headings => ["Key", "Label", "Readable", "Metric"], :rows => rows
 			puts(table) 
 		end
 
