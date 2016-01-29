@@ -37,7 +37,7 @@ req = TrisulRP::Protocol.mk_request(
                 TRP::Message::Command::QUERY_SESSIONS_REQUEST,
 				qhash.merge( { 
 					:time_interval => mk_time_interval(tmarr),
-					:resolve_keys => false
+					:resolve_keys => true
 				})
 				)
 
@@ -49,10 +49,10 @@ get_response_zmq(zmq_endpt,req) do |resp|
 		print "#{Time.at(item.time_interval.from.tv_sec)} "
 		print "#{item.time_interval.to.tv_sec-item.time_interval.from.tv_sec} ".rjust(8)
 		print "#{item.protocol.key}".ljust(8)
-		print "#{item.key1A.label}".ljust(28)
-		print "#{item.key2A.label}".ljust(11)
-		print "#{item.key1Z.label}".ljust(28)
-		print "#{item.key2Z.label}".ljust(11)
+		print "#{item.key1A.key}".ljust(28)
+		print "#{item.key2A.key}".ljust(11)
+		print "#{item.key1Z.key}".ljust(28)
+		print "#{item.key2Z.key}".ljust(11)
 		print "#{item.az_bytes}".rjust(10)
 		print "#{item.za_bytes}".rjust(10)
 		print "#{item.az_packets}".rjust(10)
