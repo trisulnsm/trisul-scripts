@@ -1,11 +1,16 @@
 Working with flows
 ==================
 
-## new file query-flow-file_zmq.rb
-Saves the flow in output file
+Various types of flow lookups.
+
+## query-flow-file_zmq.rb
+Save the flows in output file
 * Usage ruby query-flow-file_zmq.rb ipc:///usr/local/var/lib/trisul/CONTEXT0/run/trp_0 any_ip=C0.A8.01.01
 
-Various types of flow lookups.
+## query-flow_zmq.rb
+Print the flow details in your terminal
+* Usage ruby query-flow_zmq.rb ipc:///usr/local/var/lib/trisul/CONTEXT0/run/trp_0 any_ip=C0.A8.01.01
+
 
 
 ## flows_2.rb 
