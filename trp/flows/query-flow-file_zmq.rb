@@ -23,9 +23,9 @@ zmq_endpt= ARGV.shift
 
 # process arguments 
 qhash = ARGV.inject({}) do |acc,i|
-	qparts = i.split("=")
-	acc.store( qparts[0].to_sym, qparts[1])
-	acc
+  qparts = i.split("=")
+  acc.store( qparts[0].to_sym, qparts[1])
+  acc
 end
 
 # get 24 hours latest time window 
@@ -35,17 +35,17 @@ tmarr[0] = tmarr[1] - 24*3600
 # send keyspace request 
 outputfile=File.join("/tmp","Flows_#{rand(1000000000)}.csv")
 req = TrisulRP::Protocol.mk_request(
-                TRP::Message::Command::QUERY_SESSIONS_REQUEST,
-				qhash.merge( { 
-					:time_interval => mk_time_interval(tmarr),
-					:resolve_keys => true,
+        TRP::Message::Command::QUERY_SESSIONS_REQUEST,
+        qhash.merge( { 
+          :time_interval => mk_time_interval(tmarr),
+          :resolve_keys => true,
           :outputpath=>outputfile
-				})
-				)
+        })
+      )
 
 
 # print matching flows using the print_session_details helper  
 get_response_zmq(zmq_endpt,req) do |resp|
- p "Output file : #{outputfile}"
+  p "Output file : #{outputfile}"
 end
 
