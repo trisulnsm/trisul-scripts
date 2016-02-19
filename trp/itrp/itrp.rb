@@ -22,18 +22,14 @@ raise %q{
 
 } unless ARGV.length==1
 
-
 HISTFILE=File.expand_path("~/.itrp_history")
 
 # parameters 
 zmq_endpt   = ARGV.shift
 
-
 DEFAULT_PROMPT="iTRP> "
 
 print("\n\niTRP Interactive TRP Shell for Trisul\n");
-
-
 
 class Dispatches
 
@@ -41,7 +37,7 @@ class Dispatches
 	attr_reader :tmarr 
 	attr_reader :cgguid 
 	attr_reader :cgname 
-	attr_reader :cgtype 
+	attr_reader :cli_context 
 
 	def initialize(zmq)
 		@zmq_endpt = zmq
@@ -128,7 +124,7 @@ class Dispatches
 			  end
 		end
 
-        @cgtype = :counter 
+        @cli_context = :counter 
 	end
 
 
@@ -138,7 +134,7 @@ class Dispatches
         @prompt = "iTRP (Resources / #{patt[1]})> "
         @cgguid = patt[0]
         @cgname = patt[1]
-        @cgtype = :resources
+        @cli_context = :resources
     end 
 
     def setag(rgid)
@@ -146,7 +142,7 @@ class Dispatches
         @prompt = "iTRP (Alerts / #{patt[1]})> "
         @cgguid = patt[0]
         @cgname = patt[1]
-        @cgtype = :alerts
+        @cli_context = :alerts
     end 
 
     def setfts(rgid)
@@ -154,11 +150,11 @@ class Dispatches
         @prompt = "iTRP (FTS / #{patt[1]})> "
         @cgguid = patt[0]
         @cgname = patt[1]
-        @cgtype = :fts
+        @cli_context = :fts
     end 
 
 	def setkey(key)
-		if @cgtype != :counter 
+		if @cli_context != :counter 
 			puts("Err: need to do [set cg <countergroup>] first")
 			return
 		end
@@ -485,7 +481,7 @@ class Dispatches
 
     def search(patt)
         
-        case @cgtype
+        case @cli_context
             when :resources ; search_resources(patt)
             when :alerts ; search_alerts(patt)
             when :fts ; search_fts(patt)
