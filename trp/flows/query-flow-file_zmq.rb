@@ -46,6 +46,6 @@ req = TrisulRP::Protocol.mk_request(
 
 # print matching flows using the print_session_details helper  
 get_response_zmq(zmq_endpt,req) do |resp|
-  p "Output file : #{outputfile}"
+    p "Output file : #{outputfile}"
 end
 
