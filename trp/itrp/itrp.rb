@@ -7,9 +7,7 @@
 #
 require 'trisulrp'
 require 'readline'
-require 'rb-readline'
 require 'terminal-table'
-require 'matrix'
 
 # Check arguments
 raise %q{
@@ -42,6 +40,7 @@ class Dispatches
 	attr_reader :cgguid 
 	attr_reader :cgname 
 	attr_reader :cgtype 
+	attr_reader :cmdcrumbs 
 
 	def initialize(zmq)
 		@zmq_endpt = zmq
@@ -58,16 +57,20 @@ class Dispatches
 		print("Connected to #{@zmq_endpt}\n");
 		print("Available time window = #{tmarr[1]-tmarr[0]} seconds \n\n");
 
-		list = ['cglist', 'set cg', 'set time', 'set rg', 'search', 'set ag', 'timeslices', 'set fts' , 'resolve',
-                'getkey', 'getlabel'  ]
+		root_list = ['set', 'help', 'quit', 'timeslices'  ]
+		set_list = ['counter', 'alert', 'resource', 'fts', 'time' ]
+		counter_list = ['toppers', 'getkey', 'resolve' ]
+
+
+		@cmd_crumbs = [ root_list ]
 		Readline.completion_proc = proc do |s| 
-			case Readline.line_buffer()
-				when /^set cg /;  match_cg(s)
-				when /^set rg /;  match_rg(s)
-				when /^set ag /;  match_ag(s)
-				when /^set fts /;  match_fts(s)
-				else ; list.grep( /^#{Regexp.escape(s)}/) 
-			end
+			node  = find_node Readline.line_buffer()
+			if node.nil?
+				p Readline.line_buffer().split(' ')
+				set_list.grep( /^#{Regexp.escape(s)}/)
+			else
+				root_list.grep( /^#{Regexp.escape(s)}/)
+			end 
 		end
 
 	end
@@ -380,7 +383,7 @@ class Dispatches
 			  end
 		end
 
-		cgdtls.grep( /#{Regexp.escape(patt)}/)  
+		cgdtls.grep( /^#{Regexp.escape(patt)}/i)
 
 	end
 
@@ -389,7 +392,7 @@ class Dispatches
         [ '{4EF9DEB9-4332-4867-A667-6A30C5900E9E} HTTP URIs',
           '{D1E27FF0-6D66-4E57-BB91-99F76BB2143E} DNS Resources',
           '{5AEE3F0B-9304-44BE-BBD0-0467052CF468} SSL Certs',
-        ].grep( /#{Regexp.escape(patt)}/i)  
+        ].grep( /^#{Regexp.escape(patt)}/i)  
 
     end
 
