@@ -36,14 +36,24 @@ TrisulPlugin = {
     -- 
     -- filter : decide if you want to reassemble this file or not.. 
     --
-    filter = function( engine,  timestamp, flowkey, direction, header_buffer)
+    filter = function( engine,  timestamp, flowkey, header)
 
+        if header:is_response() then 
+            local ct = header:get_value("Content-Type")
+            if ct and ct == "text/html" then
+                print("KEEPING TEXT HTML with flowkey = "..flowkey:ipa_readable() )
+                return true
+            else
+                return false
+            end
+        end
+        return true
     end,
 
     -- 
     -- called when the file is completed and stored in 'path' 
     --
-    onfile_http  = function ( engine, timestamp, flowkey, req_header, resp_header, path , length )
+    onfile_http2  = function ( engine, timestamp, flowkey, req_header, resp_header, path , length )
 
         print("KYA LUA path="..path);
         print("KYA length="..length);
