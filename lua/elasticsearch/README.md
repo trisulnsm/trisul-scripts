@@ -7,6 +7,7 @@ Send networks flow to elastisearch
 
   **Prerequisites**
    1. lua-cjson
+
       luarocks install lua-cjson
 
 
