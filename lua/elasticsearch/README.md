@@ -1,4 +1,4 @@
-Send networks flow to elastisearch
+Send network flows to elastisearch
 =============
 
 1. es_curl_flow.lua
