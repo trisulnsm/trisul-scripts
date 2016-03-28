@@ -45,7 +45,7 @@ TrisulPlugin = {
               flow:id(),                                -- flow 
               "sid-8000002",                            -- a sigid (private range)
               "trisul-lua-gen",                         -- classification
-              "sn-1",                                   -- priority 1, 
+              1,                                        -- priority 1, 
               "Possible heartbleed situation ")         -- message 
 
           end

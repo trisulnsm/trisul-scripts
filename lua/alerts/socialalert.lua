@@ -51,7 +51,7 @@ TrisulPlugin = {
 					flow:id(), 								  -- flow 
 					"sid-8000001",							  -- a sigid (private range)
 					"lua-social",							  -- classification
-					"sn-1",                                   -- priority sn-1, 
+					1,                                        -- priority sn-1, 
 					"Detected social media usage")			  -- message 
 				end
 			end

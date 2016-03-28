@@ -53,7 +53,7 @@ TrisulPlugin = {
     -- 
     -- called when the file is completed and stored in 'path' 
     --
-    onfile_http2  = function ( engine, timestamp, flowkey, req_header, resp_header, path , length )
+    onfile_http  = function ( engine, timestamp, flowkey, req_header, resp_header, path , length )
 
         print("KYA LUA path="..path);
         print("KYA length="..length);
