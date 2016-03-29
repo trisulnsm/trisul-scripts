@@ -20,7 +20,7 @@ TrisulPlugin = {
 
 
   onload = function () 
-
+   math.randomseed(os.time())
     P = TrisulPlugin
 
 	P.ahoc  = {
@@ -42,7 +42,7 @@ TrisulPlugin = {
 
 	P.flowmap = { } 
 
-	local fn="/tmp/httpheaders-"..T.host:id(); 
+	local fn="/tmp/httpheaders-"..math.random(10000)
 	P.outfile = io.open(fn,"w");
 
   end,

@@ -19,7 +19,7 @@ TrisulPlugin = {
   -- Monitor attaches itself to a counter group and gets called for
   -- various events in the counter group lifecycle
   -- 
-  cg_flush_monitor  = {
+  cg_monitor  = {
 
     counter_guid = "{4CD742B1-C1CA-4708-BE78-0FCA2EB01A86}",
 

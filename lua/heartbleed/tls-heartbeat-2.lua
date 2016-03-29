@@ -40,7 +40,7 @@ TrisulPlugin = {
           if req_len ~= valbuff:size()  then
 
             -- this is how you add an alert to Trisul 
-            engine:add_alert_full( 
+            engine:add_alert_ids( 
               "{9AFD8C08-07EB-47E0-BF05-28B4A7AE8DC9}", -- GUID for IDS 
               flow:id(),                                -- flow 
               "sid-8000002",                            -- a sigid (private range)

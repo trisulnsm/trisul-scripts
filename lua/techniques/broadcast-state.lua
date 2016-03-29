@@ -18,7 +18,7 @@ TrisulPlugin = {
     description = "Log req/resp in one line ",
     author = "Unleash", version_major = 1,
     version_minor = 0,
-	clsid= "{ff2faa88-57bb-42b7-af27-edda7c91a437}",
+	  clsid= "{ff2faa88-57bb-42b7-af27-edda7c91a437}",
   },
 
 
@@ -45,12 +45,9 @@ TrisulPlugin = {
 	}
 
 	P.flowmap = { } 
+  math.randomseed(os.time())
 
-	dbg()
-
-	print("Container ID = "..T.host:id());
-
-	local fn="/tmp/httpheaders-"..T.host:id(); 
+	local fn="/tmp/httpheaders-"..math.random(100000); 
 	P.outfile = io.open(fn,"w");
 
   end,

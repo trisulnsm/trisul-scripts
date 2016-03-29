@@ -46,13 +46,13 @@ TrisulPlugin = {
 					--
 					-- add an alert if REGEX matches social media sites
 					--
-					engine:add_alert_full( 
+					engine:add_alert_ids( 
 					"{9AFD8C08-07EB-47E0-BF05-28B4A7AE8DC9}", -- GUID for IDS 
-					flow:id(), 								  -- flow 
-					"sid-8000001",							  -- a sigid (private range)
-					"lua-social",							  -- classification
-					1,                                        -- priority sn-1, 
-					"Detected social media usage")			  -- message 
+					flow:id(), 								                -- flow 
+					"sid-8000001",							              -- a sigid (private range)
+					"lua-social",							                -- classification
+					1,                                        -- priority 1, 
+					"Detected social media usage")			      -- message 
 				end
 			end
 

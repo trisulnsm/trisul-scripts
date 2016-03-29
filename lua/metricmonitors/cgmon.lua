@@ -27,7 +27,7 @@ TrisulPlugin = {
   -- Monitor attaches itself to a counter group and gets called for
   -- all keys matching the regex 
   --
-  cg_flush_monitor  = {
+  cg_monitor  = {
 
     counter_guid = "{C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}",
 

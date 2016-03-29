@@ -89,7 +89,6 @@ TrisulPlugin = {
     flow["start_time"]=st*1000;
     flow["end_time"]=et*1000;
     flow["duration"]=et-st;
-    print("curl -XPUT '"..T.uri.."' -d '" ..T.cjson.encode(flow).."' 2>/dev/null")
     local h = io.popen("curl -XPOST '"..T.uri.."' -d '" ..T.cjson.encode(flow).."' 2>/dev/null")
 	end,
 

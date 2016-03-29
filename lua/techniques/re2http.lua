@@ -29,6 +29,7 @@ TrisulPlugin = {
 		T.re2("Host\\s*:\\s*(.*)\r\n"),
 		T.re2("Referer\\s*:\\s*(.*)\r\n")
 	}
+  math.randomseed(os.time())
 
 
 	P.outfile = io.open("/tmp/httpheaders-"..math.random(1000,2000)..".log","w")
