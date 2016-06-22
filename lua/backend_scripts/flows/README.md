@@ -13,3 +13,14 @@ sg3.lua  | Working example - prints flow details like sourceip,port,destip,total
 
 
 
+## Running
+
+Place these scripts in these locations and restart trisul-probe . Normally you want to do the first (local-lua) when testing. 
+
+
+On Probe | Dir /usr/local/var/lib/trisul/domain0/probe0/context0/config/local-lua   | local-lua scripts apply to that probe and context only. Normally you want to do this when experimenting
+On Probe | Dir /usr/local/lib/trisul-probe/plugins/lua | Script loaded for all instances on that node (machine) |
+On Hub | Dir /usr/local/lib/trisul-hub/domain0/hub0/profileX/lua | All probes that use that profileX will get the lua script |
+
+
+2. /usr/local/
