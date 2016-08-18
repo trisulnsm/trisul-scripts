@@ -1,13 +1,23 @@
--- .lua
+-- filex1.lua 
 --
--- filex
---  File Extraction by lua 
+--  Basics of File Extraction in Trisul Network Analytics 
 --
+--  Demonstrates 
+--  ------------
+--  1. Use of filter(..) to only save text/html content 
+--
+--  2. When a new file is ready in ramfs- Trisul calls  onfile_http(..). In this
+--     script we just print and explore the parameters  
+--
+--  3. The files do not leave ramfs. To see the files set the 
+--     Reassembly>FileExtraction>AutoDelete to 'false' in trisulProbeConfig.xml 
+--
+--  
 --
 TrisulPlugin = {
 
   id = {
-    name = "file extraction  ",
+    name = "file extraction basics  ",
     description = "various aspects of file extraction ",
     author = "Unleash",
     version_major = 1,
@@ -17,14 +27,11 @@ TrisulPlugin = {
 
 
   onload = function()
-  	print("LOADED : filex.lua ")
-    T.end_of_flow_content = 0;
+  	print("LOADED : filex1.lua ")
   end,
 
   onunload = function()
-  	print("BYE: filex.lua ")
-
-    print(" WE FOUND ENDOF COTENT TYPE OBJECTS COUNT = ".. T.end_of_flow_content)
+  	print("BYE: filex1.lua ")
   end,
 
   -- 
@@ -53,36 +60,50 @@ TrisulPlugin = {
     -- 
     -- called when the file is completed and stored in 'path' 
     --
-    onfile_http  = function ( engine, timestamp, flowkey, req_header, resp_header, path , length )
+	onfile_http = function( engine, timestamp, flowkey, path, req_header, resp_header, length, is_chunk)
 
-        print("KYA LUA path="..path);
-        print("KYA length="..length);
+		-- print the path where the file is stored on the tmpfs 
+		--
+        -- print("path="..path);
+        print("length="..length);
 
+		-- run the linux file command - to detect the type of file 
+		-- demonstrates how you can operate on the file  justlike normal files 
         os.execute('file '..path);
 
-        print("KYA content type ="..resp_header:get_value("Content-Type"));
+		-- demonstrates accessing Content-Type (in the HTTP response header)
+		--  
+        print("content type ="..resp_header:get_value(1));
+        print("http status="..resp_header:get_status());
 
         local cl = resp_header:get_value("Content-Length");
         local te = resp_header:get_value("Transfer-Encoding");
 
-        if (cl == nil and te == nil) then 
-            T.end_of_flow_content = T.end_of_flow_content +1 
-        end 
 
-
+		-- demonstrates printing all the headers 
+		-- HTTP request 
         local req_hdrs = req_header:get_all_headers();
         print(" REQUEST HEADERS----")
         for k,v in pairs(req_hdrs) do 
             print(" "..k.." = "..v)
         end
 
+		-- demonstrates printing all the headers 
+		-- HTTP response  
         local resp_hdrs = resp_header:get_all_headers();
         print(" \n\nRESPONSE HEADERS----")
         for k,v in pairs(resp_hdrs) do 
             print(" "..k.." = "..v)
         end
 
-
+		
+		-- FINALLY ! Does not do anything with the file itself (in path)
+		-- You can copy that file from ramfs onto a persistent file system
+		-- in this script we dont do anything, so the file will be deleted 
+		-- automatically once all scripts have had a chance to get onfile_http(..)
+		-- To keep the file set the Reassembly>FileExtraction>AutoDelete to false
+		-- (use that only for debugging, because that could fill up the ramfs) 
+		--
 
     end,
 

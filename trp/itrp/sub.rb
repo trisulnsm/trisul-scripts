@@ -29,7 +29,7 @@ zmq_ctx = ZMQ::Context.new
 
 # add a subscription to Counter Item 
 #
-s1 = zmq_ctx.socket(ZMQ::PUSH)
+s1 = zmq_ctx.socket(ZMQ::REQ)
 s1.connect(zmq_endpt_sub)
 
 
@@ -37,16 +37,18 @@ req= case cmd
 
 when  "addcg"
 	mk_request(TRP::Message::Command::STAB_PUBSUB_CTL,
+					 :context_name => "default",
 					 :ctl => TRP::SubscribeCtl::CtlType::CT_SUBSCRIBE,
 					 :type => TRP::SubscribeCtl::StabberType::ST_COUNTER_ITEM,
 					 :guid => TrisulRP::Guids::CG_HOST,
-					 :key => "C0.A8.02.08")
+					 :key => "C0.A8.01.08")
 when "delcg"
 	req =mk_request(TRP::Message::Command::STAB_PUBSUB_CTL,
+					 :context_name => "default",
 					 :ctl => TRP::SubscribeCtl::CtlType::CT_UNSUBSCRIBE,
 					 :type => TRP::SubscribeCtl::StabberType::ST_COUNTER_ITEM,
 					 :guid => TrisulRP::Guids::CG_HOST,
-					 :key => "C0.A8.02.08")
+					 :key => "C0.A8.01.08")
 when "addids"
 	req =mk_request(TRP::Message::Command::STAB_PUBSUB_CTL,
 					 :ctl => TRP::SubscribeCtl::CtlType::CT_SUBSCRIBE,
@@ -91,6 +93,10 @@ when "delcg"
 					 :key => ARGV.shift)
 end
 
+req.destination_node="probe0"
 s1.send_string(req.serialize_to_string)
+
+
+
 
 
