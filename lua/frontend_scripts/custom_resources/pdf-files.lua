@@ -14,7 +14,7 @@ TrisulPlugin = {
     version_minor = 0,
   },
 
-  alertgroup  = {
+  resourcegroup   = {
     control = {
       guid = "{79237742-edeb-421e-bd92-b5c62e7f2346}", 
       name = "PDF File Resource",
