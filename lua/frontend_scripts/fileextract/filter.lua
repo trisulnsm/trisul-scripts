@@ -36,6 +36,8 @@ TrisulPlugin = {
                 return false
             end
         end
+		-- always return true  if header is a HTTP Request because you dont know the
+		-- content type yet
         return true
     end,
  }
