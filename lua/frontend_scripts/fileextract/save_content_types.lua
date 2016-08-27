@@ -32,7 +32,7 @@ TrisulPlugin = {
       --
     filter = function( engine,  timestamp, flowkey, header)
       if header:is_request() or 
-         (header:is_response() and header:match_value("Content-Type", "(shockwave|msdownload|dosexec|pdf)"))  then 
+         (header:is_response() and header:match_value("Content-Type", "(shockwave|msdownload|dosexec|pdf|octet)"))  then 
         return true
       else 
         return false
