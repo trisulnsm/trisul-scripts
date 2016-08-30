@@ -19,7 +19,7 @@ TrisulPlugin = {
 
 	resource_monitor   = {
 
-	    resource_guid = '{9781db2c-f78a-4f7f-a7e8-2b1a9a7be71a}'
+	    resource_guid = '{9781db2c-f78a-4f7f-a7e8-2b1a9a7be71a}',
 
 		onnewresource  = function(engine, newresource )
 			print(newresource:uri())
