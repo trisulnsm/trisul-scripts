@@ -22,7 +22,9 @@ TrisulPlugin = {
 	    resource_guid = '{9781db2c-f78a-4f7f-a7e8-2b1a9a7be71a}',
 
 		onnewresource  = function(engine, newresource )
-			print(newresource:uri())
+			print("hash = ".. newresource:uri())
+			print("label  = ".. newresource:label())
+			print("flow  = ".. newresource:flow():to_s())
 		end,
 
 	},
