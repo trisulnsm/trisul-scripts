@@ -1,3 +1,3 @@
-Print backlist alerts
+Print blacklist alerts
 =============
 
