@@ -4,7 +4,7 @@
 -- and run them through the Trisul pipelines
 
 local JSON = require'JSON';
-local dbg = require'debugger';
+-- local dbg = require'debugger';
 
 TrisulPlugin = {
 
@@ -21,6 +21,17 @@ TrisulPlugin = {
   inputfilter  = {
 
 
+	next_alert_line_json  = function()
+
+		local n = json_alerts_file:read("*l");
+		while n do 
+		   local p = JSON:decode(n)
+		   if p["event_type"] ==   "alert" then return p; end
+		   n = json_alerts_file:read("*l");
+		end
+		return nil 
+	end,
+
 	-- 
 	-- this function must either return nil or a table {..} with alert details
 	-- Rule 1:  no blocking 
@@ -28,36 +39,30 @@ TrisulPlugin = {
 	-- 
     step_alert  = function( )
 
-		local n = json_alerts_file:read("*l");
-		if n == nil then return nil; end 
-
-		local p = JSON:decode(n)
-
-		-- we only deal with alerts 
-	   if p["event_type"] ~=   "alert" then return nil; end
-
+		local p = TrisulPlugin.inputfilter.next_alert_line_json()
+		if not p then return p; end
 
 		local tv_sec, tv_usec = epoch_secs( p["timestamp"]);
 
 		local ret =  {
 
-			timestamp_secs = tv_sec,
-			timestamp_usecs = tv_usec,
-
-			source_ip = p["src_ip"],
-			source_port = p["src_port"],
-			destination_ip = p["dest_ip"],
-			destination_port = p["dest_port"],
-			protocol = protocol_num(p["proto"]),
-
-			sigid = p.alert["signature_id"],
-			signame = p.alert["signature"],
-			sigrev = p.alert["rev"],
-
-			priority = p.alert["severity"],
-
-			classification = p.alert["category"]
+			AlertGroupGUID='{9AFD8C08-07EB-47E0-BF05-28B4A7AE8DC9}',     -- Trisul alert group = External IDS 
+			TimestampSecs = tv_sec,										 -- Epoch based time stamps
+			TimestampUsecs = tv_usec,
+			SigIDKey = p.alert["signature_id"],                          -- SigIDKey is mandatory 
+			SigIDLabel = p.alert["signature"],	                         -- User Label for the above SigIDKey 
+			SourceIP = p["src_ip"],										 -- IP and Port pretty direct mappings
+			SourcePort = p["src_port"],
+			DestIP = p["dest_ip"],
+			DestPort = p["dest_port"],
+			Protocol = protocol_num(p["proto"]),						 -- convert TCP to 6 
+			SigRev = p.alert["rev"],
+			Priority = p.alert["severity"],
+			ClassificationKey = p.alert["category"],
+			AlertStatus=p.alert["action"],                                -- allowed/blocked like ALARM/CLEAR
+			AlertDetails=p.alert["signature"]                             -- why waste a text field 'AlertDetails'?
 		};
+
 
 		return ret;
 
