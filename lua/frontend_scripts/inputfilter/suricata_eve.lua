@@ -29,18 +29,12 @@ TrisulPlugin = {
     step_alert  = function( )
 
 		local n = json_alerts_file:read("*l");
-		print(n)
-
+		if n == nil then return nil; end 
 
 		local p = JSON:decode(n)
 
-		
-
 		-- we only deal with alerts 
-	   if p["event_type"] ~=   "alert" then
-	    print("ignoring event type ".. p["event_type"])
-	   	return nil
-	   end
+	   if p["event_type"] ~=   "alert" then return nil; end
 
 
 		local tv_sec, tv_usec = epoch_secs( p["timestamp"]);
@@ -54,7 +48,7 @@ TrisulPlugin = {
 			source_port = p["src_port"],
 			destination_ip = p["dest_ip"],
 			destination_port = p["dest_port"],
-			protocol = protocol_num(p["protocol"]),
+			protocol = protocol_num(p["proto"]),
 
 			sigid = p.alert["signature_id"],
 			signame = p.alert["signature"],
