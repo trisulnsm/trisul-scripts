@@ -15,7 +15,14 @@ TrisulPlugin = {
 
 
   onload = function()
-  	json_alerts_file = io.open("/tmp/eve.json","r")
+  	json_alerts_file = io.open("/var/log/nsm/eve.json","r")
+	local waldo_file = io.open("/nsm/trisul/lib/trisul-probe/domain0/probe0/context0/run/evejson.waldo","r")
+	if waldo_file then
+		json_alerts_file:seek("set", tonumber(waldo_file:read("*a")) )
+		waldo_file:close() 
+	end
+
+
   end,
 
   inputfilter  = {
@@ -41,6 +48,11 @@ TrisulPlugin = {
 
 		local p = TrisulPlugin.inputfilter.next_alert_line_json()
 		if not p then return p; end
+
+		local waldo_file = io.open("/nsm/trisul/lib/trisul-probe/domain0/probe0/context0/run/evejson.waldo","w")
+		waldo_file:write( json_alerts_file:seek() )
+		waldo_file:close()
+
 
 		local tv_sec, tv_usec = epoch_secs( p["timestamp"]);
 

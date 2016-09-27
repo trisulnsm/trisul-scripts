@@ -52,7 +52,6 @@ TrisulPlugin = {
 			print("extramsg          "..  alert:extra_message())
 			print("status            "..  alert:status())
 			print("ack               "..  alert:ack_flag())
-			print("flow              "..  alert:flow():to_s())
 			print("-----------------------------------------")
 
 		end,
