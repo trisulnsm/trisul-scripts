@@ -1,8 +1,24 @@
-Custom input filter for Trisul to process the sample flow DB
-======
+Input Filters 
+=============
+
+Using LUA input filter framework you can drive the Trisul pipelines. 
+Some samples in this directory
+
+# lanlflow.lua 
+How to take a completely arbitrary Network Flows dump and use that to drive Trisul. Here we
+use the lanl.gov dump. 
+
+# suricata_eve.lua
+Suricata writes alerts (and other stuff) to eve.json using the EVE JSON format for IDS alerts.
+This script picks that up and pushes the alerts into Trisul.
+
+
+
+
 
 lanlflow.lua 
-------------
+===============
+
 
 LANL has published about 58 days of network flow data for cyber security purposes at
 http://csr.lanl.gov/data/cyber1/
