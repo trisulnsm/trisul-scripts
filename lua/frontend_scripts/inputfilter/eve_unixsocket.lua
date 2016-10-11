@@ -44,34 +44,68 @@ int unlink(char * pathname);
 ]] 
 
 
-local K = ffi.new("struct constants");
+
+TrisulPlugin = {
+
+  id = {
+    name = "EVE  Alerts via UNIX DGRAM socket ",
+    description = "Suricata to Trisul via Unix DGRAM input filter ",
+  },
 
 
--- socket 
-local socket = ffi.C.socket( K.AF_UNIX, K.SOCK_DGRAM, 0);
-if  socket == -1 then 
-	print("Error socket() " .. strerror())
-	return 
-end 
-
-local strerror = function()
-  return ffi.string(ffi.C.strerror( ffi.errno() ))
-end
+  -- returning false from onload will effectively stop the script itself
+  -- 
+  onload = function()
+	local K = ffi.new("struct constants");
 
 
--- bind to unix socket endpoint
-local addr = ffi.new("struct sockaddr_un");
-addr.sun_family = K.AF_UNIX;
-addr.sun_path = "/tmp/snort_alert"
-ffi.C.unlink(addr.sun_path);
-local ret = ffi.C.bind( socket,  ffi.cast("const struct sockaddr *", addr) , ffi.sizeof(addr));
+	-- socket 
+	local socket = ffi.C.socket( K.AF_UNIX, K.SOCK_DGRAM, 0);
+	if  socket == -1 then 
+		print("Error socket() " .. strerror())
+		return 
+	end 
+
+	local strerror = function()
+	  return ffi.string(ffi.C.strerror( ffi.errno() ))
+	end
 
 
-print ("Ret = "..ret.." pah="..ffi.string(addr.sun_path) )
-if ret == -1 then
-	print("Error bind() " .. strerror())
-	return
-end
+	-- bind to unix socket endpoint
+	local addr = ffi.new("struct sockaddr_un");
+	addr.sun_family = K.AF_UNIX;
+	addr.sun_path = "/var/log/nsm/eve.json"
+	ffi.C.unlink(addr.sun_path);
+	local ret = ffi.C.bind( socket,  ffi.cast("const struct sockaddr *", addr) , ffi.sizeof(addr));
+
+
+	print ("Ret = "..ret.." pah="..ffi.string(addr.sun_path) )
+	if ret == -1 then
+		print("Error bind() " .. strerror())
+		return
+	end
+
+   end,
+
+
+  inputfilter  = {
+
+    -- 
+    -- this function must either return nil or a table {..} with alert details
+    -- Rule 1:  no blocking 
+    -- Rule 2:  handle the JSON yourself here in LUA
+    -- 
+    step_alert  = function( )
+
+
+    end
+
+
+  },
+
+}
+
+
 
 
 
