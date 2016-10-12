@@ -1,52 +1,50 @@
--- save.lua
+-- .lua
 --
--- Save ALL HTTP payloads seen 
+-- saveall(.)
+--  Saves all files into /tmp/trisul_files , even the large ones that arrive in chunks
 --
 --
 TrisulPlugin = {
 
   id = {
-    name = "saveall",
-    description = "save all files to a directory ",
-    author = "Unleash",
-    version_major = 1,
-    version_minor = 0,
+    name = "saveall files",
+    description = "saves all files into /tmp/fx_files",
+    author = "Unleash", version_major = 1, version_minor = 0,
   },
 
 
 
   onload = function()
-  	os.execute("mkdir -p /tmp/kk")
+  	os.execute("mkdir -p /tmp/trisul_files")
   end,
 
-
   -- 
-  -- Monitor attaches itself to file extraction module(s)
-  -- gets called at various stages, can control and add stats etc
+  -- Save everything from the ramfs to /tmp/.. 
+  -- the 'is_chunk' is used to handle large files which are presented to this 
+  -- script in large (5MB or 10MB) chunks (see trisulProbeConfig.xml)
   --
   filex_monitor  = {
 
 
     -- save all content to /tmp/kk 
     --
-    onfile_http  = function ( engine, timestamp, flowkey, path, req_header, resp_header, length )
-       local fn = path:match("^.+/(.+)$")
-       if fn then
-           T.async:schedule( 
-                {
-                    data = "cp "..path.."  /tmp/kk/"..fn,
+    onfile_http  = function ( engine, timestamp, flowkey, path, req_header, resp_header, length , is_chunk )
 
-                    onexecute = function( indata) 
-						require "os";
-						os.execute(indata)
-                    end,
+		if is_chunk then 
+		   local fn = path:match("^.+/(.+)%.%d+.part$")
+		   --  just a chunk , concatenate with prev 
+		   --
+		   T.async:cat( path, "/tmp/trisul_files/"..fn)
 
-                    oncomplete = function( indata, outdata)
+		else
+		   -- full file 
+		   --
+		   local fn = path:match("^.+/(.+)$")
 
-                    end,
-                }
-           )
-       end
+		   T.async:copy( path, "/tmp/trisul_files/"..fn)
+
+		end 
+
     end,
 
  }
