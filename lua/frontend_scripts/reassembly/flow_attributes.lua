@@ -28,7 +28,7 @@ TrisulPlugin = {
 
 		onattribute  = function(engine, time, flow, attr_type, attr_value )
 
-			if attr_type == "HTTP-Host" then
+			if attr_type == "Host" then
 				print("Attribute "..attr_type.." = "..attr_value)
 			end
 		  end,
