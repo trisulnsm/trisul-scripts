@@ -34,12 +34,13 @@ req =TrisulRP::Protocol.mk_request(TRP::Message::Command::COUNTER_ITEM_REQUEST,
 	 :time_interval =>  mk_time_interval(tmarr) )
 
 TrisulRP::Protocol.get_response_zmq(zmq_endpt,req) do |resp|
-	  print "Counter Group = #{resp.stats.counter_group}\n"
-	  print "Key           = #{resp.stats.key}\n"
-	  resp.stats.meters.each do |meter|
-	  	print "----- Showing Meter #{meter.meter}\n"
-	  	meter.values.each do |val|
-		  print "#{Time.at(val.ts.tv_sec).to_s} = #{val.val}\n"
+	  print "Counter Group = #{resp.counter_group}\n"
+	  print "Key           = #{resp.key.key}  #{resp.key.label} \n"
+	  resp.stats.each do |stat|
+		print "#{Time.at(stat.ts_tv_sec).to_s} " 
+	  	stat.values.each do |val|
+			print "#{val} "
 		end
+		print "\n"
 	  end
 end

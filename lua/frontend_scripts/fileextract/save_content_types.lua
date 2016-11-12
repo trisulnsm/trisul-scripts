@@ -9,7 +9,7 @@ TrisulPlugin = {
 
   id = {
     name = "Save Content Types 1",
-    description = "How to save based on http content type",
+    description = "Extract MSI,EXE,PDF files etc ",
     author = "Unleash",
     version_major = 1,
     version_minor = 0,
@@ -32,7 +32,7 @@ TrisulPlugin = {
       --
     filter = function( engine,  timestamp, flowkey, header)
       if header:is_request() or 
-         (header:is_response() and header:match_value("Content-Type", "(shockwave|msdownload|dosexec|pdf|octet)"))  then 
+         (header:is_response() and header:match_value("Content-Type", "(shockwave|msdownload|dosexec|pdf)"))  then 
         return true
       else 
         return false
@@ -45,14 +45,34 @@ TrisulPlugin = {
     -- this is because we are in the fast packet path when executing this method so we
     -- do all I/O out in a separate thread 
     --
-    onfile_http  = function ( engine, timestamp, flowkey, path, req_header, resp_header, length )
+	-- the 'is_chunk' is used to handle large files which are presented to this 
+	-- script in large (5MB or 10MB) chunks (see trisulProbeConfig.xml)
+	--
+	filex_monitor  = {
 
-      -- separate the path (which is in ramfs) from the synthesized file name
-      -- 
-      local fn = path:match("^.+/(.+)$")
-      T.async:copy( path, "/tmp/savedfiles/"..fn)
 
-    end,
+		-- save all content to /tmp/savedfiles 
+		--
+		onfile_http  = function ( engine, timestamp, flowkey, path, req_header, resp_header, length , is_chunk )
+
+			if is_chunk then 
+			   local fn = path:match("^.+/(.+)%.%d+.part$")
+			   --  just a chunk , concatenate with prev 
+			   --
+			   T.async:cat( path, "/tmp/savedfiles/"..fn)
+
+			else
+			   -- full file 
+			   --
+			   local fn = path:match("^.+/(.+)$")
+
+			   T.async:copy( path, "/tmp/savedfiles/"..fn)
+
+			end 
+
+		end,
+
+	}
 
 
  }
