@@ -45,37 +45,30 @@ TrisulPlugin = {
     -- this is because we are in the fast packet path when executing this method so we
     -- do all I/O out in a separate thread 
     --
-	-- the 'is_chunk' is used to handle large files which are presented to this 
-	-- script in large (5MB or 10MB) chunks (see trisulProbeConfig.xml)
-	--
-	filex_monitor  = {
+    -- the 'is_chunk' is used to handle large files which are presented to this 
+    -- script in large (5MB or 10MB) chunks (see trisulProbeConfig.xml)
+    --
+    onfile_http  = function ( engine, timestamp, flowkey, path, req_header, resp_header, length , is_chunk )
 
+        -- you can get 0 length for HTTP 304, etc - skip it (or log it in other ways etc)
+        if length == 0 then return; end 
 
-		-- save all content to /tmp/savedfiles 
-		--
-		onfile_http  = function ( engine, timestamp, flowkey, path, req_header, resp_header, length , is_chunk )
+        if is_chunk then 
+           local fn = path:match("^.+/(.+)%.%d+.part$")
+           --  just a chunk , concatenate with prev 
+           --
+           T.async:cat( path, "/tmp/savedfiles/"..fn)
 
-			-- you can get 0 length for HTTP 304, etc - skip it (or log it in other ways etc)
-			if length == 0 then return; end 
+        else
+           -- full file 
+           --
+           local fn = path:match("^.+/(.+)$")
 
-			if is_chunk then 
-			   local fn = path:match("^.+/(.+)%.%d+.part$")
-			   --  just a chunk , concatenate with prev 
-			   --
-			   T.async:cat( path, "/tmp/savedfiles/"..fn)
+           T.async:copy( path, "/tmp/savedfiles/"..fn)
 
-			else
-			   -- full file 
-			   --
-			   local fn = path:match("^.+/(.+)$")
+        end 
 
-			   T.async:copy( path, "/tmp/savedfiles/"..fn)
-
-			end 
-
-		end,
-
-	}
+    end,
 
 
  }
