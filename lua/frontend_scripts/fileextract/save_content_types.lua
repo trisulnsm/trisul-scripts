@@ -69,8 +69,6 @@ TrisulPlugin = {
         end 
 
     end,
-
-
  }
 }
 
