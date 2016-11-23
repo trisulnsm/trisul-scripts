@@ -1,13 +1,10 @@
--- eve_unixsocket.lua
+-- barnyard2_alert.lua
 --
--- same as eve.json file but uses Unix Sockets (via Luajit FFI) 
+-- Reads unified2_  structs from barnyard2_ unix_socket
 --
--- Several advantages to using Unix Sockets 
---  1. no need to maintain a waldo file
---  2. no need to poll for file changes 
 
 local ffi=require'ffi'
-local UNIX_SOCKETFILE='/tmp/s1/snort_alert'
+local UNIX_SOCKETFILE='/nsm/sensor_data/devbox-System-Product-Name-eth2/barnyard2_alert'
 
 -- local dbg=require'debugger'
 
@@ -52,33 +49,33 @@ char * strerror(int errno);
 int unlink(char * pathname);
 
 
-typedef struct _Event
+typedef struct _Unified2EventCommon
 {
-    uint32_t     sig_generator;   /* which part of snort generated the alert? */
-    uint32_t     sig_id;          /* sig id for this generator */
-    uint32_t     sig_rev;         /* sig revision for this id */
-    uint32_t     classification;  /* event classification */
-    uint32_t     priority;        /* event priority */
-    uint32_t     event_id;        /* event ID */
-    uint32_t     event_reference; /* reference to other events that have gone off, */
-    uint32_t     tm_sec;		  /* timeval 32_bit sec */
-    uint32_t     tm_usec;		  /* timeval 32_bit usec */
-} Event;
+    uint32_t sensor_id;
+    uint32_t event_id;
+    uint32_t event_second;
+    uint32_t event_microsecond;
+    uint32_t signature_id;
+    uint32_t generator_id;
+    uint32_t signature_revision;
+    uint32_t classification_id;
+    uint32_t priority_id;
+} Unified2EventCommon;
 
 
-typedef struct _Alertpkt
+typedef struct _AlertpktUnified2
 {
     uint8_t  alertmsg[256]; 				/* variable.. */
-    uint8_t  pcap_pkt_header_ignored[16];	/* 32-bit tv_sec version of pcap_pkthdr */
+    uint8_t  pcap_pkt_header_ignored[24];	/* 64-bit tv_sec version of pcap_pkthdr */
     uint32_t dlthdr;       					/* datalink header offset. (ethernet, etc.. ) */
     uint32_t nethdr;       					/* network header offset. (ip etc...) */
     uint32_t transhdr;     					/* transport header offset (tcp/udp/icmp ..) */
     uint32_t data;
     uint32_t val;  							/* which fields are valid. (NULL could be
                                              * valids also) */
-    uint8_t pkt[65535];
-    Event event;
-} Alertpkt;
+    uint8_t pkt[1514];				/* from barnyard2 decode.h */
+    Unified2EventCommon  event;
+} AlertpktUnified2;
 
 ]] 
 
@@ -92,17 +89,14 @@ K = ffi.new("struct constants");
 TrisulPlugin = {
 
   id = {
-    name = "Snort unsock alerts",
-    description = "Feed Snort unsock alerts into Trisul input",
+    name = "Barnyard2 unsock alerts",
+    description = "Unified2 from unix_socket from barynard2 ",
   },
 
 
   -- returning false from onload will effectively stop the script itself
   -- 
   onload = function()
-
-    -- dir where snort will write to 'snort_alert' 
-    os.execute("mkdir -p /tmp/s1")
 
     -- socket 
     local socket = ffi.C.socket( K.AF_UNIX, K.SOCK_DGRAM, 0 );
@@ -137,9 +131,9 @@ TrisulPlugin = {
     -- 
     step_alert  = function()
 
-        local rbuf  = ffi.new("char[?]", ffi.sizeof("Alertpkt"));
+        local rbuf  = ffi.new("char[?]", ffi.sizeof("AlertpktUnified2"));
 
-		local ret = ffi.C.recv(T.socket, rbuf,ffi.sizeof("Alertpkt"),K.MSG_DONTWAIT)
+		local ret = ffi.C.recv(T.socket, rbuf,ffi.sizeof("AlertpktUnified2"),K.MSG_DONTWAIT)
 		if ret < 0 then
 			if ffi.errno()  == K.EAGAIN then 
 				print("Nothing to read" )
@@ -152,7 +146,7 @@ TrisulPlugin = {
 
 		print ("Read bytes=".. ret);
 
-		local alert_pkt  = ffi.cast( "Alertpkt*", rbuf);
+		local alert_pkt  = ffi.cast( "AlertpktUnified2*", rbuf);
 		local buf = ffi.new("char[?]",32);
 
 		local source_ip = ffi.string(ffi.C.inet_ntop( K.AF_INET,  alert_pkt.pkt + alert_pkt.nethdr + 12,  buf, 32)); 
@@ -164,20 +158,20 @@ TrisulPlugin = {
         local ret =  {
 
             AlertGroupGUID='{9AFD8C08-07EB-47E0-BF05-28B4A7AE8DC9}',     -- Trisul alert group = External IDS 
-            TimestampSecs = alert_pkt.event.tm_sec,                      -- Epoch based time stamps
-            TimestampUsecs = alert_pkt.event.tm_usec,
-            SigIDKey = alert_pkt.event.sig_id,                           -- SigIDKey is mandatory 
+            TimestampSecs = ffi.C.ntohl(alert_pkt.event.event_second),                -- Epoch based time stamps
+            TimestampUsecs = ffi.C.ntohl(alert_pkt.event.event_microsecond),
+            SigIDKey = ffi.C.ntohl(alert_pkt.event.signature_id),                     -- SigIDKey is mandatory 
             SigIDLabel = ffi.string(alert_pkt.alertmsg),                 -- User Label for the above SigIDKey 
             SourceIP = source_ip,                                        -- IP and Port pretty direct mappings
             SourcePort = source_port,
             DestIP = dest_ip,
             DestPort = dest_port,
-            Protocol = ip_protocol,                                       -- TCP to 6 , UDP to 11 etc
-            SigRev = alert_pkt.event.sig_rev,
-            Priority = alert_pkt.event.priority,
-            ClassificationKey = alert_pkt.event.classification,
+            Protocol = ip_protocol,                                      -- TCP to 6 , UDP to 11 etc
+            SigRev = ffi.C.ntohl(alert_pkt.event.signature_revision),
+            Priority = ffi.C.ntohl(alert_pkt.event.priority_id),
+            ClassificationKey = ffi.C.ntohl(alert_pkt.event.classification_id),
             AlertStatus="FIRED",                                		  -- allowed/blocked like ALARM/CLEAR
-            AlertDetails="from socket1"                                   -- why waste a text field 'AlertDetails'?
+            AlertDetails="from gen:"..ffi.C.ntohl(alert_pkt.event.generator_id)        -- why waste a text field 'AlertDetails'?
         };
 
 --		dbg();

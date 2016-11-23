@@ -85,7 +85,7 @@ TrisulPlugin = {
     print ("Ret = "..ret.." pah="..ffi.string(addr.sun_path) )
     if ret == -1 then
         T.log(T.K.loglevel.ERROR, "Error bind() " .. strerror())
-        return
+        return false
     end
 
     T.socket = socket
