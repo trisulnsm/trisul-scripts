@@ -1,9 +1,11 @@
 -- save_content-types.lua
 --
--- Working  script that saves all files matching a Content-Type REGEX (google RE2 format)
--- into /tmp/saved_content
+-- Saves all files matching a Content-Type REGEX (google RE2 format)
+-- into /tmp/savedfiles
 -- 
 -- The regex we are using is (shockwave|msdownload|dosexec|pdf) to save common malware files
+-- SWF,PDF,MSI,EXE etc
+--
 --
 TrisulPlugin = {
 
