@@ -7,14 +7,14 @@
 -- Suricata, decodes the alerts, and pushes them into Trisul Network Analytics
 -- using the 'inputfilter'  LUA script. 
 --
--- See also : eve_unixsocket.lua for pulling out JSON from Suricata Unix Socket into 
---            Trisul input filter 
 --
 -- Installing : Just pop this script into the LUA directory of Trisul. 
--- trisulctl_probe list lua default@probe0 will tell you the directories 
+--              'trisulctl_probe list lua default@probe0' will tell you the directories 
 -- 
--- Note : You dont need to install the JSON and debugger, they are included in Trisul 
+-- Note       : You dont need to install the JSON and debugger, they are included in Trisul 
 --
+-- See also   : eve_unixsocket.lua for pulling out JSON from Suricata Unix Socket into 
+--              Trisul input filter 
 
 local JSON = require'JSON';
 -- local dbg = require'debugger';

@@ -5,6 +5,14 @@
 -- Several advantages to using Unix Sockets 
 --  1. no need to maintain a waldo file
 --  2. no need to poll for file changes 
+--
+-- We purposely keep the LuaJIT FFI CDEFs in the same file to 
+-- reduce the dependencies. You can refactor if you wish. 
+--
+-- Note     : Just change the EVE_SOCKETFILE to your unsock path 
+-- See also : suricata_eve.lua to read from eve.json file 
+-- 
+--
 
 local ffi=require'ffi'
 local JSON=require'JSON'

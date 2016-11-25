@@ -1,10 +1,16 @@
--- eve_unixsocket.lua
+-- snort_unixsocket.lua
 --
--- same as eve.json file but uses Unix Sockets (via Luajit FFI) 
+-- Listen to alerts from Snort directly and then feed them into 
+-- Trisul Network Analytics input filter 
+-- 
+-- The UNIX_SOCKETFILE is the socket file path to which snort writes out alerts
+-- when you run snort as  
+-- 		'snort -A unsock -l /tmp/s1 ... " 
 --
--- Several advantages to using Unix Sockets 
---  1. no need to maintain a waldo file
---  2. no need to poll for file changes 
+-- The cool thing is you you can install any number of this file with different
+-- sockets. That allows alerts from multiple sources to enter the Trisul system.
+--
+--
 
 local ffi=require'ffi'
 local UNIX_SOCKETFILE='/tmp/s1/snort_alert'

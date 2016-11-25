@@ -2,7 +2,16 @@
 --
 -- Reads unified2_  structs from barnyard2_ unix_socket
 --
-
+-- The UNIX_SOCKETFILE is the path to the unix socket that barnyard2 is goign to 
+-- write to  based on the following parameters in barnyard2.conf
+--
+--     config logdir: /nsm/sensor_data/devbox-System-Product-Name-eth2
+--     output alert_unixsock
+--
+-- Note that you can have multiple copies of this script, under different filenames of
+-- course listening to different UNIX_SOCKETFILE to inteface N instances of by2.
+--
+--
 local ffi=require'ffi'
 local UNIX_SOCKETFILE='/nsm/sensor_data/devbox-System-Product-Name-eth2/barnyard2_alert'
 
