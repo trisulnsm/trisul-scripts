@@ -1,7 +1,20 @@
 -- suricata-eve.lua
 --
--- Uses the input filter framework to accept EVE JSON events from Suricata IDS
--- and run them through the Trisul pipelines
+-- EVE (Extensible Event Format) is a new output method for alerts, flows, etc
+-- and is the preferred method for Suricata because it is just JSON !! 
+--
+-- This script suricata_eve.lua listens to eve.json file output by  
+-- Suricata, decodes the alerts, and pushes them into Trisul Network Analytics
+-- using the 'inputfilter'  LUA script. 
+--
+-- See also : eve_unixsocket.lua for pulling out JSON from Suricata Unix Socket into 
+--            Trisul input filter 
+--
+-- Installing : Just pop this script into the LUA directory of Trisul. 
+-- trisulctl_probe list lua default@probe0 will tell you the directories 
+-- 
+-- Note : You dont need to install the JSON and debugger, they are included in Trisul 
+--
 
 local JSON = require'JSON';
 -- local dbg = require'debugger';

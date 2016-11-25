@@ -61,20 +61,20 @@ typedef struct _Event
     uint32_t     priority;        /* event priority */
     uint32_t     event_id;        /* event ID */
     uint32_t     event_reference; /* reference to other events that have gone off, */
-    uint32_t     tm_sec;		  /* timeval 32_bit sec */
-    uint32_t     tm_usec;		  /* timeval 32_bit usec */
+    uint32_t     tm_sec;          /* timeval 32_bit sec */
+    uint32_t     tm_usec;         /* timeval 32_bit usec */
 } Event;
 
 
 typedef struct _Alertpkt
 {
-    uint8_t  alertmsg[256]; 				/* variable.. */
-    uint8_t  pcap_pkt_header_ignored[16];	/* 32-bit tv_sec version of pcap_pkthdr */
-    uint32_t dlthdr;       					/* datalink header offset. (ethernet, etc.. ) */
-    uint32_t nethdr;       					/* network header offset. (ip etc...) */
-    uint32_t transhdr;     					/* transport header offset (tcp/udp/icmp ..) */
+    uint8_t  alertmsg[256];                 /* variable.. */
+    uint8_t  pcap_pkt_header_ignored[16];   /* 32-bit tv_sec version of pcap_pkthdr */
+    uint32_t dlthdr;                        /* datalink header offset. (ethernet, etc.. ) */
+    uint32_t nethdr;                        /* network header offset. (ip etc...) */
+    uint32_t transhdr;                      /* transport header offset (tcp/udp/icmp ..) */
     uint32_t data;
-    uint32_t val;  							/* which fields are valid. (NULL could be
+    uint32_t val;                           /* which fields are valid. (NULL could be
                                              * valids also) */
     uint8_t pkt[65535];
     Event event;
@@ -139,27 +139,27 @@ TrisulPlugin = {
 
         local rbuf  = ffi.new("char[?]", ffi.sizeof("Alertpkt"));
 
-		local ret = ffi.C.recv(T.socket, rbuf,ffi.sizeof("Alertpkt"),K.MSG_DONTWAIT)
-		if ret < 0 then
-			if ffi.errno()  == K.EAGAIN then 
-				print("Nothing to read" )
-				return nil
-			else 
-				print("Error ffi.recv " .. strerror())
-				return nil 
-			end 
-		end
+        local ret = ffi.C.recv(T.socket, rbuf,ffi.sizeof("Alertpkt"),K.MSG_DONTWAIT)
+        if ret < 0 then
+            if ffi.errno()  == K.EAGAIN then 
+                print("Nothing to read" )
+                return nil
+            else 
+                print("Error ffi.recv " .. strerror())
+                return nil 
+            end 
+        end
 
-		print ("Read bytes=".. ret);
+        print ("Read bytes=".. ret);
 
-		local alert_pkt  = ffi.cast( "Alertpkt*", rbuf);
-		local buf = ffi.new("char[?]",32);
+        local alert_pkt  = ffi.cast( "Alertpkt*", rbuf);
+        local buf = ffi.new("char[?]",32);
 
-		local source_ip = ffi.string(ffi.C.inet_ntop( K.AF_INET,  alert_pkt.pkt + alert_pkt.nethdr + 12,  buf, 32)); 
-		local dest_ip   = ffi.string(ffi.C.inet_ntop( K.AF_INET,  alert_pkt.pkt + alert_pkt.nethdr + 16,  buf, 32)); 
-		local source_port = ffi.C.ntohs( ffi.cast("uint16_t*", alert_pkt.pkt + alert_pkt.transhdr + 0)[0]);
-		local dest_port = ffi.C.ntohs( ffi.cast("uint16_t*", alert_pkt.pkt + alert_pkt.transhdr + 2)[0]);
-		local ip_protocol = ffi.cast("uint8_t*", alert_pkt.pkt + alert_pkt.nethdr + 9)[0];
+        local source_ip = ffi.string(ffi.C.inet_ntop( K.AF_INET,  alert_pkt.pkt + alert_pkt.nethdr + 12,  buf, 32)); 
+        local dest_ip   = ffi.string(ffi.C.inet_ntop( K.AF_INET,  alert_pkt.pkt + alert_pkt.nethdr + 16,  buf, 32)); 
+        local source_port = ffi.C.ntohs( ffi.cast("uint16_t*", alert_pkt.pkt + alert_pkt.transhdr + 0)[0]);
+        local dest_port = ffi.C.ntohs( ffi.cast("uint16_t*", alert_pkt.pkt + alert_pkt.transhdr + 2)[0]);
+        local ip_protocol = ffi.cast("uint8_t*", alert_pkt.pkt + alert_pkt.nethdr + 9)[0];
 
         local ret =  {
 
@@ -176,11 +176,11 @@ TrisulPlugin = {
             SigRev = alert_pkt.event.sig_rev,
             Priority = alert_pkt.event.priority,
             ClassificationKey = alert_pkt.event.classification,
-            AlertStatus="FIRED",                                		  -- allowed/blocked like ALARM/CLEAR
+            AlertStatus="FIRED",                                          -- allowed/blocked like ALARM/CLEAR
             AlertDetails="from socket1"                                   -- why waste a text field 'AlertDetails'?
         };
 
---		dbg();
+--      dbg();
 
         return ret;
 
