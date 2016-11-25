@@ -30,8 +30,6 @@ uint16_t ntohs(uint16_t netshort);
 uint32_t ntohl(uint32_t netlong);
 const char *inet_ntop(int af, const void *src, char *dst, socklen_t size);
 
-
-
 struct sockaddr {
     sa_family_t sa_family;          
     char        sa_data[14];       
@@ -65,15 +63,15 @@ typedef struct _Unified2EventCommon
 
 typedef struct _AlertpktUnified2
 {
-    uint8_t  alertmsg[256]; 				/* variable.. */
-    uint8_t  pcap_pkt_header_ignored[24];	/* 64-bit tv_sec version of pcap_pkthdr */
-    uint32_t dlthdr;       					/* datalink header offset. (ethernet, etc.. ) */
-    uint32_t nethdr;       					/* network header offset. (ip etc...) */
-    uint32_t transhdr;     					/* transport header offset (tcp/udp/icmp ..) */
+    uint8_t  alertmsg[256];                 /* variable.. */
+    uint8_t  pcap_pkt_header_ignored[24];   /* 64-bit tv_sec version of pcap_pkthdr */
+    uint32_t dlthdr;                        /* datalink header offset. (ethernet, etc.. ) */
+    uint32_t nethdr;                        /* network header offset. (ip etc...) */
+    uint32_t transhdr;                      /* transport header offset (tcp/udp/icmp ..) */
     uint32_t data;
-    uint32_t val;  							/* which fields are valid. (NULL could be
+    uint32_t val;                           /* which fields are valid. (NULL could be
                                              * valids also) */
-    uint8_t pkt[1514];				/* from barnyard2 decode.h */
+    uint8_t pkt[1514];              /* from barnyard2 decode.h */
     Unified2EventCommon  event;
 } AlertpktUnified2;
 
@@ -133,34 +131,34 @@ TrisulPlugin = {
 
         local rbuf  = ffi.new("char[?]", ffi.sizeof("AlertpktUnified2"));
 
-		local ret = ffi.C.recv(T.socket, rbuf,ffi.sizeof("AlertpktUnified2"),K.MSG_DONTWAIT)
-		if ret < 0 then
-			if ffi.errno()  == K.EAGAIN then 
-				print("Nothing to read" )
-				return nil
-			else 
-				print("Error ffi.recv " .. strerror())
-				return nil 
-			end 
-		end
+        local ret = ffi.C.recv(T.socket, rbuf,ffi.sizeof("AlertpktUnified2"),K.MSG_DONTWAIT)
+        if ret < 0 then
+            if ffi.errno()  == K.EAGAIN then 
+                print("Nothing to read" )
+                return nil
+            else 
+                print("Error ffi.recv " .. strerror())
+                return nil 
+            end 
+        end
 
-		print ("Read bytes=".. ret);
+        print ("Read bytes=".. ret);
 
-		local alert_pkt  = ffi.cast( "AlertpktUnified2*", rbuf);
-		local buf = ffi.new("char[?]",32);
+        local alert_pkt  = ffi.cast( "AlertpktUnified2*", rbuf);
+        local buf = ffi.new("char[?]",32);
 
-		local source_ip = ffi.string(ffi.C.inet_ntop( K.AF_INET,  alert_pkt.pkt + alert_pkt.nethdr + 12,  buf, 32)); 
-		local dest_ip   = ffi.string(ffi.C.inet_ntop( K.AF_INET,  alert_pkt.pkt + alert_pkt.nethdr + 16,  buf, 32)); 
-		local source_port = ffi.C.ntohs( ffi.cast("uint16_t*", alert_pkt.pkt + alert_pkt.transhdr + 0)[0]);
-		local dest_port = ffi.C.ntohs( ffi.cast("uint16_t*", alert_pkt.pkt + alert_pkt.transhdr + 2)[0]);
-		local ip_protocol = ffi.cast("uint8_t*", alert_pkt.pkt + alert_pkt.nethdr + 9)[0];
+        local source_ip = ffi.string(ffi.C.inet_ntop( K.AF_INET,  alert_pkt.pkt + alert_pkt.nethdr + 12,  buf, 32)); 
+        local dest_ip   = ffi.string(ffi.C.inet_ntop( K.AF_INET,  alert_pkt.pkt + alert_pkt.nethdr + 16,  buf, 32)); 
+        local source_port = ffi.C.ntohs( ffi.cast("uint16_t*", alert_pkt.pkt + alert_pkt.transhdr + 0)[0]);
+        local dest_port = ffi.C.ntohs( ffi.cast("uint16_t*", alert_pkt.pkt + alert_pkt.transhdr + 2)[0]);
+        local ip_protocol = ffi.cast("uint8_t*", alert_pkt.pkt + alert_pkt.nethdr + 9)[0];
 
-        local ret =  {
+        local new_alert =  {
 
             AlertGroupGUID='{9AFD8C08-07EB-47E0-BF05-28B4A7AE8DC9}',     -- Trisul alert group = External IDS 
-            TimestampSecs = ffi.C.ntohl(alert_pkt.event.event_second),                -- Epoch based time stamps
+            TimestampSecs = ffi.C.ntohl(alert_pkt.event.event_second),   -- Epoch based time stamps
             TimestampUsecs = ffi.C.ntohl(alert_pkt.event.event_microsecond),
-            SigIDKey = ffi.C.ntohl(alert_pkt.event.signature_id),                     -- SigIDKey is mandatory 
+            SigIDKey = ffi.C.ntohl(alert_pkt.event.signature_id),        -- SigIDKey is mandatory 
             SigIDLabel = ffi.string(alert_pkt.alertmsg),                 -- User Label for the above SigIDKey 
             SourceIP = source_ip,                                        -- IP and Port pretty direct mappings
             SourcePort = source_port,
@@ -170,13 +168,13 @@ TrisulPlugin = {
             SigRev = ffi.C.ntohl(alert_pkt.event.signature_revision),
             Priority = ffi.C.ntohl(alert_pkt.event.priority_id),
             ClassificationKey = ffi.C.ntohl(alert_pkt.event.classification_id),
-            AlertStatus="FIRED",                                		  -- allowed/blocked like ALARM/CLEAR
+            AlertStatus="FIRED",                                          -- allowed/blocked like ALARM/CLEAR
             AlertDetails="from gen:"..ffi.C.ntohl(alert_pkt.event.generator_id)        -- why waste a text field 'AlertDetails'?
         };
 
---		dbg();
+--      dbg();
 
-        return ret;
+        return new_alert;
 
     end
 
