@@ -28,13 +28,13 @@ You can interface to Suricata EVE (which is a great new format) or to traditiona
 using these LUA input filter scripts. 
 
 
-# suricata_eve.lua
+### suricata_eve.lua
 Suricata writes alerts (and other stuff) to eve.json using the EVE JSON format for IDS alerts.
 This script picks that up and pushes _only_ the alerts into Trisul. Also uses a .waldo file to keep track
 of where it left off just like traditional logtail systems like Fluentd.
 
 
-# suricata_eve_unixsocket.lua 
+### suricata_eve_unixsocket.lua 
 Uses LuaJIT FFI to open a Unix socket and then pull EVE JSON alerts from it.  Demonstrates  the following
 
 1. LuaJIT FFI 
@@ -42,14 +42,14 @@ Uses LuaJIT FFI to open a Unix socket and then pull EVE JSON alerts from it.  De
 3. Handle failure by returning false from @onload(..)@ which effectively unloads the script
 
 
-# snort_unixsocket.lua
+### snort_unixsocket.lua
 By default Trisul opens a single socket to which you can plugin your snort alerts by running it in
 'snort -A unsock ..'  - This LUA script lets to do this outside of Trisul.  Demonstrates
 
 1. LuaJIT FFI technique for typecasting,network/byte order 
 2. How to unpack a C Struct , extract IP headers etc
 
-# barnyard2_unixsocket.lua
+### barnyard2_unixsocket.lua
 Barnyard2 writes Unix socket in a different format  called Unified2. This LUA script picks up those alerts
 and constructs an alert {..} object.   Suitable for use with Security Onion, just turn on  in barnyard2.conf
 
