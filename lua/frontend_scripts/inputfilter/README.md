@@ -24,8 +24,8 @@ For more details see http://trisul.org/docs/lua/basics.html#installing_and_unins
 Alerts 
 ======
 
-You can interface to Suricata EVE (which is a great new format) or to traditional Unified/Unified2 formats
-using these LUA input filter scripts. 
+You can interface to Suricata EVE (which is a great new JSON based format) or to traditional Unified/Unified2 
+binary formats using these LUA input filter scripts. We use LuaJIT FFI to talk Unix Sockets. 
 
 
 ### suricata_eve.lua
