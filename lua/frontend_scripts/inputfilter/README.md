@@ -1,23 +1,69 @@
 Input Filters 
 =============
 
-Using LUA input filter framework you can drive the Trisul pipelines. 
-Some samples in this directory
 
-# lanlflow.lua 
-How to take a completely arbitrary Network Flows dump and use that to drive Trisul. Here we
-use the lanl.gov dump. 
+Input filters are LUA scripts you write that let you drive Trisul using custom input.
+
+Documentation for _input filters_ can be found at http://trisul.org/docs/lua/inputfilter.html
+
+
+Samples in this directory demonstrate how to 
+
+1.  Interface to various IDS alert systems (simulataneously) Demonstates the 'step_alert' function
+2.  Read Flow and Packet data from custom formats. Demonstrates the 'step' function 
+
+
+Installing these scripts
+========================
+
+Simply pop the .lua files  in /usr/local/var/lib/trisul-probe/domain0/probe0/context0/config/local-lua 
+
+For more details see http://trisul.org/docs/lua/basics.html#installing_and_uninstalling
+
+
+Alerts 
+======
+
+You can interface to Suricata EVE (which is a great new format) or to traditional Unified/Unified2 formats
+using these LUA input filter scripts. 
+
 
 # suricata_eve.lua
 Suricata writes alerts (and other stuff) to eve.json using the EVE JSON format for IDS alerts.
-This script picks that up and pushes the alerts into Trisul.
+This script picks that up and pushes _only_ the alerts into Trisul. Also uses a .waldo file to keep track
+of where it left off just like traditional logtail systems like Fluentd.
+
+
+# suricata_eve_unixsocket.lua 
+Uses LuaJIT FFI to open a Unix socket and then pull EVE JSON alerts from it.  Demonstrates  the following
+
+1. LuaJIT FFI 
+2. How to setup unix socket and create the alert { .. } object 
+3. Handle failure by returning false from @onload(..)@ which effectively unloads the script
+
+
+# snort_unixsocket.lua
+By default Trisul opens a single socket to which you can plugin your snort alerts by running it in
+'snort -A unsock ..'  - This LUA script lets to do this outside of Trisul.  Demonstrates
+
+1. LuaJIT FFI technique for typecasting,network/byte order 
+2. How to unpack a C Struct , extract IP headers etc
+
+# barnyard2_unixsocket.lua
+Barnyard2 writes Unix socket in a different format  called Unified2. This LUA script picks up those alerts
+and constructs an alert {..} object.   Suitable for use with Security Onion, just turn on  in barnyard2.conf
+
+````
+output alert_unixsock
+````
 
 
 
 
-
-lanlflow.lua 
+Network Flows:  lanlflow.lua 
 ===============
+
+### Shows how to read an arbitrary network flow file and drive Trisul 
 
 
 LANL has published about 58 days of network flow data for cyber security purposes at
