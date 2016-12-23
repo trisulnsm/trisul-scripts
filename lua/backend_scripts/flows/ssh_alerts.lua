@@ -42,6 +42,14 @@ TrisulPlugin = {
 									 'SSHXFER',
 									 1,
 									 "ssh session transferring ".. total_bytes.." bytes, check it out");
+           engine:add_alert_full("{5E97C3A3-41DB-4E34-92C3-87C904FAB83E}",
+                   newflow:flow():id(),
+                   'SSHXFER',
+                   'attack',
+                   1,
+                   "ssh session transferring ".. total_bytes.." bytes, check it out",
+                   "FIRE")
+
 				end 
 
 			end
