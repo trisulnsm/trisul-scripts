@@ -22,8 +22,6 @@ TrisulPlugin = {
 
 	sg_monitor  = {
 
-	    session_guid = '{99A78737-4B41-4387-8F31-8077DB917336}',
-
 		onnewflow = function(engine, newflow)
 
 			-- p-0016 appears in flowkey format when ssh involved
@@ -32,7 +30,7 @@ TrisulPlugin = {
 
 			if flowkey:match("p-0016") then 
 
-				print("On engine "..engine:instance().." found ssh session " .. newflow:flow():to_s());
+				print("On engine "..engine:instanceid().." found ssh session " .. newflow:flow():to_s());
 
 				local total_bytes =  newflow:az_bytes() + newflow:za_bytes()
 
