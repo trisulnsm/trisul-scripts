@@ -24,7 +24,7 @@ TrisulPlugin = {
 
 	sg_monitor  = {
 
-		onnewflow = function(engine, newflow)
+		onflush  = function(engine, newflow)
 
 			-- p-0016 appears in flowkey format when ssh involved
 			-- you can also newflow:flow():porta_readable() = '22' (for port 22) etc
