@@ -15,9 +15,11 @@ TrisulPlugin = {
 	},
 
 	alertgroup = {
-		guid = '{0409EAC7-1E60-43D3-C0FA-A87429F99728}',	
-		name = 'SSH Alerts',
-		description = 'Alerts on SSH login and transfer'
+		control  = {
+			guid = '{0409EAC7-1E60-43D3-C0FA-A87429F99728}',	
+			name = 'SSH Alerts',
+			description = 'Alerts on SSH login and transfer'
+		} 
 	},
 
 	sg_monitor  = {
@@ -34,7 +36,7 @@ TrisulPlugin = {
 
 				local total_bytes =  newflow:az_bytes() + newflow:za_bytes()
 
-				if total_bytes > 30000 then
+				if total_bytes > 10000 then
 					engine:add_alert('{0409EAC7-1E60-43D3-C0FA-A87429F99728}',
 									 newflow:flow():id(),
 									 'SSHXFER',
