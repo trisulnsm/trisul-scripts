@@ -85,6 +85,12 @@ TrisulPlugin = {
     onendflush = function(engine) 
       -- your lua code goes here 
     end,
+
+    -- WHEN CALLED: every 1 sec
+    onmetronome = function(engine, timestamp, tick_count, tick_interval )
+      -- your lua code goes here 
+    end,
+
   },
 
 }
