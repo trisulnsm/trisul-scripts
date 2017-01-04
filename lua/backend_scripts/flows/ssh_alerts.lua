@@ -15,16 +15,16 @@ TrisulPlugin = {
 	},
 
 	alertgroup = {
-		guid = '{0409EAC7-1E60-43D3-C0FA-A87429F99728}',	
-		name = 'SSH Alerts',
-		description = 'Alerts on SSH login and transfer'
+		control  = {
+			guid = '{0409EAC7-1E60-43D3-C0FA-A87429F99728}',	
+			name = 'SSH Alerts',
+			description = 'Alerts on SSH login and transfer'
+		} 
 	},
 
 	sg_monitor  = {
 
-	    session_guid = '{99A78737-4B41-4387-8F31-8077DB917336}',
-
-		onnewflow = function(engine, newflow)
+		onflush  = function(engine, newflow)
 
 			-- p-0016 appears in flowkey format when ssh involved
 			-- you can also newflow:flow():porta_readable() = '22' (for port 22) etc
@@ -32,11 +32,11 @@ TrisulPlugin = {
 
 			if flowkey:match("p-0016") then 
 
-				print("On engine "..engine:instance().." found ssh session " .. newflow:flow():to_s());
+				print("On engine "..engine:instanceid().." found ssh session " .. newflow:flow():to_s());
 
 				local total_bytes =  newflow:az_bytes() + newflow:za_bytes()
 
-				if total_bytes > 30000 then
+				if total_bytes > 10000 then
 					engine:add_alert('{0409EAC7-1E60-43D3-C0FA-A87429F99728}',
 									 newflow:flow():id(),
 									 'SSHXFER',
