@@ -7,7 +7,6 @@
 --              the "flush" activity when alerts are forwarded to the 
 --              Hub nodes for storage. 
 -- 
--- 
 TrisulPlugin = { 
 
  -- the ID block, you can skip the fields marked 'optional '
