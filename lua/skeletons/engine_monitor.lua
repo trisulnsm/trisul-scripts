@@ -19,9 +19,9 @@ TrisulPlugin = {
     version_minor = 0,                        -- optional
   },
 
-  -- 
-  -- common functions onload, onunload, onmessage()..
 
+
+  -- common functions onload, onunload, onmessage()..
   -- WHEN CALLED : your LUA script is loaded into Trisul 
   onload = function()
     -- your code 
@@ -37,8 +37,9 @@ TrisulPlugin = {
 
   -- WHEN CALLED: when another plugin sends you a message 
   onmessage = function(msgid, msg)
-    
+    -- your code 
   end,
+
 
 
   -- engine_monitor block
