@@ -5,7 +5,7 @@ Dynamic DNS lets you access your resource using a fixed domain name while your I
 
 Presence of dynamic DNS in your organizations traffic definitely warrants a closer look at whats going on.  Think of it is a low cost but essential threat hunting. You can use it to update alerts, enrich other types of data, or just record it in the logs for future data mining.
 
-The Intel is open and  relatively easy to collate. You can get a  list of providers here http://dnslookup.me/dynamic-dns/ - then visit each of the Free providers like Afraid.Org and draw up a list of domains.  The providers usually own the 2LD (or sometimes 3LD) and you get add the front part.
+The Intel is open and  relatively easy to collate. You can get a  list of providers here http://dnslookup.me/dynamic-dns/ - then visit each of the Free providers like Afraid.Org and draw up a list of domains.  The providers usually own the 2LD (or sometimes 3LD) and you get to add the front part.
 
 Here is a script you can use now. 
 
