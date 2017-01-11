@@ -100,33 +100,36 @@
 
 ## trp.proto
 
-
+trp.proto - Trisul Remote Protocol .proto file
+TRP : Trisul Remote Protocol is a remote query API that allows
+clients to connect and retrieve data from Trisul Hub
 
 <a name="TRP.AlertT"/>
 ### AlertT
-/////////////////////////////////
-AlertT
+AlertT : an alert in Trisul 
+/  all alert types Threshold Crossing, Flow Tracker, Badfellas, custom alerts use 
+/  the same object below
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| sensor_id | [int64](#int64) | optional |  |
-| time | [Timestamp](#TRP.Timestamp) | required |  |
-| alert_id | [string](#string) | required |  |
-| source_ip | [KeyT](#TRP.KeyT) | optional |  |
+| sensor_id | [int64](#int64) | optional | source of alert, usually not used |
+| time | [Timestamp](#TRP.Timestamp) | required | timestamp |
+| alert_id | [string](#string) | required | DB alert ID eg 99:8:98838 |
+| source_ip | [KeyT](#TRP.KeyT) | optional | source ip |
 | source_port | [KeyT](#TRP.KeyT) | optional |  |
 | destination_ip | [KeyT](#TRP.KeyT) | optional |  |
 | destination_port | [KeyT](#TRP.KeyT) | optional |  |
-| sigid | [KeyT](#TRP.KeyT) | optional |  |
-| classification | [KeyT](#TRP.KeyT) | optional |  |
-| priority | [KeyT](#TRP.KeyT) | optional |  |
-| dispatch_time | [Timestamp](#TRP.Timestamp) | optional |  |
-| dispatch_message1 | [string](#string) | optional |  |
-| dispatch_message2 | [string](#string) | optional |  |
-| occurrances | [int64](#int64) | optional |  Default: 1 |
-| group_by_key | [string](#string) | optional |  |
-| probe_id | [string](#string) | optional |  |
-| alert_status | [string](#string) | optional |  |
-| acknowledge_flag | [int64](#int64) | optional |  |
+| sigid | [KeyT](#TRP.KeyT) | optional | unique key representing alert type |
+| classification | [KeyT](#TRP.KeyT) | optional | classification (from IDS terminology) |
+| priority | [KeyT](#TRP.KeyT) | optional | priority 1,2,3 |
+| dispatch_time | [Timestamp](#TRP.Timestamp) | optional | sent time |
+| dispatch_message1 | [string](#string) | optional | a free format string created by generator of alert |
+| dispatch_message2 | [string](#string) | optional | second format |
+| occurrances | [int64](#int64) | optional | number of occurranes, used by QueryAlerts for aggregation Default: 1 |
+| group_by_key | [string](#string) | optional | aggregation key |
+| probe_id | [string](#string) | optional | probe generating this alert |
+| alert_status | [string](#string) | optional | FIRE,CLEAR,BLOCK etc |
+| acknowledge_flag | [int64](#int64) | optional | ACK or NOT |
 
 
 <a name="TRP.AsyncRequest"/>
@@ -165,9 +168,9 @@ ContextConfigRequest - start stop status
 | context_name | [string](#string) | required |  |
 | profile | [string](#string) | optional |  |
 | params | [string](#string) | optional |  |
-| push_config_blob | [bytes](#bytes) | optional |  |
-| query_config | [NameValue](#TRP.NameValue) | repeated |  |
-| set_config_values | [NameValue](#TRP.NameValue) | repeated |  |
+| push_config_blob | [bytes](#bytes) | optional | push this .. |
+| query_config | [NameValue](#TRP.NameValue) | repeated | query, leave the .value field blank |
+| set_config_values | [NameValue](#TRP.NameValue) | repeated | push this ..  (name=value;name=value ..) |
 
 
 <a name="TRP.ContextConfigResponse"/>
@@ -178,13 +181,13 @@ ContextConfigRequest - start stop status
 | ----- | ---- | ----- | ----------- |
 | context_name | [string](#string) | required |  |
 | profile | [string](#string) | optional |  |
-| params | [string](#string) | optional |  |
-| pull_config_blob | [bytes](#bytes) | optional |  |
-| config_blob | [bytes](#bytes) | optional |  |
+| params | [string](#string) | optional | what kind of config you want |
+| pull_config_blob | [bytes](#bytes) | optional | config |
+| config_blob | [bytes](#bytes) | optional | compress tar.gz .. |
 | endpoints_flush | [string](#string) | repeated |  |
 | endpoints_query | [string](#string) | repeated |  |
 | endpoints_pub | [string](#string) | repeated |  |
-| config_values | [NameValue](#TRP.NameValue) | repeated |  |
+| config_values | [NameValue](#TRP.NameValue) | repeated | query, leave the .value field blank |
 | layers | [ContextConfigResponse.Layer](#TRP.ContextConfigResponse.Layer) | repeated |  |
 
 
@@ -219,8 +222,8 @@ ContextDelete  : initialize
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| context_name | [string](#string) | required |  |
-| reset_data | [bool](#bool) | optional |  |
+| context_name | [string](#string) | required | if not  set all context get in |
+| reset_data | [bool](#bool) | optional | reset data dont delete everything |
 
 
 <a name="TRP.ContextInfoRequest"/>
@@ -231,8 +234,8 @@ ContextInfo : one or all contexts
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| context_name | [string](#string) | optional |  |
-| get_size_on_disk | [bool](#bool) | optional |  Default: false |
+| context_name | [string](#string) | optional | if not  set all context get in |
+| get_size_on_disk | [bool](#bool) | optional | get size on disk (expensive) Default: false |
 
 
 <a name="TRP.ContextInfoResponse"/>
@@ -269,11 +272,11 @@ ContextInfo : one or all contexts
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| context_name | [string](#string) | required |  |
+| context_name | [string](#string) | required | if not  set all context get in |
 | mode | [string](#string) | optional |  |
 | background | [bool](#bool) | optional |  |
 | pcap_path | [string](#string) | optional |  |
-| run_tool | [string](#string) | optional |  |
+| run_tool | [string](#string) | optional | snort, suricata supported.. |
 | tool_ids_config | [string](#string) | optional |  |
 | tool_av_config | [string](#string) | optional |  |
 
@@ -284,8 +287,8 @@ ContextInfo : one or all contexts
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| context_name | [string](#string) | required |  |
-| run_tool | [string](#string) | optional |  |
+| context_name | [string](#string) | required | if not  set all context get in |
+| run_tool | [string](#string) | optional | snort, suricata , trp, flushd supported.. |
 
 
 <a name="TRP.CounterGroupInfoRequest"/>
@@ -311,72 +314,69 @@ ContextInfo : one or all contexts
 
 <a name="TRP.CounterGroupT"/>
 ### CounterGroupT
-
+CounterGroupT : Represents a counter group 
+/
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| guid | [string](#string) | required |  |
-| name | [string](#string) | required |  |
-| bucket_size | [int64](#int64) | optional |  |
-| time_interval | [TimeInterval](#TRP.TimeInterval) | optional |  |
-| topper_bucket_size | [int64](#int64) | optional |  |
-| meters | [MeterInfo](#TRP.MeterInfo) | repeated |  |
+| guid | [string](#string) | required | guid identifying the CG |
+| name | [string](#string) | required | CG name |
+| bucket_size | [int64](#int64) | optional | bucketsize for all meters in this group |
+| time_interval | [TimeInterval](#TRP.TimeInterval) | optional | total time interval available in DB |
+| topper_bucket_size | [int64](#int64) | optional | topper bucketsize (streaming analytics window) |
+| meters | [MeterInfo](#TRP.MeterInfo) | repeated | array of meter information (m0, m1, .. mn) |
 
 
 <a name="TRP.CounterGroupTopperRequest"/>
 ### CounterGroupTopperRequest
-////////////////////////////
-CounterGroupTopperRequest
+CounterGroupTopperRequest  - retrieve toppers for a counter group (top-K)
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| counter_group | [string](#string) | required |  |
-| meter | [int64](#int64) | optional |  Default: 0 |
-| maxitems | [int64](#int64) | optional |  Default: 100 |
-| time_interval | [TimeInterval](#TRP.TimeInterval) | optional |  |
+| counter_group | [string](#string) | required | guid of CG |
+| meter | [int64](#int64) | optional | meter; eg to get Top Hosts By Connections use cg=Hosts meter = 6(connections) Default: 0 |
+| maxitems | [int64](#int64) | optional | number of top items to retreive Default: 100 |
+| time_interval | [TimeInterval](#TRP.TimeInterval) | optional | time interval |
 | time_instant | [Timestamp](#TRP.Timestamp) | optional |  |
 | flags | [int64](#int64) | optional |  |
-| resolve_keys | [bool](#bool) | optional |  Default: true |
+| resolve_keys | [bool](#bool) | optional | retrieve labels as set in the response for each key Default: true |
 
 
 <a name="TRP.CounterGroupTopperResponse"/>
 ### CounterGroupTopperResponse
-////////////////////////////
 CounterGroupTopperResponse
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| counter_group | [string](#string) | required |  |
-| meter | [int64](#int64) | required |  |
-| sysgrouptotal | [int64](#int64) | optional |  |
-| keys | [KeyT](#TRP.KeyT) | repeated |  |
+| counter_group | [string](#string) | required | request cgid |
+| meter | [int64](#int64) | required | from request |
+| sysgrouptotal | [int64](#int64) | optional | the metric value for &quot;Others..&quot;  after Top-K |
+| keys | [KeyT](#TRP.KeyT) | repeated | topper keys, KeyT.metric contains the top-k value |
 
 
 <a name="TRP.CounterItemRequest"/>
 ### CounterItemRequest
-////////////////////////////
-CounterItemRequest
+CounterItemRequest : Time series history statistics for an item
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| counter_group | [string](#string) | required |  |
-| meter | [int64](#int64) | optional |  |
-| key | [KeyT](#TRP.KeyT) | required |  |
-| time_interval | [TimeInterval](#TRP.TimeInterval) | required |  |
-| volumes_only | [int64](#int64) | optional |  Default: 0 |
+| counter_group | [string](#string) | required | guid of counter group |
+| meter | [int64](#int64) | optional | optional meter, default will retrieve all (same cost) |
+| key | [KeyT](#TRP.KeyT) | required | key (can specify key.key, key.label, etc too |
+| time_interval | [TimeInterval](#TRP.TimeInterval) | required | Time interval for query |
+| volumes_only | [int64](#int64) | optional | if '1' ; then only retrieves totals for each meter Default: 0 |
 
 
 <a name="TRP.CounterItemResponse"/>
 ### CounterItemResponse
-////////////////////////////
-CounterItemResponse
+CounterItemResponse  -
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| counter_group | [string](#string) | required |  |
-| key | [KeyT](#TRP.KeyT) | required |  |
-| totals | [StatsArray](#TRP.StatsArray) | optional |  |
-| stats | [StatsArray](#TRP.StatsArray) | repeated |  |
+| counter_group | [string](#string) | required | guid of CG |
+| key | [KeyT](#TRP.KeyT) | required | key : filled up with readable,label automatically |
+| totals | [StatsArray](#TRP.StatsArray) | optional | if volumes_only = 1 in request, this contains totals for each metric |
+| stats | [StatsArray](#TRP.StatsArray) | repeated | time series stats - can use to draw charts etc |
 
 
 <a name="TRP.DeleteAlertsRequest"/>
@@ -396,26 +396,26 @@ CounterItemResponse
 | priority | [KeyT](#TRP.KeyT) | optional |  |
 | any_ip | [KeyT](#TRP.KeyT) | optional |  |
 | any_port | [KeyT](#TRP.KeyT) | optional |  |
-| message_regex | [string](#string) | optional |  |
+| message_regex | [string](#string) | optional | delete using regex |
 
 
 <a name="TRP.DocumentT"/>
 ### DocumentT
-/////////////////////////////////
-DocumentT
+DocumentT : a full text document 
+/     full HTTP headers, printable TLS certs, etc
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| dockey | [string](#string) | required |  |
-| fts_attributes | [string](#string) | optional |  |
-| fullcontent | [string](#string) | optional |  |
-| flows | [DocumentT.Flow](#TRP.DocumentT.Flow) | repeated |  |
+| dockey | [string](#string) | required | unique id |
+| fts_attributes | [string](#string) | optional | attibutes used for facets |
+| fullcontent | [string](#string) | optional | full document text |
+| flows | [DocumentT.Flow](#TRP.DocumentT.Flow) | repeated | list of flows where this doc was seen |
 | probe_id | [string](#string) | optional |  |
 
 
 <a name="TRP.DocumentT.Flow"/>
 ### DocumentT.Flow
-
+this document was seen at these time and on this flow
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -464,51 +464,49 @@ DocumentT
 
 <a name="TRP.ErrorResponse"/>
 ### ErrorResponse
-////////////////////////////
-Error
+ErrorResponse
+/ All XYZRequest() messages can either generate a XYZResponse() or an ErrorResponse()
+/ you need to handle the error case
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| original_command | [int64](#int64) | required |  |
-| error_code | [int64](#int64) | required |  |
-| error_message | [string](#string) | required |  |
+| original_command | [int64](#int64) | required | Command ID of request |
+| error_code | [int64](#int64) | required | numeric error code |
+| error_message | [string](#string) | required | error string |
 
 
 <a name="TRP.FileRequest"/>
 ### FileRequest
-//////////////////////////////////
-FileRequest
+FileRequest   - used to download files from Trisul domain nodes like probes
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| uri | [string](#string) | required |  |
-| position | [int64](#int64) | required |  |
-| params | [string](#string) | optional |  |
-| context_name | [string](#string) | optional |  |
+| uri | [string](#string) | required | uri of resource you want to download , example PcapResponse.save_file |
+| position | [int64](#int64) | required | seek position in that file |
+| params | [string](#string) | optional | local meaning sentback n response |
+| context_name | [string](#string) | optional | context name |
 | delete_on_eof | [bool](#bool) | optional |  Default: false |
 
 
 <a name="TRP.FileResponse"/>
 ### FileResponse
-///////////////////////////////
 FileResponse
-     one chunk at at time, Trisul has slightly inefficient File Transfer
-     for very large files, since most files are data feeds  &lt; 100MB fine for now
+/      one chunk at at time, Trisul has slightly inefficient File Transfer
+/      for very large files, since most files are data feeds  &lt; 100MB fine for now
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| uri | [string](#string) | required |  |
-| eof | [bool](#bool) | required |  |
-| position | [int64](#int64) | optional |  |
-| content | [bytes](#bytes) | optional |  |
+| uri | [string](#string) | required | requested URI |
+| eof | [bool](#bool) | required | end of all chunks |
+| position | [int64](#int64) | optional | current  position |
+| content | [bytes](#bytes) | optional | file chunk content |
 | request_params | [string](#string) | optional |  |
 | context_name | [string](#string) | optional |  |
 
 
 <a name="TRP.GrepRequest"/>
 ### GrepRequest
-/////////////////////////////////
-GrepRequest
+GrepRequest - reconstruct and search for patterns in saved packets
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -516,35 +514,33 @@ GrepRequest
 | time_interval | [TimeInterval](#TRP.TimeInterval) | required |  |
 | maxitems | [int64](#int64) | optional |  Default: 100 |
 | flowcutoff_bytes | [int64](#int64) | optional |  |
-| pattern_hex | [string](#string) | optional |  |
-| pattern_text | [string](#string) | optional |  |
-| pattern_file | [string](#string) | optional |  |
-| md5list | [string](#string) | repeated |  |
+| pattern_hex | [string](#string) | optional | hex patttern |
+| pattern_text | [string](#string) | optional | plain text |
+| pattern_file | [string](#string) | optional | a file - must be available at probe |
+| md5list | [string](#string) | repeated | a list of MD5 matching the content |
 | resolve_keys | [bool](#bool) | optional |  Default: true |
 
 
 <a name="TRP.GrepResponse"/>
 ### GrepResponse
-//////////////////////////////////
 GrepResponse
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | context_name | [string](#string) | required |  |
-| sessions | [SessionT](#TRP.SessionT) | repeated |  |
-| hints | [string](#string) | repeated |  |
+| sessions | [SessionT](#TRP.SessionT) | repeated | sessionT with keys containing the content |
+| hints | [string](#string) | repeated | some surrounding context for the match |
 | probe_id | [string](#string) | optional |  |
 
 
 <a name="TRP.HelloRequest"/>
 ### HelloRequest
-////////////////////////////
-Hello
+Hello Request : use to check connectivity
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| station_id | [string](#string) | required |  |
-| message | [string](#string) | optional |  |
+| station_id | [string](#string) | required | an id of the query client trying to connect |
+| message | [string](#string) | optional | a message (will be echoed back in response) |
 
 
 <a name="TRP.HelloResponse"/>
@@ -553,16 +549,17 @@ Hello
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| station_id | [string](#string) | required |  |
-| station_id_request | [string](#string) | optional |  |
-| message | [string](#string) | optional |  |
-| local_timestamp | [int64](#int64) | optional |  |
+| station_id | [string](#string) | required | station id of the query server |
+| station_id_request | [string](#string) | optional | station id found in the request |
+| message | [string](#string) | optional | message found in the request |
+| local_timestamp | [int64](#int64) | optional | local timestamp at server, used to detect drifts |
 
 
 <a name="TRP.KeySpaceRequest"/>
 ### KeySpaceRequest
-/////////////////////////////////
-KeySpaceRequest
+KeySpaceRequest - search hits in Key Space 
+/ for example you can search the key space 10.0.0.0 to 11.0.0.0 to get all IP 
+/ seen in that range
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -579,43 +576,45 @@ KeySpaceRequest
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| from_key | [KeyT](#TRP.KeyT) | required |  |
-| to_key | [KeyT](#TRP.KeyT) | required |  |
+| from_key | [KeyT](#TRP.KeyT) | required | from key representing start of keyspace |
+| to_key | [KeyT](#TRP.KeyT) | required | end of key space |
 
 
 <a name="TRP.KeySpaceResponse"/>
 ### KeySpaceResponse
-//////////////////////////////////
 KeySpaceResponse
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | counter_group | [string](#string) | optional |  |
-| hits | [KeyT](#TRP.KeyT) | repeated |  |
+| hits | [KeyT](#TRP.KeyT) | repeated | array of keys in the requested space |
 
 
 <a name="TRP.KeyStats"/>
 ### KeyStats
-
+KeyStats - A full time series item (countergroup, key, timeseries) 
+/
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| counter_group | [string](#string) | required |  |
-| key | [KeyT](#TRP.KeyT) | required |  |
-| meters | [MeterValues](#TRP.MeterValues) | repeated |  |
+| counter_group | [string](#string) | required | guid of counter group |
+| key | [KeyT](#TRP.KeyT) | required | key representing an item |
+| meters | [MeterValues](#TRP.MeterValues) | repeated | array of timeseries (timeseries-meter0, ts-meter1, ...ts-meter-n) |
 
 
 <a name="TRP.KeyT"/>
 ### KeyT
-
+KeyT : Represents a Key 
+/ Top level objects are named ObjT 
+/   eg KeyT - Key Type, SessionT - Session Type etc.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| key | [string](#string) | optional |  |
-| readable | [string](#string) | optional |  |
-| label | [string](#string) | optional |  |
-| description | [string](#string) | optional |  |
-| metric | [int64](#int64) | optional |  |
+| key | [string](#string) | optional | key in trisul key format eg, C0.A8.01.02 for 192.168.1.2 |
+| readable | [string](#string) | optional | human friendly name |
+| label | [string](#string) | optional | a user label eg, a hostname or manually assigned name |
+| description | [string](#string) | optional | description |
+| metric | [int64](#int64) | optional | optional : a single metric value - relevant to the query used |
 
 
 <a name="TRP.LogRequest"/>
@@ -643,12 +642,17 @@ LogRequest  - want log file
 | context_name | [string](#string) | required |  |
 | logfilename | [string](#string) | optional |  |
 | seekpos | [int64](#int64) | optional |  |
-| log_lines | [string](#string) | repeated |  |
+| log_lines | [string](#string) | repeated | compressed gz |
 
 
 <a name="TRP.Message"/>
 ### Message
-
+/ Top level message is TRP::Message
+/  - wraps the actual request or response 
+/ 
+/ You must set trp.command = &lt;cmd&gt; for EACH request in addition to 
+/ constructing the actual TRP request message 
+/
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -734,7 +738,7 @@ MeterType : information about a particular meter
 <a name="TRP.MeterValues"/>
 ### MeterValues
 MeterValues : a timeseries  (meter_id, stat1, stat2, ... statn) 
-/		this is rarely used because StatsArray is available .
+/     this is rarely used because StatsArray is available .
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -796,10 +800,10 @@ MetricsSummaryResponse
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| guid | [string](#string) | required |  |
-| name | [string](#string) | optional |  |
-| download_rules | [string](#string) | optional |  |
-| uri | [string](#string) | repeated |  |
+| guid | [string](#string) | required | identifying feed group (eg Geo, Badfellas) |
+| name | [string](#string) | optional | name |
+| download_rules | [string](#string) | optional | xml file with feed update instructions |
+| uri | [string](#string) | repeated | individual files in config//.. for FileRequest download |
 
 
 <a name="TRP.NodeConfigResponse"/>
@@ -829,26 +833,34 @@ MetricsSummaryResponse
 
 <a name="TRP.OKResponse"/>
 ### OKResponse
-////////////////////////////
-OK
+OKResponse
+/ many messages return an OKResponse indicating success of operation
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| original_command | [int64](#int64) | required |  |
-| message | [string](#string) | optional |  |
+| original_command | [int64](#int64) | required | command id of request |
+| message | [string](#string) | optional | success message |
 
 
 <a name="TRP.PcapRequest"/>
 ### PcapRequest
-////////////////////////////
-PcapReqiest
- NOTE - only one of the various filters are supported
- sending &gt; 1 will result in error 
- 
-Modes
- 1.  nothing set =&gt; PCAP file in contents
- 2.  save_file_prefix set =&gt;  file download token
- 3.  merge_pcap_files =&gt; file download token
+PcapRequest - retrieve a PCAP
+/ ** Sent directly to each probe rather than to the DB query HUB **  
+/
+/ PCAP Request for a file -&gt; put a file on the probe &gt; return a token
+/    &gt; use that token in FileDownload or another PcapRequest to merge multiple files and then FileDownload  
+/
+/ see app notes and examples
+/
+/  NOTE - only one of the various filters are supported
+/  sending &gt; 1 will result in error 
+/  
+/ Modes
+/  1.  nothing set =&gt; PCAP file in contents
+/  2.  save_file_prefix set =&gt;  file download token
+/  3.  merge_pcap_files =&gt; file download token 
+/ 
+/
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -857,16 +869,16 @@ Modes
 | compress_type | [CompressionType](#TRP.CompressionType) | optional |  Default: UNCOMPRESSED |
 | time_interval | [TimeInterval](#TRP.TimeInterval) | optional |  |
 | save_file_prefix | [string](#string) | optional |  |
-| filter_expression | [string](#string) | optional |  |
-| merge_pcap_files | [string](#string) | repeated |  |
+| filter_expression | [string](#string) | optional | PCAP filter expression in Trisul Filter format |
+| merge_pcap_files | [string](#string) | repeated | list of PCAP files on probe that you need to merge |
 | delete_after_merge | [bool](#bool) | optional |  Default: true |
 | format | [PcapFormat](#TRP.PcapFormat) | optional |  Default: LIBPCAP |
 
 
 <a name="TRP.PcapResponse"/>
 ### PcapResponse
-//////////////////////////////////
-FileredDatagaramResponse
+Pcap Response - for small files (&lt;1MB) contents directly contain the PCAP 
+/   for larger files, save_file contains a download token for use by FileRequest
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -927,8 +939,8 @@ ProbeStatsResponse
 
 <a name="TRP.QueryAlertsRequest"/>
 ### QueryAlertsRequest
-/////////////////////////////////
-QueryAlertsRequest
+QueryAlertsRequest - query alerts in system, can group_by (aggregate) any one field 
+/ multiple query fields are treated as AND
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -942,31 +954,33 @@ QueryAlertsRequest
 | sigid | [KeyT](#TRP.KeyT) | optional |  |
 | classification | [KeyT](#TRP.KeyT) | optional |  |
 | priority | [KeyT](#TRP.KeyT) | optional |  |
-| aux_message1 | [string](#string) | optional |  |
-| aux_message2 | [string](#string) | optional |  |
-| group_by_fieldname | [string](#string) | optional |  |
-| idlist | [string](#string) | repeated |  |
+| aux_message1 | [string](#string) | optional | matches dispatchmessage1 in AlertT |
+| aux_message2 | [string](#string) | optional | matches dispatchmessage2 in AlertT |
+| group_by_fieldname | [string](#string) | optional | can group by any field - group by 'sigid' will group results by sigid |
+| idlist | [string](#string) | repeated | list of alert ids |
 | resolve_keys | [bool](#bool) | optional |  Default: true |
-| any_ip | [KeyT](#TRP.KeyT) | optional |  |
-| any_port | [KeyT](#TRP.KeyT) | optional |  |
-| ip_pair | [KeyT](#TRP.KeyT) | repeated |  |
-| message_regex | [string](#string) | optional |  |
+| any_ip | [KeyT](#TRP.KeyT) | optional | search by any_ip (source_dest) |
+| any_port | [KeyT](#TRP.KeyT) | optional | search by any_port (source_dest) |
+| ip_pair | [KeyT](#TRP.KeyT) | repeated | array of 2 ips |
+| message_regex | [string](#string) | optional | searech via regex of the dispatch message |
 
 
 <a name="TRP.QueryAlertsResponse"/>
 ### QueryAlertsResponse
-//////////////////////////////////
-QueryAlertsResponse
+QueryAlertsResponse - response 
+/ if you used group_by_fieldname then AlertT.occurrances would contain the count
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | alert_group | [string](#string) | required |  |
-| alerts | [AlertT](#TRP.AlertT) | repeated |  |
+| alerts | [AlertT](#TRP.AlertT) | repeated | array of matching alerts |
 
 
 <a name="TRP.QueryFTSRequest"/>
 ### QueryFTSRequest
-
+FTS
+/  query to return docs, docids, and flows based on keyword search
+/
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -988,8 +1002,7 @@ QueryAlertsResponse
 
 <a name="TRP.QueryResourcesRequest"/>
 ### QueryResourcesRequest
-/////////////////////////////////
- QueryResourcesRequest
+QueryResourcesRequest - resource queries
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -1012,7 +1025,6 @@ QueryAlertsResponse
 
 <a name="TRP.QueryResourcesResponse"/>
 ### QueryResourcesResponse
-//////////////////////////////////
 QueryResourceResponse
 
 | Field | Type | Label | Description |
@@ -1023,9 +1035,9 @@ QueryResourceResponse
 
 <a name="TRP.QuerySessionsRequest"/>
 ### QuerySessionsRequest
-////////////////////////////////
-QuerySessions - any of the fields can be filled
-                all the fields filled are treated as AND criteria
+QuerySessions - Query flows 
+/   fields filled are treated as AND criteria 
+/   See SessionT for description of common query fields
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -1036,51 +1048,51 @@ QuerySessions - any of the fields can be filled
 | source_port | [KeyT](#TRP.KeyT) | optional |  |
 | dest_ip | [KeyT](#TRP.KeyT) | optional |  |
 | dest_port | [KeyT](#TRP.KeyT) | optional |  |
-| any_ip | [KeyT](#TRP.KeyT) | optional |  |
-| any_port | [KeyT](#TRP.KeyT) | optional |  |
-| ip_pair | [KeyT](#TRP.KeyT) | repeated |  |
+| any_ip | [KeyT](#TRP.KeyT) | optional | source or dest match |
+| any_port | [KeyT](#TRP.KeyT) | optional | source or dest match |
+| ip_pair | [KeyT](#TRP.KeyT) | repeated | array of 2 ips |
 | protocol | [KeyT](#TRP.KeyT) | optional |  |
-| flowtag | [string](#string) | optional |  |
+| flowtag | [string](#string) | optional | string flow tagger text |
 | nf_routerid | [KeyT](#TRP.KeyT) | optional |  |
 | nf_ifindex_in | [KeyT](#TRP.KeyT) | optional |  |
 | nf_ifindex_out | [KeyT](#TRP.KeyT) | optional |  |
-| subnet_24 | [string](#string) | optional |  |
-| subnet_16 | [string](#string) | optional |  |
-| maxitems | [int64](#int64) | optional |  Default: 100 |
-| volume_filter | [int64](#int64) | optional |  Default: 0 |
+| subnet_24 | [string](#string) | optional | ip /24 subnet  matching |
+| subnet_16 | [string](#string) | optional | ip /16 subnet |
+| maxitems | [int64](#int64) | optional | maximum number of matching flows to retrieve Default: 100 |
+| volume_filter | [int64](#int64) | optional | only retrieve flows &gt; this many bytes (a+z) Default: 0 |
 | resolve_keys | [bool](#bool) | optional |  Default: true |
-| outputpath | [string](#string) | optional |  |
-| idlist | [string](#string) | repeated |  |
+| outputpath | [string](#string) | optional | write results to a file (CSV) on trisul-hub (for very large dumps) |
+| idlist | [string](#string) | repeated | array of flow ids , usually from SessionTracker response |
 
 
 <a name="TRP.QuerySessionsResponse"/>
 ### QuerySessionsResponse
-//////////////////////////////////
-QuerySessionsResponse
+QuerySessionsResponse 
+/  a list of matching flows
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | session_group | [string](#string) | required |  |
-| sessions | [SessionT](#TRP.SessionT) | repeated |  |
-| outputpath | [string](#string) | optional |  |
+| sessions | [SessionT](#TRP.SessionT) | repeated | matching flows SessionT objects |
+| outputpath | [string](#string) | optional | if 'outputpath' set in request, the sessions are here (in CSV format) |
 
 
 <a name="TRP.ResourceT"/>
 ### ResourceT
-/////////////////////////////////
-ResourceT
+ResourceT : represents a &quot;resource&quot; object 
+/ examples DNS records, HTTP URLs, TLS Certificates, extracted file hashes, etc
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| time | [Timestamp](#TRP.Timestamp) | required |  |
-| resource_id | [string](#string) | required |  |
+| time | [Timestamp](#TRP.Timestamp) | required | time resource was seen |
+| resource_id | [string](#string) | required | DB id format = 988:0:8388383 |
 | source_ip | [KeyT](#TRP.KeyT) | optional |  |
 | source_port | [KeyT](#TRP.KeyT) | optional |  |
 | destination_ip | [KeyT](#TRP.KeyT) | optional |  |
 | destination_port | [KeyT](#TRP.KeyT) | optional |  |
-| uri | [string](#string) | optional |  |
-| userlabel | [string](#string) | optional |  |
-| probe_id | [string](#string) | optional |  |
+| uri | [string](#string) | optional | raw resource - uniform resource id ,dns names, http url, etc |
+| userlabel | [string](#string) | optional | additional data |
+| probe_id | [string](#string) | optional | which probe detected this |
 
 
 <a name="TRP.SearchKeysRequest"/>
@@ -1113,45 +1125,47 @@ SearchKeysResponse
 
 <a name="TRP.SessionT"/>
 ### SessionT
-
+SessionT : an IP flow 
+/
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| session_key | [string](#string) | optional |  |
-| session_id | [string](#string) | required |  |
-| user_label | [string](#string) | optional |  |
-| time_interval | [TimeInterval](#TRP.TimeInterval) | required |  |
-| state | [int64](#int64) | optional |  |
-| az_bytes | [int64](#int64) | optional |  |
-| za_bytes | [int64](#int64) | optional |  |
-| az_packets | [int64](#int64) | optional |  |
-| za_packets | [int64](#int64) | optional |  |
-| key1A | [KeyT](#TRP.KeyT) | required |  |
-| key2A | [KeyT](#TRP.KeyT) | required |  |
-| key1Z | [KeyT](#TRP.KeyT) | required |  |
-| key2Z | [KeyT](#TRP.KeyT) | required |  |
-| protocol | [KeyT](#TRP.KeyT) | required |  |
-| nf_routerid | [KeyT](#TRP.KeyT) | optional |  |
-| nf_ifindex_in | [KeyT](#TRP.KeyT) | optional |  |
-| nf_ifindex_out | [KeyT](#TRP.KeyT) | optional |  |
-| tags | [string](#string) | optional |  |
-| az_payload | [int64](#int64) | optional |  |
-| za_payload | [int64](#int64) | optional |  |
-| setup_rtt | [int64](#int64) | optional |  |
-| retransmissions | [int64](#int64) | optional |  |
-| tracker_statval | [int64](#int64) | optional |  |
-| probe_id | [string](#string) | optional |  |
+| session_key | [string](#string) | optional | Trisul format eg 06A:C0.A8.01.02:p-0B94_D1.D8.F9.3A:p-0016 |
+| session_id | [string](#string) | required | SID once stored in DB 883:3:883488 |
+| user_label | [string](#string) | optional | any label assigned by user |
+| time_interval | [TimeInterval](#TRP.TimeInterval) | required | start and end time of flow |
+| state | [int64](#int64) | optional | flow state (see docs) |
+| az_bytes | [int64](#int64) | optional | bytes in A&gt;Z direction, see KeyA&gt;KeyZ |
+| za_bytes | [int64](#int64) | optional | bytes in  Z&gt;A direction |
+| az_packets | [int64](#int64) | optional | pkts in A&gt;Z direction |
+| za_packets | [int64](#int64) | optional | pkts in Z&gt;A direction |
+| key1A | [KeyT](#TRP.KeyT) | required | basically IP A End |
+| key2A | [KeyT](#TRP.KeyT) | required | Port Z End (can be a string like ICMP00, GRE00, for non TCP/UDP) |
+| key1Z | [KeyT](#TRP.KeyT) | required | IP Z end |
+| key2Z | [KeyT](#TRP.KeyT) | required | Port Z End |
+| protocol | [KeyT](#TRP.KeyT) | required | IP Protocol |
+| nf_routerid | [KeyT](#TRP.KeyT) | optional | Netflow only : Router ID |
+| nf_ifindex_in | [KeyT](#TRP.KeyT) | optional | Netflow only : Interface Index |
+| nf_ifindex_out | [KeyT](#TRP.KeyT) | optional | Netflow only : Interface Index |
+| tags | [string](#string) | optional | tags assigned using flow taggers |
+| az_payload | [int64](#int64) | optional | AZ payload - actual content transferred |
+| za_payload | [int64](#int64) | optional | ZA payload |
+| setup_rtt | [int64](#int64) | optional | Round Trip Time for setup : Must have TCPReassmbly enabled on Probe |
+| retransmissions | [int64](#int64) | optional | Retransmissiosn total |
+| tracker_statval | [int64](#int64) | optional | Metric for flow trackers |
+| probe_id | [string](#string) | optional | Probe ID generating this flow |
 
 
 <a name="TRP.SessionTrackerRequest"/>
 ### SessionTrackerRequest
-//////////////////////////////////
-SessionTrackerRequest
+SessionTrackerRequest  - query session trackers 
+/     session trackers are top-k streaming algorithm for network flows 
+/     They are Top Sessions fulfilling a particular preset criterion
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | session_group | [string](#string) | optional |  Default: &quot;{99A78737-4B41-4387-8F31-8077DB917336}&quot; |
-| tracker_id | [int64](#int64) | required |  Default: 1 |
+| tracker_id | [int64](#int64) | required | session tracker id Default: 1 |
 | maxitems | [int64](#int64) | optional |  Default: 100 |
 | time_interval | [TimeInterval](#TRP.TimeInterval) | required |  |
 | resolve_keys | [bool](#bool) | optional |  Default: true |
@@ -1159,13 +1173,16 @@ SessionTrackerRequest
 
 <a name="TRP.SessionTrackerResponse"/>
 ### SessionTrackerResponse
-////////////////////////////////
-SessionTrackerResponse
+SessionTrackerResponse - results of tracker
+/  returns a list of SessionT  for the matching sessions. 
+/  Note: the returned list of SessionT only contains keys (in key format) and the 
+/  tracker_statval reprsenting the tracker metric. You need to send further QuerySession
+/  request with the session_key to retrive the fullflow
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | session_group | [string](#string) | required |  |
-| sessions | [SessionT](#TRP.SessionT) | repeated |  |
+| sessions | [SessionT](#TRP.SessionT) | repeated | contains session_key and tracker_statval |
 | tracker_id | [int64](#int64) | optional |  |
 
 
@@ -1192,7 +1209,6 @@ StatsTuple : a single timeseries vaue (t,v)
 
 <a name="TRP.SubscribeCtl"/>
 ### SubscribeCtl
-////////////////////////////////
 Subscribe - add a subcription to the Real Time channel
 
 | Field | Type | Label | Description |
@@ -1217,7 +1233,10 @@ TimeInterval from and to
 
 <a name="TRP.TimeSlicesRequest"/>
 ### TimeSlicesRequest
-
+Timeslices - retrieves the backend timeslice details 
+/
+/ get the METERS METASLICE info 
+/ .. response = TimeSlicesResponse
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -1263,8 +1282,8 @@ TimeInterval from and to
 
 <a name="TRP.TopperTrendRequest"/>
 ### TopperTrendRequest
-////////////////////////////
-TopperTrendRequest
+TopperTrendRequest - raw top-K at each topper snapshot interval
+/ can use this to see &quot;Top apps over 1 Week&quot;
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -1276,32 +1295,31 @@ TopperTrendRequest
 
 <a name="TRP.TopperTrendResponse"/>
 ### TopperTrendResponse
-////////////////////////////
 TopperTrendResponse
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | counter_group | [string](#string) | required |  |
 | meter | [int64](#int64) | required |  |
-| keytrends | [KeyStats](#TRP.KeyStats) | repeated |  |
+| keytrends | [KeyStats](#TRP.KeyStats) | repeated | timeseries - ts, (array of key stats) for each snapshot interval |
 
 
 <a name="TRP.UpdateKeyRequest"/>
 ### UpdateKeyRequest
-///////////////////////////////////////////
-/ UpdatekeysRequest
+UpdatekeysRequest
 / Response = OKResponse or ErrorResponse
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | counter_group | [string](#string) | required |  |
-| keys | [KeyT](#TRP.KeyT) | repeated |  |
+| keys | [KeyT](#TRP.KeyT) | repeated | key  : if you set both key and label, the DB label will be updated |
 
 
 
 <a name="TRP.AuthLevel"/>
 ### AuthLevel
-
+Enums
+/  Auth Level
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
@@ -1312,7 +1330,7 @@ TopperTrendResponse
 
 <a name="TRP.CompressionType"/>
 ### CompressionType
-
+Compression: Used by PCAP or other content requests
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
@@ -1434,13 +1452,13 @@ from TrisulAPI
 
 <a name="TRP.PcapFormat"/>
 ### PcapFormat
-
+Pcap: format
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
-| LIBPCAP | 1 |  |
+| LIBPCAP | 1 | normal libpcap format *.pcap |
 | UNSNIFF | 2 |  |
-| LIBPCAPNOFILEHEADER | 3 |  |
+| LIBPCAPNOFILEHEADER | 3 | libpcap but without the pcap file header |
 
 <a name="TRP.SubscribeCtl.CtlType"/>
 ### SubscribeCtl.CtlType

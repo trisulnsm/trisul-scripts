@@ -1,11 +1,11 @@
+/// trp.proto - Trisul Remote Protocol .proto file 
+/// TRP : Trisul Remote Protocol is a remote query API that allows
+/// clients to connect and retrieve data from Trisul Hub
+
 // Trisul Remote Protocol (TRP) definition
 // Based on Google Protocol Buffers
 // (c) 2012-16, Unleash Networks (http://www.unleashnetworks.com)
 // $Rev: 6946 $
-
-/// trp.proto - Trisul Remote Protocol .proto file 
-/// TRP : Trisul Remote Protocol is a remote query API that allows
-/// clients to connect and retrieve data from Trisul Hub
 
 option optimize_for = LITE_RUNTIME; 
 
@@ -23,30 +23,30 @@ message Timestamp  {
 
 /// TimeInterval from and to 
 message TimeInterval  {
-    required Timestamp      from=1;	 /// start time 
-    required Timestamp      to=2;	 /// end  time 
+    required Timestamp      from=1;  /// start time 
+    required Timestamp      to=2;    /// end  time 
 }
 
 /// StatsTuple : a single timeseries vaue (t,v) 
 message StatsTuple {
-    required Timestamp      ts=1; 		/// ts 
-    required int64          val=2; 		/// value metric  
+    required Timestamp      ts=1;       /// ts 
+    required int64          val=2;      /// value metric  
 }
 
 /// StatsArray : multiple timeseries values (t, v1, v2, v3...vn) 
 ///    notice we use ts_tv_sec. Most Trisul data have 1 sec resolution.
 message StatsArray {
     required int64          ts_tv_sec=1;  /// tv.tv_sec 
-    repeated int64          values=2; 	  /// array of values 
+    repeated int64          values=2;     /// array of values 
 }
 
 /// MeterValues : a timeseries  (meter_id, stat1, stat2, ... statn) 
-///		this is rarely used because StatsArray is available .
+///     this is rarely used because StatsArray is available .
 message MeterValues {
-    required int32          meter=1;		/// metric id , eg Hosts:TotalConnections 
+    required int32          meter=1;        /// metric id , eg Hosts:TotalConnections 
     repeated StatsTuple     values=2;
-    optional int64          total=3;		/// total of all metric values 
-    optional int64          seconds=4;		/// total number of seconds in time series 
+    optional int64          total=3;        /// total of all metric values 
+    optional int64          seconds=4;      /// total number of seconds in time series 
 }
 
 
@@ -54,7 +54,7 @@ message MeterValues {
 /// 
 message MeterInfo {
 
-	/// types of meters 
+    /// types of meters 
     // from TrisulAPI 
     enum MeterType
     {
@@ -79,121 +79,127 @@ message MeterInfo {
     optional string         units=6;
 }
 
+/// KeyStats - A full time series item (countergroup, key, timeseries) 
+///   
 message KeyStats {
-    required string         counter_group=2;
-    required KeyT           key=3;
-    repeated MeterValues    meters=4;
+    required string         counter_group=2;        /// guid of counter group 
+    required KeyT           key=3;                  /// key representing an item 
+    repeated MeterValues    meters=4;               /// array of timeseries (timeseries-meter0, ts-meter1, ...ts-meter-n) 
 }
 
 
-//
-// Top level objects are named ObjT 
-//   eg KeyT - Key Type, SessionT - Session Type etc.
-//
+/// KeyT : Represents a Key 
+/// Top level objects are named ObjT 
+///   eg KeyT - Key Type, SessionT - Session Type etc.
 message KeyT {
-    optional string         key=1;
-    optional string         readable=2;
-    optional string         label=3;
-    optional string         description=4;
-    optional int64          metric=5;
+    optional string         key=1;                  /// key in trisul key format eg, C0.A8.01.02 for 192.168.1.2
+    optional string         readable=2;             /// human friendly name
+    optional string         label=3;                /// a user label eg, a hostname or manually assigned name 
+    optional string         description=4;          /// description 
+    optional int64          metric=5;               /// optional : a single metric value - relevant to the query used 
 }
 
 
+/// CounterGroupT : Represents a counter group 
+/// 
 message CounterGroupT {
-    required string         guid=1;
-    required string         name=2;
-    optional int64          bucket_size=3;
-    optional TimeInterval   time_interval=4;
-    optional int64          topper_bucket_size=5;
-    repeated MeterInfo      meters=6;
+    required string         guid=1;                 /// guid identifying the CG 
+    required string         name=2;                 /// CG name 
+    optional int64          bucket_size=3;          /// bucketsize for all meters in this group 
+    optional TimeInterval   time_interval=4;        /// total time interval available in DB 
+    optional int64          topper_bucket_size=5;   /// topper bucketsize (streaming analytics window)
+    repeated MeterInfo      meters=6;               /// array of meter information (m0, m1, .. mn) 
 }
 
+/// SessionT : an IP flow 
+/// 
 message SessionT  {
-    optional string         session_key=1;
-    required string         session_id=2;
-    optional string         user_label=3;
-    required TimeInterval   time_interval=4;
-    optional int64          state=5;
-    optional int64          az_bytes=6;
-    optional int64          za_bytes=7;
-    optional int64          az_packets=8;
-    optional int64          za_packets=9;
-    required KeyT           key1A=10;
-    required KeyT           key2A=11;
-    required KeyT           key1Z=12;
-    required KeyT           key2Z=13;
-    required KeyT           protocol=14;
-    optional KeyT           nf_routerid=15;
-    optional KeyT           nf_ifindex_in=16;
-    optional KeyT           nf_ifindex_out=17;
-    optional string         tags=18;
-    optional int64          az_payload=19;
-    optional int64          za_payload=20;
-    optional int64          setup_rtt=21;
-    optional int64          retransmissions=22;
-    optional int64          tracker_statval=23;
-    optional string         probe_id=24;
+    optional string         session_key=1;          /// Trisul format eg 06A:C0.A8.01.02:p-0B94_D1.D8.F9.3A:p-0016
+    required string         session_id=2;           /// SID once stored in DB 883:3:883488
+    optional string         user_label=3;           /// any label assigned by user 
+    required TimeInterval   time_interval=4;        /// start and end time of flow 
+    optional int64          state=5;                /// flow state (see docs)
+    optional int64          az_bytes=6;             /// bytes in A>Z direction, see KeyA>KeyZ 
+    optional int64          za_bytes=7;             /// bytes in  Z>A direction
+    optional int64          az_packets=8;           /// pkts in A>Z direction
+    optional int64          za_packets=9;           /// pkts in Z>A direction
+    required KeyT           key1A=10;               /// basically IP A End
+    required KeyT           key2A=11;               /// Port Z End (can be a string like ICMP00, GRE00, for non TCP/UDP)
+    required KeyT           key1Z=12;               /// IP Z end
+    required KeyT           key2Z=13;               /// Port Z End
+    required KeyT           protocol=14;            /// IP Protocol 
+    optional KeyT           nf_routerid=15;         /// Netflow only : Router ID 
+    optional KeyT           nf_ifindex_in=16;       /// Netflow only : Interface Index 
+    optional KeyT           nf_ifindex_out=17;      /// Netflow only : Interface Index 
+    optional string         tags=18;                /// tags assigned using flow taggers 
+    optional int64          az_payload=19;          /// AZ payload - actual content transferred
+    optional int64          za_payload=20;          /// ZA payload  
+    optional int64          setup_rtt=21;           /// Round Trip Time for setup : Must have TCPReassmbly enabled on Probe
+    optional int64          retransmissions=22;     /// Retransmissiosn total 
+    optional int64          tracker_statval=23;     /// Metric for flow trackers 
+    optional string         probe_id=24;            /// Probe ID generating this flow 
 }
 
 
-////////////////////////////////////
-// AlertT
+/// AlertT : an alert in Trisul 
+///  all alert types Threshold Crossing, Flow Tracker, Badfellas, custom alerts use 
+///  the same object below 
 message AlertT{
-    optional int64          sensor_id=1;
-    required Timestamp      time=2;
-    required string         alert_id=3;
-    optional KeyT           source_ip=4;
+    optional int64          sensor_id=1;            /// source of alert, usually not used
+    required Timestamp      time=2;                 /// timestamp 
+    required string         alert_id=3;             /// DB alert ID eg 99:8:98838
+    optional KeyT           source_ip=4;            /// source ip 
     optional KeyT           source_port=5;
     optional KeyT           destination_ip=6;
     optional KeyT           destination_port=7;
-    optional KeyT           sigid=8;
-    optional KeyT           classification=9;
-    optional KeyT           priority=10;
-    optional Timestamp      dispatch_time=11;
-    optional string         dispatch_message1=12;
-    optional string         dispatch_message2=13;
-    optional int64          occurrances=14[default=1];
-    optional string         group_by_key=15;
-    optional string         probe_id=16;
-    optional string         alert_status=17;
-    optional int64          acknowledge_flag=18;
+    optional KeyT           sigid=8;                /// unique key representing alert type 
+    optional KeyT           classification=9;       /// classification (from IDS terminology)
+    optional KeyT           priority=10;            /// priority 1,2,3 
+    optional Timestamp      dispatch_time=11;       /// sent time 
+    optional string         dispatch_message1=12;   /// a free format string created by generator of alert
+    optional string         dispatch_message2=13;   /// second format 
+    optional int64          occurrances=14[default=1];/// number of occurranes, used by QueryAlerts for aggregation 
+    optional string         group_by_key=15;        /// aggregation key 
+    optional string         probe_id=16;            /// probe generating this alert 
+    optional string         alert_status=17;        /// FIRE,CLEAR,BLOCK etc 
+    optional int64          acknowledge_flag=18;    /// ACK or NOT 
 }
 
 
-////////////////////////////////////
-// ResourceT
+/// ResourceT : represents a "resource" object 
+/// examples DNS records, HTTP URLs, TLS Certificates, extracted file hashes, etc 
 message ResourceT {
-    required Timestamp      time=1;
-    required string         resource_id=2;
-    optional KeyT           source_ip=3;
+    required Timestamp      time=1;                 /// time resource was seen 
+    required string         resource_id=2;          /// DB id format = 988:0:8388383
+    optional KeyT           source_ip=3;            
     optional KeyT           source_port=4;
     optional KeyT           destination_ip=5;
     optional KeyT           destination_port=6;
-    optional string         uri=7;
-    optional string         userlabel=8;
-    optional string         probe_id=9;
+    optional string         uri=7;                  /// raw resource - uniform resource id ,dns names, http url, etc
+    optional string         userlabel=8;            /// additional data 
+    optional string         probe_id=9;             /// which probe detected this 
 }
 
-////////////////////////////////////
-// DocumentT
+/// DocumentT : a full text document 
+///     full HTTP headers, printable TLS certs, etc 
 message DocumentT  {
-    required string         dockey=1;
-    optional string         fts_attributes=2;
-    optional string         fullcontent=3;
+    required string         dockey=1;               /// unique id 
+    optional string         fts_attributes=2;       /// attibutes used for facets
+    optional string         fullcontent=3;          /// full document text 
 
+    /// this document was seen at these time and on this flow 
     message Flow {
-        required Timestamp  time=1;
+        required Timestamp  time=1;     
         required string     key=2;
     }
 
-    repeated Flow           flows=4;
-    optional string         probe_id=5;
+    repeated Flow           flows=4;                /// list of flows where this doc was seen 
+    optional string         probe_id=5;             
 }
 
 
-//
-// Enums
-//
+/// Enums
+///  Auth Level 
 enum AuthLevel {
     ADMIN=1;
     BASIC_USER=2;
@@ -201,15 +207,17 @@ enum AuthLevel {
     BLOCKED_USER=4;
 }
 
+/// Compression: Used by PCAP or other content requests 
 enum CompressionType {
     UNCOMPRESSED=1;
     GZIP=2;
 }
 
+/// Pcap: format 
 enum  PcapFormat {
-    LIBPCAP=1;
-    UNSNIFF=2;
-    LIBPCAPNOFILEHEADER=3;
+    LIBPCAP=1;                      /// normal libpcap format *.pcap
+    UNSNIFF=2;                      ///
+    LIBPCAPNOFILEHEADER=3;          /// libpcap but without the pcap file header 
 }
 
 enum DomainNodeType
@@ -233,10 +241,13 @@ message NameValue {
     optional string value=2;
 }
 
-//
-// Top level message is TRP::Message
-//  - wraps the actual request or response 
-// 
+///
+/// Top level message is TRP::Message
+///  - wraps the actual request or response 
+/// 
+/// You must set trp.command = <cmd> for EACH request in addition to 
+/// constructing the actual TRP request message 
+/// 
 message Message {
     enum Command {  HELLO_REQUEST=1; 
                     HELLO_RESPONSE=2;
@@ -380,75 +391,71 @@ message Message {
 // --------------- Messages Section -------------------------//
 //////////////////////////////////////////////////////////////
 
-///////////////////////////////
-// Hello 
+/// Hello Request : use to check connectivity 
 message HelloRequest{
-  required string   station_id=1;
-  optional string   message=2;
+  required string   station_id=1;       /// an id of the query client trying to connect 
+  optional string   message=2;          /// a message (will be echoed back in response) 
 }       
 
 message HelloResponse{
-  required string       station_id=1;
-  optional string       station_id_request=2;
-  optional string       message=3;
-  optional int64        local_timestamp=4;
+  required string       station_id=1;           /// station id of the query server 
+  optional string       station_id_request=2;   /// station id found in the request 
+  optional string       message=3;              /// message found in the request 
+  optional int64        local_timestamp=4;      /// local timestamp at server, used to detect drifts 
 }
 
-///////////////////////////////
-// Error 
+/// ErrorResponse
+/// All XYZRequest() messages can either generate a XYZResponse() or an ErrorResponse()
+/// you need to handle the error case 
 message ErrorResponse{
-   required int64       original_command=1;
-   required int64       error_code=2;
-   required string      error_message=3;
+   required int64       original_command=1;     /// Command ID of request 
+   required int64       error_code=2;           /// numeric error code 
+   required string      error_message=3;        /// error string 
 }
 
-///////////////////////////////
-// OK 
+/// OKResponse
+/// many messages return an OKResponse indicating success of operation
 message OKResponse{
-   required int64       original_command=1;
-   optional string      message=2;
+   required int64       original_command=1;     /// command id of request 
+   optional string      message=2;              /// success message 
 }
 
 
-///////////////////////////////
-// CounterItemRequest 
+/// CounterItemRequest : Time series history statistics for an item 
 message CounterItemRequest{
-    required string         counter_group=2;
-    optional int64          meter=3;
-    required KeyT           key=4;
-    required TimeInterval   time_interval=5;
-    optional int64          volumes_only=6 [default=0];
+    required string         counter_group=2;                /// guid of counter group 
+    optional int64          meter=3;                        /// optional meter, default will retrieve all (same cost)
+    required KeyT           key=4;                          /// key (can specify key.key, key.label, etc too 
+    required TimeInterval   time_interval=5;                /// Time interval for query
+    optional int64          volumes_only=6 [default=0];     /// if '1' ; then only retrieves totals for each meter 
 }
 
-///////////////////////////////
-// CounterItemResponse  
+/// CounterItemResponse  - 
 message CounterItemResponse{
-    required string         counter_group=1;
-    required KeyT           key=2;
-    optional StatsArray     totals=3;
-    repeated StatsArray     stats=4;
+    required string         counter_group=1;                /// guid of CG 
+    required KeyT           key=2;                          /// key : filled up with readable,label automatically 
+    optional StatsArray     totals=3;                       /// if volumes_only = 1 in request, this contains totals for each metric 
+    repeated StatsArray     stats=4;                        /// time series stats - can use to draw charts etc 
 }
 
 
-///////////////////////////////
-// CounterGroupTopperRequest 
+/// CounterGroupTopperRequest  - retrieve toppers for a counter group (top-K)
 message CounterGroupTopperRequest{
-    required string         counter_group=2;
-    optional int64          meter=3 [default=0];
-    optional int64          maxitems=4 [default=100];
-    optional TimeInterval   time_interval=5;
-    optional Timestamp      time_instant=6;
-    optional int64          flags=7;
-    optional bool           resolve_keys=8 [default=true];
+    required string         counter_group=2;                /// guid of CG 
+    optional int64          meter=3 [default=0];            /// meter; eg to get Top Hosts By Connections use cg=Hosts meter = 6(connections)
+    optional int64          maxitems=4 [default=100];       /// number of top items to retreive 
+    optional TimeInterval   time_interval=5;                /// time interval 
+    optional Timestamp      time_instant=6;                 /// 
+    optional int64          flags=7;                        
+    optional bool           resolve_keys=8 [default=true];  /// retrieve labels as set in the response for each key 
 }
 
-///////////////////////////////
-// CounterGroupTopperResponse  
+/// CounterGroupTopperResponse  
 message  CounterGroupTopperResponse{
-    required string         counter_group=2;
-    required int64          meter=3;
-    optional int64          sysgrouptotal=4;
-    repeated KeyT           keys=6;
+    required string         counter_group=2;                /// request cgid
+    required int64          meter=3;                        /// from request 
+    optional int64          sysgrouptotal=4;                /// the metric value for "Others.."  after Top-K
+    repeated KeyT           keys=6;                         /// topper keys, KeyT.metric contains the top-k value 
 }
 
 
@@ -486,9 +493,9 @@ message CounterGroupInfoResponse{
     repeated CounterGroupT    group_details=2;
 }
 
-///////////////////////////////////
-// QuerySessions - any of the fields can be filled
-//                 all the fields filled are treated as AND criteria 
+/// QuerySessions - Query flows 
+///   fields filled are treated as AND criteria 
+///   See SessionT for description of common query fields 
 message QuerySessionsRequest {
     optional string         session_group=2[default="{99A78737-4B41-4387-8F31-8077DB917336}"];
     optional TimeInterval   time_interval=3;
@@ -497,59 +504,63 @@ message QuerySessionsRequest {
     optional KeyT           source_port=6;
     optional KeyT           dest_ip=7;
     optional KeyT           dest_port=8;
-    optional KeyT           any_ip=9;
-    optional KeyT           any_port=10;
-    repeated KeyT           ip_pair=11;         // array of 2 ips 
+    optional KeyT           any_ip=9;           /// source or dest match
+    optional KeyT           any_port=10;            /// source or dest match
+    repeated KeyT           ip_pair=11;         /// array of 2 ips 
     optional KeyT           protocol=12;
-    optional string         flowtag=13;
+    optional string         flowtag=13;         /// string flow tagger text 
     optional KeyT           nf_routerid=14;
     optional KeyT           nf_ifindex_in=15;
     optional KeyT           nf_ifindex_out=16;
-    optional string         subnet_24=17;
-    optional string         subnet_16=18;
-    optional int64          maxitems=19[default=100];
-    optional int64          volume_filter=20[default=0];
-    optional bool           resolve_keys=21[default=true];
-    optional string         outputpath=22;
-    repeated string         idlist=23;
+    optional string         subnet_24=17;       /// ip /24 subnet  matching 
+    optional string         subnet_16=18;       /// ip /16 subnet 
+    optional int64          maxitems=19[default=100];   /// maximum number of matching flows to retrieve 
+    optional int64          volume_filter=20[default=0];    /// only retrieve flows > this many bytes (a+z)
+    optional bool           resolve_keys=21[default=true];  
+    optional string         outputpath=22;      /// write results to a file (CSV) on trisul-hub (for very large dumps) 
+    repeated string         idlist=23;          /// array of flow ids , usually from SessionTracker response 
 }
 
-/////////////////////////////////////
-// QuerySessionsResponse 
+
+/// QuerySessionsResponse 
+///  a list of matching flows 
 message QuerySessionsResponse {
     required string             session_group=2;
-    repeated SessionT           sessions=3;
-    optional string             outputpath=4;
+    repeated SessionT           sessions=3;         /// matching flows SessionT objects
+    optional string             outputpath=4;       /// if 'outputpath' set in request, the sessions are here (in CSV format)
 }
 
-//////////////////////////////////////////////
 /// UpdatekeysRequest
 /// Response = OKResponse or ErrorResponse
 message UpdateKeyRequest{
     required string         counter_group=2;
-    repeated KeyT           keys=4;
+    repeated KeyT           keys=4;  /// key  : if you set both key and label, the DB label will be updated 
 }
 
-/////////////////////////////////////
-// SessionTrackerRequest
+/// SessionTrackerRequest  - query session trackers 
+///     session trackers are top-k streaming algorithm for network flows 
+///     They are Top Sessions fulfilling a particular preset criterion 
 message SessionTrackerRequest {
     optional string         session_group=2[default="{99A78737-4B41-4387-8F31-8077DB917336}"];
-    required int64          tracker_id=3 [default=1];
-    optional int64          maxitems=4 [default=100];
+    required int64          tracker_id=3 [default=1];       /// session tracker id 
+    optional int64          maxitems=4 [default=100];       
     required TimeInterval   time_interval=5;
     optional bool           resolve_keys=6 [default=true];
 }
 
-///////////////////////////////////
-// SessionTrackerResponse 
+/// SessionTrackerResponse - results of tracker
+///  returns a list of SessionT  for the matching sessions. 
+///  Note: the returned list of SessionT only contains keys (in key format) and the 
+///  tracker_statval reprsenting the tracker metric. You need to send further QuerySession
+///  request with the session_key to retrive the fullflow 
 message SessionTrackerResponse{
     required string         session_group=2;
-    repeated SessionT       sessions=3;
+    repeated SessionT       sessions=3;         /// contains session_key and tracker_statval 
     optional int64          tracker_id=4;
 }
 
-////////////////////////////////////
-// QueryAlertsRequest 
+/// QueryAlertsRequest - query alerts in system, can group_by (aggregate) any one field 
+/// multiple query fields are treated as AND 
 message QueryAlertsRequest  {
     required string         alert_group=2;
     optional TimeInterval   time_interval=3;
@@ -561,25 +572,26 @@ message QueryAlertsRequest  {
     optional KeyT           sigid=10;
     optional KeyT           classification=11;
     optional KeyT           priority=12;
-    optional string         aux_message1=13;
-    optional string         aux_message2=14;
-    optional string         group_by_fieldname=15;
-    repeated string         idlist=16;
+    optional string         aux_message1=13;        /// matches dispatchmessage1 in AlertT
+    optional string         aux_message2=14;        /// matches dispatchmessage2 in AlertT
+    optional string         group_by_fieldname=15;  /// can group by any field - group by 'sigid' will group results by sigid 
+    repeated string         idlist=16;              /// list of alert ids
     optional bool           resolve_keys=17[default=true];
-    optional KeyT           any_ip=18;
-    optional KeyT           any_port=19;
-    repeated KeyT           ip_pair=20;              // array of 2 ips 
-    optional string         message_regex=21;       // searech via regex 
+    optional KeyT           any_ip=18;              /// search by any_ip (source_dest) 
+    optional KeyT           any_port=19;            /// search by any_port (source_dest) 
+    repeated KeyT           ip_pair=20;             /// array of 2 ips 
+    optional string         message_regex=21;       /// searech via regex of the dispatch message 
 }
 
-/////////////////////////////////////
-// QueryAlertsResponse 
+/// QueryAlertsResponse - response 
+/// if you used group_by_fieldname then AlertT.occurrances would contain the count 
 message QueryAlertsResponse {
     required string         alert_group=2;
-    repeated AlertT         alerts=3;
+    repeated AlertT         alerts=3;       /// array of matching alerts 
 }
-////////////////////////////////////
-//  QueryResourcesRequest
+
+
+///  QueryResourcesRequest - resource queries 
 message QueryResourcesRequest {
     required string         resource_group=2;
     optional TimeInterval   time_interval=3;
@@ -598,8 +610,7 @@ message QueryResourcesRequest {
     repeated KeyT           ip_pair=17;              // array of 2 ips 
 }
 
-/////////////////////////////////////
-// QueryResourceResponse  
+/// QueryResourceResponse  
 message QueryResourcesResponse {
     required string         resource_group=2;
     repeated ResourceT      resources=3;
@@ -607,31 +618,31 @@ message QueryResourcesResponse {
 
 
 
-////////////////////////////////////
-// KeySpaceRequest
+/// KeySpaceRequest - search hits in Key Space 
+/// for example you can search the key space 10.0.0.0 to 11.0.0.0 to get all IP 
+/// seen in that range 
 message KeySpaceRequest {
     required string         counter_group=2;
     required TimeInterval   time_interval=3;
     optional int64          maxitems=4 [default=100];
 
     message KeySpace {
-        required KeyT   from_key=1;
-        required KeyT   to_key=2;
+        required KeyT   from_key=1;     /// from key representing start of keyspace
+        required KeyT   to_key=2;       /// end of key space 
     }
 
     repeated KeySpace       spaces=5;
     optional bool           resolve_keys=6[default=true];
 }
 
-/////////////////////////////////////
-// KeySpaceResponse  
+/// KeySpaceResponse  
 message KeySpaceResponse  {
     optional string         counter_group=2;
-    repeated KeyT           hits=3;
+    repeated KeyT           hits=3;             /// array of keys in the requested space 
 }
 
-///////////////////////////////
-// TopperTrendRequest 
+/// TopperTrendRequest - raw top-K at each topper snapshot interval
+/// can use this to see "Top apps over 1 Week" 
 message TopperTrendRequest {
     required string         counter_group=2;
     optional int64          meter=3 [default=0];
@@ -639,18 +650,16 @@ message TopperTrendRequest {
     optional TimeInterval   time_interval=5;
 }
 
-///////////////////////////////
-// TopperTrendResponse   
+/// TopperTrendResponse   
 message  TopperTrendResponse {
     required string         counter_group=2;
-    required int64          meter=3;
-    repeated KeyStats       keytrends=4;
+    required int64          meter=3;    
+    repeated KeyStats       keytrends=4;    /// timeseries - ts, (array of key stats) for each snapshot interval 
 }
 
 
 
-///////////////////////////////////
-// Subscribe - add a subcription to the Real Time channel
+/// Subscribe - add a subcription to the Real Time channel
 message SubscribeCtl  {
 
     // from TrisulAPI 
@@ -678,10 +687,9 @@ message SubscribeCtl  {
 
 
 
-// FTS
-//  query to return docs, docids, and flows based on keyword search
-//
-
+/// FTS
+///  query to return docs, docids, and flows based on keyword search
+///
 message QueryFTSRequest  {
 
     required TimeInterval       time_interval=2;
@@ -699,11 +707,10 @@ message QueryFTSResponse {
 }
 
 
-// Timeslices
-//
-// get the METERS METASLICE info 
-// .. response = TimeSlicesResponse
-
+/// Timeslices - retrieves the backend timeslice details 
+///
+/// get the METERS METASLICE info 
+/// .. response = TimeSlicesResponse
 message TimeSlicesRequest  {
     optional bool   get_disk_usage=1[default=false];
     optional bool   get_all_engines=2[default=false];
@@ -748,7 +755,7 @@ message DeleteAlertsRequest  {
     optional KeyT           priority=12;
     optional KeyT           any_ip=18;
     optional KeyT           any_port=19;
-    optional string         message_regex=21;       // delete using regex 
+    optional string         message_regex=21;       /// delete using regex 
 } 
 
 //////////////////////////////////
@@ -787,7 +794,7 @@ message LogResponse  {
      required  string         context_name=1;
      optional  string         logfilename=6;
      optional  int64          seekpos=7;
-     repeated  string         log_lines=8; // compressed gz 
+     repeated  string         log_lines=8; /// compressed gz 
 }
 
 
@@ -825,10 +832,10 @@ message NodeConfigRequest {
     optional string message=1;
 
     message IntelFeed {
-        required string     guid=1;             // identifying feed group (eg Geo, Badfellas)
-        optional string     name=2;             // name
-        optional string     download_rules=3;   // xml file with feed update instructions
-        repeated string     uri=4;              // individual files in config//.. for FileRequest download 
+        required string     guid=1;             /// identifying feed group (eg Geo, Badfellas)
+        optional string     name=2;             /// name
+        optional string     download_rules=3;   /// xml file with feed update instructions
+        repeated string     uri=4;              /// individual files in config//.. for FileRequest download 
     }
 
     optional IntelFeed      add_feed=2;
@@ -868,8 +875,8 @@ message ContextCreateRequest  {
 // ContextInfo : one or all contexts
 //  use is_init to prime with config 
 message ContextInfoRequest {
-     optional   string         context_name=1;     // if not  set all context get in 
-     optional   bool           get_size_on_disk=2[default=false]; //  get size on disk (expensive) 
+     optional   string         context_name=1;     /// if not  set all context get in 
+     optional   bool           get_size_on_disk=2[default=false]; ///  get size on disk (expensive) 
 }
 
 message ContextInfoResponse {
@@ -897,18 +904,18 @@ message ContextInfoResponse {
 // ContextDelete  : initialize 
 //      reset data only .. 
 message ContextDeleteRequest   {
-     required   string         context_name=1;      // if not  set all context get in 
-     optional   bool           reset_data=2;    // reset data dont delete everything
+     required   string         context_name=1;      /// if not  set all context get in 
+     optional   bool           reset_data=2;        /// reset data dont delete everything
 }
 
 // ContextStart  : run 
 //      run data only .. 
 message ContextStartRequest   {
-     required   string         context_name=1;      // if not  set all context get in 
+     required   string         context_name=1;      /// if not  set all context get in 
      optional   string         mode=2;
      optional   bool           background=3;
      optional   string         pcap_path=4;
-     optional   string         run_tool=5;          // snort, suricata supported..
+     optional   string         run_tool=5;          /// snort, suricata supported..
      optional   string         tool_ids_config=6;
      optional   string         tool_av_config=7;
 
@@ -916,8 +923,8 @@ message ContextStartRequest   {
 
 // ContextSttop  : kill 
 message ContextStopRequest   {
-     required   string         context_name=1;      // if not  set all context get in 
-     optional   string         run_tool=5;          // snort, suricata , trp, flushd supported..
+     required   string         context_name=1;      /// if not  set all context get in 
+     optional   string         run_tool=5;          /// snort, suricata , trp, flushd supported..
 }
 
 
@@ -929,9 +936,9 @@ message ContextConfigRequest {
      required  string         context_name=1;
      optional  string         profile=2;
      optional  string         params=3;
-     optional  bytes          push_config_blob=4;     // push this .. 
-     repeated  NameValue      query_config=5;         // query, leave the .value field blank
-     repeated  NameValue      set_config_values=6;    // push this ..  (name=value;name=value ..)
+     optional  bytes          push_config_blob=4;     /// push this .. 
+     repeated  NameValue      query_config=5;         /// query, leave the .value field blank
+     repeated  NameValue      set_config_values=6;    /// push this ..  (name=value;name=value ..)
 }
 
 
@@ -946,42 +953,49 @@ message ContextConfigResponse {
 
     required  string            context_name=1;
     optional  string            profile=2;
-    optional  string            params=3;                   // what kind of config you want 
-    optional  bytes             pull_config_blob=4; // config 
-    optional  bytes             config_blob=5;          // compress tar.gz ..
+    optional  string            params=3;               /// what kind of config you want 
+    optional  bytes             pull_config_blob=4;     /// config 
+    optional  bytes             config_blob=5;          /// compress tar.gz ..
     repeated  string            endpoints_flush=6;
     repeated  string            endpoints_query=7;
     repeated  string            endpoints_pub=8;
-    repeated  NameValue         config_values=10;         // query, leave the .value field blank
+    repeated  NameValue         config_values=10;       /// query, leave the .value field blank
     repeated  Layer             layers=11;
 
 }
 
-///////////////////////////////
-// PcapReqiest
-//  NOTE - only one of the various filters are supported
-//  sending > 1 will result in error 
-//  
-// Modes
-//  1.  nothing set => PCAP file in contents
-//  2.  save_file_prefix set =>  file download token
-//  3.  merge_pcap_files => file download token 
-// 
+/// PcapRequest - retrieve a PCAP
+/// ** Sent directly to each probe rather than to the DB query HUB **  
+///
+/// PCAP Request for a file -> put a file on the probe > return a token
+///    > use that token in FileDownload or another PcapRequest to merge multiple files and then FileDownload  
+///
+/// see app notes and examples
+///
+///  NOTE - only one of the various filters are supported
+///  sending > 1 will result in error 
+///  
+/// Modes
+///  1.  nothing set => PCAP file in contents
+///  2.  save_file_prefix set =>  file download token
+///  3.  merge_pcap_files => file download token 
+/// 
+/// 
 message PcapRequest {
-    required string             context_name=1;
-    optional int64              max_bytes=2[default=100000000]; // 100MB , can increase to 0.75 Filesystem freespace
+    required string             context_name=1; // context 
+    optional int64              max_bytes=2[default=100000000]; // max return PCAP size default=100MB , can increase to 0.75 Filesystem freespace
     optional CompressionType    compress_type=3[default=UNCOMPRESSED];              
     optional TimeInterval       time_interval=4;                // not needed for merge option 
     optional string             save_file_prefix=5;
-    optional string             filter_expression=6;
-    repeated string             merge_pcap_files=7;
+    optional string             filter_expression=6;    /// PCAP filter expression in Trisul Filter format 
+    repeated string             merge_pcap_files=7; /// list of PCAP files on probe that you need to merge 
     optional bool               delete_after_merge=8[default=true];
     optional PcapFormat         format=9[default=LIBPCAP];                                 
 }
 
 
-/////////////////////////////////////
-// FileredDatagaramResponse
+/// Pcap Response - for small files (<1MB) contents directly contain the PCAP 
+///   for larger files, save_file contains a download token for use by FileRequest 
 message PcapResponse  {
     required string             context_name=1;
     optional PcapFormat         format=2[default=LIBPCAP];                                 
@@ -993,26 +1007,24 @@ message PcapResponse  {
     optional string             save_file=8;        //use FileRequest framework to download 
 }
 
-////////////////////////////////////
-// GrepRequest
+/// GrepRequest - reconstruct and search for patterns in saved packets 
 message GrepRequest {
     required string         context_name=1;
     required TimeInterval   time_interval=2;
     optional int64          maxitems=3 [default=100];
     optional int64          flowcutoff_bytes=4;
-    optional string         pattern_hex=5;
-    optional string         pattern_text=6;
-    optional string         pattern_file=7;
-    repeated string         md5list=8;
+    optional string         pattern_hex=5;      /// hex patttern 
+    optional string         pattern_text=6;     /// plain text 
+    optional string         pattern_file=7;     /// a file - must be available at probe 
+    repeated string         md5list=8;          /// a list of MD5 matching the content 
     optional bool           resolve_keys=9 [default=true];
 }
 
-/////////////////////////////////////
-// GrepResponse  
+/// GrepResponse  
 message GrepResponse  {
     required string         context_name=1;
-    repeated SessionT       sessions=2;
-    repeated string         hints=3;
+    repeated SessionT       sessions=2;     /// sessionT with keys containing the content 
+    repeated string         hints=3;        /// some surrounding context for the match 
     optional string         probe_id=4;
 }
 
@@ -1059,25 +1071,23 @@ message AsyncRequest {
      optional  string       request_message =2; // basically extra text for logging 
 }
 
-/////////////////////////////////////
-// FileRequest  
+/// FileRequest   - used to download files from Trisul domain nodes like probes 
 message FileRequest  {
-    required string         uri=1;
-    required int64          position=2;
-    optional string         params=3;   // local meaning sentback n response
-    optional string         context_name=4;
+    required string         uri=1;      /// uri of resource you want to download , example PcapResponse.save_file 
+    required int64          position=2; /// seek position in that file
+    optional string         params=3;   /// local meaning sentback n response
+    optional string         context_name=4; /// context name 
     optional bool           delete_on_eof=5[default=false];
 }
 
-//////////////////////////////////
-// FileResponse
-//      one chunk at at time, Trisul has slightly inefficient File Transfer
-//      for very large files, since most files are data feeds  < 100MB fine for now
+/// FileResponse
+///      one chunk at at time, Trisul has slightly inefficient File Transfer
+///      for very large files, since most files are data feeds  < 100MB fine for now
 message FileResponse  {
-     required  string       uri=1;
-     required  bool         eof=2;
-     optional  int64        position=3;
-     optional  bytes        content=4;
+     required  string       uri=1;      /// requested URI 
+     required  bool         eof=2;      /// end of all chunks 
+     optional  int64        position=3; /// current  position 
+     optional  bytes        content=4;  /// file chunk content 
      optional  string       request_params =5; 
      optional string        context_name=6;
 }
