@@ -290,8 +290,7 @@ ContextSttop  : kill  the context processes
 
 <a name="TRP.CounterGroupInfoRequest"/>
 ### CounterGroupInfoRequest
-//////////////////////////////////
-/ CounterGroupInfoRequest
+CounterGroupInfoRequest - retrieve information about enabled counter groups
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -301,8 +300,7 @@ ContextSttop  : kill  the context processes
 
 <a name="TRP.CounterGroupInfoResponse"/>
 ### CounterGroupInfoResponse
-////////////////////////////////
-/ CounterGroupInfoResponse
+CounterGroupInfoResponse
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -1092,8 +1090,7 @@ ResourceT : represents a &quot;resource&quot; object
 
 <a name="TRP.SearchKeysRequest"/>
 ### SearchKeysRequest
-////////////////////////////////////
-SearchkeysRequest
+SearchkeysRequest - search for keys
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -1108,7 +1105,6 @@ SearchkeysRequest
 
 <a name="TRP.SearchKeysResponse"/>
 ### SearchKeysResponse
-///////////////////////////////////
 SearchKeysResponse
 
 | Field | Type | Label | Description |

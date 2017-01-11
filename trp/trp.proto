@@ -458,8 +458,7 @@ message  CounterGroupTopperResponse{
 }
 
 
-///////////////////////////////////////
-// SearchkeysRequest
+/// SearchkeysRequest - search for keys 
 message SearchKeysRequest{
     required string         counter_group=2;        
     optional int64          maxitems=3[default=100];
@@ -470,8 +469,7 @@ message SearchKeysRequest{
     optional bool           get_totals=8[default=false];
 } 
 
-//////////////////////////////////////
-// SearchKeysResponse
+/// SearchKeysResponse
 message SearchKeysResponse{
     required string         counter_group=2;        
     repeated KeyT           keys=3;
@@ -479,14 +477,12 @@ message SearchKeysResponse{
 
 } 
 
-/////////////////////////////////////
-/// CounterGroupInfoRequest
+/// CounterGroupInfoRequest - retrieve information about enabled counter groups 
 message CounterGroupInfoRequest{
     optional string        counter_group=2;
     optional bool          get_meter_info=3[default=false];
 }
 
-///////////////////////////////////
 /// CounterGroupInfoResponse
 message CounterGroupInfoResponse{
     repeated CounterGroupT    group_details=2;
