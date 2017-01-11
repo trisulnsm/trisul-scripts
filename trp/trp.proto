@@ -241,9 +241,8 @@ message NameValue {
     optional string value=2;
 }
 
-///
 /// Top level message is TRP::Message
-///  - wraps the actual request or response 
+/// wraps the actual request or response 
 /// 
 /// You must set trp.command = <cmd> for EACH request in addition to 
 /// constructing the actual TRP request message 
@@ -773,8 +772,7 @@ message MetricsSummaryResponse {
 
 
 
-//////////////////////////////////
-// LogRequest  - want log file 
+/// LogRequest  - get log file  from a domain node 
 message LogRequest  {
 
      required  string         context_name=1;
@@ -959,7 +957,7 @@ message ContextConfigResponse {
 }
 
 /// PcapRequest - retrieve a PCAP
-/// Sent directly to each probe rather than to the DB query HUB **  
+/// Sent directly to each probe rather than to the DB query HUB   
 ///
 /// the flow is PCAP Request for a file -> put a file on the probe > return a token
 ///    > use that token in FileRequest to download the file from the probe 
@@ -1022,15 +1020,14 @@ message GrepResponse  {
     optional string         probe_id=4;
 }
 
-//////////////////////////////////
-// ProbeStatsRequest
+/// ProbeStatsRequest - DOMAIN 
+/// retrieve statistics about probe cpu, mem, etc 
 message ProbeStatsRequest{
      required  string       context_name=1;
      optional  string       param=2;
 }
 
-//////////////////////////////////
-// ProbeStatsResponse
+/// ProbeStatsResponse
 message ProbeStatsResponse {
     required string         context_name=1;
     required string         instance_name=2;

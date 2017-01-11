@@ -617,8 +617,7 @@ KeyT : Represents a Key
 
 <a name="TRP.LogRequest"/>
 ### LogRequest
-///////////////////////////////
-LogRequest  - want log file
+LogRequest  - get log file  from a domain node
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -645,8 +644,8 @@ LogRequest  - want log file
 
 <a name="TRP.Message"/>
 ### Message
-/ Top level message is TRP::Message
-/  - wraps the actual request or response 
+Top level message is TRP::Message
+/ wraps the actual request or response 
 / 
 / You must set trp.command = &lt;cmd&gt; for EACH request in addition to 
 / constructing the actual TRP request message 
@@ -841,7 +840,7 @@ OKResponse
 <a name="TRP.PcapRequest"/>
 ### PcapRequest
 PcapRequest - retrieve a PCAP
-/ Sent directly to each probe rather than to the DB query HUB **  
+/ Sent directly to each probe rather than to the DB query HUB   
 /
 / the flow is PCAP Request for a file -&gt; put a file on the probe &gt; return a token
 /    &gt; use that token in FileRequest to download the file from the probe 
@@ -901,8 +900,8 @@ Pcap Response - for small files (&lt;1MB) contents directly contain the PCAP
 
 <a name="TRP.ProbeStatsRequest"/>
 ### ProbeStatsRequest
-///////////////////////////////
-ProbeStatsRequest
+ProbeStatsRequest - DOMAIN 
+/ retrieve statistics about probe cpu, mem, etc
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -912,7 +911,6 @@ ProbeStatsRequest
 
 <a name="TRP.ProbeStatsResponse"/>
 ### ProbeStatsResponse
-///////////////////////////////
 ProbeStatsResponse
 
 | Field | Type | Label | Description |
