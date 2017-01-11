@@ -21,47 +21,53 @@ message Timestamp  {
   optional int64            tv_usec=2 [default=0];
 }
 
-/// TimeInterval :
+/// TimeInterval from and to 
 message TimeInterval  {
-    required Timestamp      from=1;
-    required Timestamp      to=2;
+    required Timestamp      from=1;	 /// start time 
+    required Timestamp      to=2;	 /// end  time 
 }
 
 /// StatsTuple : a single timeseries vaue (t,v) 
 message StatsTuple {
-    required Timestamp      ts=1; 
-    required int64          val=2; 
+    required Timestamp      ts=1; 		/// ts 
+    required int64          val=2; 		/// value metric  
 }
 
 /// StatsArray : multiple timeseries values (t, v1, v2, v3...vn) 
 ///    notice we use ts_tv_sec. Most Trisul data have 1 sec resolution.
 message StatsArray {
-    required int64          ts_tv_sec=1;  // tv.tv_sec 
-    repeated int64          values=2; 	  // array of values 
+    required int64          ts_tv_sec=1;  /// tv.tv_sec 
+    repeated int64          values=2; 	  /// array of values 
 }
 
+/// MeterValues : a timeseries  (meter_id, stat1, stat2, ... statn) 
+///		this is rarely used because StatsArray is available .
 message MeterValues {
-    required int32          meter=1;
+    required int32          meter=1;		/// metric id , eg Hosts:TotalConnections 
     repeated StatsTuple     values=2;
-    optional int64          total=3;
-    optional int64          seconds=4;
+    optional int64          total=3;		/// total of all metric values 
+    optional int64          seconds=4;		/// total number of seconds in time series 
 }
 
+
+/// MeterType : information about a particular meter
+/// 
 message MeterInfo {
 
+	/// types of meters 
     // from TrisulAPI 
     enum MeterType
     {
         VT_INVALID=0;
-        VT_RATE_COUNTER_WITH_SLIDING_WINDOW=1;// this for top-N type counters
-        VT_COUNTER=2;                         // basic counter, stores val in the raw
-        VT_COUNTER_WITH_SLIDING_WINDOW=3;     // use this for top-N type counters
-        VT_RATE_COUNTER=4;                    // rate counter stores val/sec
-        VT_GAUGE=5;                           // basic gauge
-        VT_GAUGE_MIN_MAX_AVG=6;               // gauge with 3 additional min/avg/max cols (auto)
-        VT_AUTO=7;                            // automatic (eg, min/max/avg/stddev/)
-        VT_RUNNING_COUNTER=8;                 // running counter, no delta calc 
-        VT_AVERAGE=9;                         // average of samples, total/sampl uses 32bt|32bit
+        VT_RATE_COUNTER_WITH_SLIDING_WINDOW=1;///  this for top-N type counters
+        VT_COUNTER=2;                         ///  basic counter, stores val in the raw
+        VT_COUNTER_WITH_SLIDING_WINDOW=3;     ///  use this for top-N type counters
+        VT_RATE_COUNTER=4;                    ///  rate counter stores val/sec
+        VT_GAUGE=5;                           ///  basic gauge
+        VT_GAUGE_MIN_MAX_AVG=6;               ///  gauge with 3 additional min/avg/max cols (auto)
+        VT_AUTO=7;                            ///  automatic (eg, min/max/avg/stddev/)
+        VT_RUNNING_COUNTER=8;                 ///  running counter, no delta calc 
+        VT_AVERAGE=9;                         ///  average of samples, total/sampl uses 32bt|32bit
     }
 
 

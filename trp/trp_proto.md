@@ -718,7 +718,8 @@ LogRequest  - want log file
 
 <a name="TRP.MeterInfo"/>
 ### MeterInfo
-
+MeterType : information about a particular meter
+/
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -732,14 +733,15 @@ LogRequest  - want log file
 
 <a name="TRP.MeterValues"/>
 ### MeterValues
-
+MeterValues : a timeseries  (meter_id, stat1, stat2, ... statn) 
+/		this is rarely used because StatsArray is available .
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| meter | [int32](#int32) | required |  |
+| meter | [int32](#int32) | required | metric id , eg Hosts:TotalConnections |
 | values | [StatsTuple](#TRP.StatsTuple) | repeated |  |
-| total | [int64](#int64) | optional |  |
-| seconds | [int64](#int64) | optional |  |
+| total | [int64](#int64) | optional | total of all metric values |
+| seconds | [int64](#int64) | optional | total number of seconds in time series |
 
 
 <a name="TRP.MetricsSummaryRequest"/>
@@ -1174,8 +1176,8 @@ StatsArray : multiple timeseries values (t, v1, v2, v3...vn)
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| ts_tv_sec | [int64](#int64) | required |  |
-| values | [int64](#int64) | repeated |  |
+| ts_tv_sec | [int64](#int64) | required | tv.tv_sec |
+| values | [int64](#int64) | repeated | array of values |
 
 
 <a name="TRP.StatsTuple"/>
@@ -1184,8 +1186,8 @@ StatsTuple : a single timeseries vaue (t,v)
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| ts | [Timestamp](#TRP.Timestamp) | required |  |
-| val | [int64](#int64) | required |  |
+| ts | [Timestamp](#TRP.Timestamp) | required | ts |
+| val | [int64](#int64) | required | value metric |
 
 
 <a name="TRP.SubscribeCtl"/>
@@ -1205,12 +1207,12 @@ Subscribe - add a subcription to the Real Time channel
 
 <a name="TRP.TimeInterval"/>
 ### TimeInterval
-TimeInterval :
+TimeInterval from and to
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| from | [Timestamp](#TRP.Timestamp) | required |  |
-| to | [Timestamp](#TRP.Timestamp) | required |  |
+| from | [Timestamp](#TRP.Timestamp) | required | start time |
+| to | [Timestamp](#TRP.Timestamp) | required | end  time |
 
 
 <a name="TRP.TimeSlicesRequest"/>
@@ -1414,20 +1416,21 @@ TopperTrendResponse
 
 <a name="TRP.MeterInfo.MeterType"/>
 ### MeterInfo.MeterType
-
+types of meters 
+from TrisulAPI
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
 | VT_INVALID | 0 |  |
-| VT_RATE_COUNTER_WITH_SLIDING_WINDOW | 1 |  |
-| VT_COUNTER | 2 |  |
-| VT_COUNTER_WITH_SLIDING_WINDOW | 3 |  |
-| VT_RATE_COUNTER | 4 |  |
-| VT_GAUGE | 5 |  |
-| VT_GAUGE_MIN_MAX_AVG | 6 |  |
-| VT_AUTO | 7 |  |
-| VT_RUNNING_COUNTER | 8 |  |
-| VT_AVERAGE | 9 |  |
+| VT_RATE_COUNTER_WITH_SLIDING_WINDOW | 1 | this for top-N type counters |
+| VT_COUNTER | 2 | basic counter, stores val in the raw |
+| VT_COUNTER_WITH_SLIDING_WINDOW | 3 | use this for top-N type counters |
+| VT_RATE_COUNTER | 4 | rate counter stores val/sec |
+| VT_GAUGE | 5 | basic gauge |
+| VT_GAUGE_MIN_MAX_AVG | 6 | gauge with 3 additional min/avg/max cols (auto) |
+| VT_AUTO | 7 | automatic (eg, min/max/avg/stddev/) |
+| VT_RUNNING_COUNTER | 8 | running counter, no delta calc |
+| VT_AVERAGE | 9 | average of samples, total/sampl uses 32bt|32bit |
 
 <a name="TRP.PcapFormat"/>
 ### PcapFormat
