@@ -378,7 +378,7 @@ message Message {
     optional FileResponse    file_response=123;
     optional string     destination_node=200;   // todo move 2nd
     optional string     probe_id=201;           // todo move 3rd 
-    optional bool       run_async=202;          // todo move 3rd 
+    optional bool       run_async=202;          /// if run_async = true, then you will immediately get a AsynResponse with a token you can poll 
 
 }
 
@@ -717,8 +717,8 @@ message TimeSlicesRequest  {
     optional bool   get_total_window=3[default=false];
 }
 
-// .. response = TimeSlicesResponse
-// get the PCAP METASLICE based info 
+/// .. response = TimeSlicesResponse
+/// get the PCAP METASLICE based info 
 message PcapSlicesRequest {
     required string context_name=1;
     optional bool   get_total_window=2[default=false];
@@ -741,8 +741,8 @@ message TimeSlicesResponse  {
 }
 
 
-// DeleteAlerts
-//  - very limited exception to Trisul rule of not having delete options 
+/// DeleteAlerts
+///  - very limited exception to Trisul rule of not having delete options 
 message DeleteAlertsRequest  {
     required string         alert_group=2;
     required TimeInterval   time_interval=3;
@@ -758,16 +758,14 @@ message DeleteAlertsRequest  {
     optional string         message_regex=21;       /// delete using regex 
 } 
 
-//////////////////////////////////
-// MetricsSummaryRequest
+/// MetricsSummaryRequest - used to retrieve DB stats 
 message MetricsSummaryRequest{
      optional  TimeInterval   time_interval=1;
      required  string         metric_name=2;
      optional  bool           totals_only=3[default=true];
 }
 
-//////////////////////////////////
-// MetricsSummaryResponse
+/// MetricsSummaryResponse
 message MetricsSummaryResponse {
     required  string         metric_name=2;
     repeated  StatsTuple     vals=3;
@@ -798,7 +796,7 @@ message LogResponse  {
 }
 
 
-// messages to routerX backend 
+/// messages to routerX backend 
 message DomainRequest {
     required    DomainOperation     cmd=1;
     optional    string              station_id=2;
@@ -862,18 +860,16 @@ message NodeConfigResponse {
 }
 
 
-//////////////////////////////////
-// ContextRequest  - Context methods 
-//  response Ok or Error, follow up with ContextInfo to print details 
-// 
+/// ContextRequest  - Context methods 
+///  response Ok or Error, follow up with ContextInfo to print details 
+/// 
 message ContextCreateRequest  {
      required  string         context_name=1;
      optional  string         clone_from=2;
 }
 
-//////////////////////////////////
-// ContextInfo : one or all contexts
-//  use is_init to prime with config 
+/// ContextInfo : one or all contexts
+///  use is_init to prime with config 
 message ContextInfoRequest {
      optional   string         context_name=1;     /// if not  set all context get in 
      optional   bool           get_size_on_disk=2[default=false]; ///  get size on disk (expensive) 
@@ -900,16 +896,15 @@ message ContextInfoResponse {
     repeated  Item  items=1;
 }
 
-//////////////////////////////////
-// ContextDelete  : initialize 
-//      reset data only .. 
+/// ContextDelete  : initialize 
+///      reset data only .. 
 message ContextDeleteRequest   {
      required   string         context_name=1;      /// if not  set all context get in 
      optional   bool           reset_data=2;        /// reset data dont delete everything
 }
 
-// ContextStart  : run 
-//      run data only .. 
+/// ContextStart  : run 
+///      run data only .. 
 message ContextStartRequest   {
      required   string         context_name=1;      /// if not  set all context get in 
      optional   string         mode=2;
@@ -921,17 +916,16 @@ message ContextStartRequest   {
 
 }
 
-// ContextSttop  : kill 
+/// ContextSttop  : kill  the context processes 
 message ContextStopRequest   {
      required   string         context_name=1;      /// if not  set all context get in 
      optional   string         run_tool=5;          /// snort, suricata , trp, flushd supported..
 }
 
 
-//////////////////////////////////
-// ContextConfigRequest - start stop status 
-//  OK or ERROR response 
-//  Status = OK if running with PID etc in message text 
+/// ContextConfigRequest - start stop status 
+///  OK or ERROR response 
+///  Status = OK if running with PID etc in message text 
 message ContextConfigRequest {
      required  string         context_name=1;
      optional  string         profile=2;
@@ -965,10 +959,10 @@ message ContextConfigResponse {
 }
 
 /// PcapRequest - retrieve a PCAP
-/// ** Sent directly to each probe rather than to the DB query HUB **  
+/// Sent directly to each probe rather than to the DB query HUB **  
 ///
-/// PCAP Request for a file -> put a file on the probe > return a token
-///    > use that token in FileDownload or another PcapRequest to merge multiple files and then FileDownload  
+/// the flow is PCAP Request for a file -> put a file on the probe > return a token
+///    > use that token in FileRequest to download the file from the probe 
 ///
 /// see app notes and examples
 ///
@@ -1055,19 +1049,18 @@ message ProbeStatsResponse {
     optional bool           is_running=15;
 }
 
-/////////////////////////////////////
-// AsyncResponse  
+/// AsyncResponse   - a token represnting a future response
+///  you will get an AsyncResponse  for TRP Request  if you set the run_async=true at the message level 
 message AsyncResponse  {
-    required int64          token=1;
+    required int64          token=1; /// use this token in AsyncRequest polling until you get the original Response you expected 
     optional string         response_message=3;
     optional Message        response=4;
 }
 
-//////////////////////////////////
-// AsyncRequest
-//      response taken from original (if ready) or not_ready flag set   
+/// AsyncRequest - Asynchrononous query framework 
+///      response taken from original , the token 
 message AsyncRequest {
-     required  int64        token=1;
+     required  int64        token=1;	// token from AsyncResponse
      optional  string       request_message =2; // basically extra text for logging 
 }
 

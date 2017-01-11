@@ -134,9 +134,8 @@ AlertT : an alert in Trisul
 
 <a name="TRP.AsyncRequest"/>
 ### AsyncRequest
-///////////////////////////////
-AsyncRequest
-     response taken from original (if ready) or not_ready flag set
+AsyncRequest - Asynchrononous query framework 
+/      response taken from original , the token
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -146,22 +145,21 @@ AsyncRequest
 
 <a name="TRP.AsyncResponse"/>
 ### AsyncResponse
-//////////////////////////////////
-AsyncResponse
+AsyncResponse   - a token represnting a future response
+/  you will get an AsyncResponse  for TRP Request  if you set the run_async=true at the message level
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| token | [int64](#int64) | required |  |
+| token | [int64](#int64) | required | use this token in AsyncRequest polling until you get the original Response you expected |
 | response_message | [string](#string) | optional |  |
 | response | [Message](#TRP.Message) | optional |  |
 
 
 <a name="TRP.ContextConfigRequest"/>
 ### ContextConfigRequest
-///////////////////////////////
 ContextConfigRequest - start stop status 
- OK or ERROR response 
- Status = OK if running with PID etc in message text
+/  OK or ERROR response 
+/  Status = OK if running with PID etc in message text
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -204,9 +202,9 @@ ContextConfigRequest - start stop status
 
 <a name="TRP.ContextCreateRequest"/>
 ### ContextCreateRequest
-///////////////////////////////
 ContextRequest  - Context methods 
- response Ok or Error, follow up with ContextInfo to print details
+/  response Ok or Error, follow up with ContextInfo to print details 
+/
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -216,9 +214,8 @@ ContextRequest  - Context methods
 
 <a name="TRP.ContextDeleteRequest"/>
 ### ContextDeleteRequest
-///////////////////////////////
 ContextDelete  : initialize 
-     reset data only ..
+/      reset data only ..
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -228,9 +225,8 @@ ContextDelete  : initialize
 
 <a name="TRP.ContextInfoRequest"/>
 ### ContextInfoRequest
-///////////////////////////////
 ContextInfo : one or all contexts
- use is_init to prime with config
+/  use is_init to prime with config
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -268,7 +264,8 @@ ContextInfo : one or all contexts
 
 <a name="TRP.ContextStartRequest"/>
 ### ContextStartRequest
-
+ContextStart  : run 
+/      run data only ..
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -283,7 +280,7 @@ ContextInfo : one or all contexts
 
 <a name="TRP.ContextStopRequest"/>
 ### ContextStopRequest
-
+ContextSttop  : kill  the context processes
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -381,7 +378,8 @@ CounterItemResponse  -
 
 <a name="TRP.DeleteAlertsRequest"/>
 ### DeleteAlertsRequest
-
+DeleteAlerts
+/  - very limited exception to Trisul rule of not having delete options
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -425,7 +423,7 @@ this document was seen at these time and on this flow
 
 <a name="TRP.DomainRequest"/>
 ### DomainRequest
-
+messages to routerX backend
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -717,7 +715,7 @@ LogRequest  - want log file
 | file_response | [FileResponse](#TRP.FileResponse) | optional |  |
 | destination_node | [string](#string) | optional |  |
 | probe_id | [string](#string) | optional |  |
-| run_async | [bool](#bool) | optional |  |
+| run_async | [bool](#bool) | optional | if run_async = true, then you will immediately get a AsynResponse with a token you can poll |
 
 
 <a name="TRP.MeterInfo"/>
@@ -750,8 +748,7 @@ MeterValues : a timeseries  (meter_id, stat1, stat2, ... statn)
 
 <a name="TRP.MetricsSummaryRequest"/>
 ### MetricsSummaryRequest
-///////////////////////////////
-MetricsSummaryRequest
+MetricsSummaryRequest - used to retrieve DB stats
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -762,7 +759,6 @@ MetricsSummaryRequest
 
 <a name="TRP.MetricsSummaryResponse"/>
 ### MetricsSummaryResponse
-///////////////////////////////
 MetricsSummaryResponse
 
 | Field | Type | Label | Description |
@@ -845,10 +841,10 @@ OKResponse
 <a name="TRP.PcapRequest"/>
 ### PcapRequest
 PcapRequest - retrieve a PCAP
-/ ** Sent directly to each probe rather than to the DB query HUB **  
+/ Sent directly to each probe rather than to the DB query HUB **  
 /
-/ PCAP Request for a file -&gt; put a file on the probe &gt; return a token
-/    &gt; use that token in FileDownload or another PcapRequest to merge multiple files and then FileDownload  
+/ the flow is PCAP Request for a file -&gt; put a file on the probe &gt; return a token
+/    &gt; use that token in FileRequest to download the file from the probe 
 /
 / see app notes and examples
 /
@@ -894,7 +890,8 @@ Pcap Response - for small files (&lt;1MB) contents directly contain the PCAP
 
 <a name="TRP.PcapSlicesRequest"/>
 ### PcapSlicesRequest
-
+.. response = TimeSlicesResponse
+/ get the PCAP METASLICE based info
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
