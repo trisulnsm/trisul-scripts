@@ -1169,7 +1169,8 @@ SessionTrackerResponse
 
 <a name="TRP.StatsArray"/>
 ### StatsArray
-
+StatsArray : multiple timeseries values (t, v1, v2, v3...vn) 
+/    notice we use ts_tv_sec. Most Trisul data have 1 sec resolution.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -1179,7 +1180,7 @@ SessionTrackerResponse
 
 <a name="TRP.StatsTuple"/>
 ### StatsTuple
-
+StatsTuple : a single timeseries vaue (t,v)
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -1204,7 +1205,7 @@ Subscribe - add a subcription to the Real Time channel
 
 <a name="TRP.TimeInterval"/>
 ### TimeInterval
-
+TimeInterval :
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |

@@ -3,6 +3,10 @@
 // (c) 2012-16, Unleash Networks (http://www.unleashnetworks.com)
 // $Rev: 6946 $
 
+/// trp.proto - Trisul Remote Protocol .proto file 
+/// TRP : Trisul Remote Protocol is a remote query API that allows
+/// clients to connect and retrieve data from Trisul Hub
+
 option optimize_for = LITE_RUNTIME; 
 
 
@@ -11,24 +15,29 @@ package TRP;
 //
 // Basic structures
 //
+/// Timestamp : Epoch time unix time  (seconds since Jan 1 1970) 
 message Timestamp  {
   required int64            tv_sec=1;
   optional int64            tv_usec=2 [default=0];
 }
 
+/// TimeInterval :
 message TimeInterval  {
     required Timestamp      from=1;
     required Timestamp      to=2;
 }
 
+/// StatsTuple : a single timeseries vaue (t,v) 
 message StatsTuple {
     required Timestamp      ts=1; 
     required int64          val=2; 
 }
 
+/// StatsArray : multiple timeseries values (t, v1, v2, v3...vn) 
+///    notice we use ts_tv_sec. Most Trisul data have 1 sec resolution.
 message StatsArray {
-    required int64          ts_tv_sec=1; 
-    repeated int64          values=2; 
+    required int64          ts_tv_sec=1;  // tv.tv_sec 
+    repeated int64          values=2; 	  // array of values 
 }
 
 message MeterValues {
