@@ -1,0 +1,1070 @@
+// Trisul Remote Protocol (TRP) definition
+// Based on Google Protocol Buffers
+// (c) 2012-16, Unleash Networks (http://www.unleashnetworks.com)
+// $Rev: 6946 $
+
+option optimize_for = LITE_RUNTIME; 
+
+
+package TRP;
+
+//
+// Basic structures
+//
+message Timestamp  {
+  required int64            tv_sec=1;
+  optional int64            tv_usec=2 [default=0];
+}
+
+message TimeInterval  {
+    required Timestamp      from=1;
+    required Timestamp      to=2;
+}
+
+message StatsTuple {
+    required Timestamp      ts=1; 
+    required int64          val=2; 
+}
+
+message StatsArray {
+    required int64      	ts_tv_sec=1; 
+    repeated int64          values=2; 
+}
+
+message MeterValues {
+    required int32          meter=1;
+    repeated StatsTuple     values=2;
+	optional int64			total=3;
+	optional int64			seconds=4;
+}
+
+message MeterInfo {
+
+	// from TrisulAPI 
+	enum MeterType
+	{
+		VT_INVALID=0;
+		VT_RATE_COUNTER_WITH_SLIDING_WINDOW=1;// this for top-N type counters
+		VT_COUNTER=2;                         // basic counter, stores val in the raw
+		VT_COUNTER_WITH_SLIDING_WINDOW=3;     // use this for top-N type counters
+		VT_RATE_COUNTER=4;                    // rate counter stores val/sec
+		VT_GAUGE=5;                           // basic gauge
+		VT_GAUGE_MIN_MAX_AVG=6;               // gauge with 3 additional min/avg/max cols (auto)
+		VT_AUTO=7;                            // automatic (eg, min/max/avg/stddev/)
+		VT_RUNNING_COUNTER=8;                 // running counter, no delta calc 
+        VT_AVERAGE=9;                 		  // average of samples, total/sampl uses 32bt|32bit
+	}
+
+
+    required int32          id=1;
+    required MeterType      type=2;
+    required int32	     	topcount=3;
+	required string			name=4;
+	optional string			description=5;
+	optional string			units=6;
+}
+
+message KeyStats {
+    required string         counter_group=2;
+    required KeyT           key=3;
+    repeated MeterValues    meters=4;
+}
+
+
+//
+// Top level objects are named ObjT 
+//	 eg KeyT - Key Type, SessionT - Session Type etc.
+//
+message KeyT {
+    optional string         key=1;
+    optional string         readable=2;
+    optional string         label=3;
+    optional string         description=4;
+	optional int64			metric=5;
+}
+
+
+message CounterGroupT {
+    required string         guid=1;
+    required string         name=2;
+    optional int64          bucket_size=3;
+    optional TimeInterval   time_interval=4;
+    optional int64          topper_bucket_size=5;
+	repeated MeterInfo		meters=6;
+}
+
+message SessionT  {
+	optional string         session_key=1;
+	required string         session_id=2;
+	optional string         user_label=3;
+	required TimeInterval   time_interval=4;
+	optional int64          state=5;
+	optional int64          az_bytes=6;
+	optional int64          za_bytes=7;
+	optional int64          az_packets=8;
+	optional int64          za_packets=9;
+	required KeyT     		key1A=10;
+	required KeyT     		key2A=11;
+	required KeyT     		key1Z=12;
+	required KeyT     		key2Z=13;
+	required KeyT     		protocol=14;
+	optional KeyT     		nf_routerid=15;
+	optional KeyT     		nf_ifindex_in=16;
+	optional KeyT     		nf_ifindex_out=17;
+	optional string		    tags=18;
+	optional int64          az_payload=19;
+	optional int64          za_payload=20;
+	optional int64          setup_rtt=21;
+	optional int64          retransmissions=22;
+	optional int64		    tracker_statval=23;
+	optional string			probe_id=24;
+}
+
+
+////////////////////////////////////
+// AlertT
+message AlertT{
+	optional int64          sensor_id=1;
+	required Timestamp      time=2;
+	required string 		alert_id=3;
+	optional KeyT           source_ip=4;
+	optional KeyT           source_port=5;
+	optional KeyT           destination_ip=6;
+	optional KeyT           destination_port=7;
+	optional KeyT           sigid=8;
+	optional KeyT           classification=9;
+	optional KeyT           priority=10;
+	optional Timestamp      dispatch_time=11;
+	optional string         dispatch_message1=12;
+	optional string         dispatch_message2=13;
+	optional int64          occurrances=14[default=1];
+	optional string         group_by_key=15;
+	optional string			probe_id=16;
+	optional string         alert_status=17;
+	optional int64          acknowledge_flag=18;
+}
+
+
+////////////////////////////////////
+// ResourceT
+message ResourceT {
+	required Timestamp      time=1;
+	required string         resource_id=2;
+	optional KeyT     source_ip=3;
+	optional KeyT     source_port=4;
+	optional KeyT     destination_ip=5;
+	optional KeyT     destination_port=6;
+    optional string         uri=7;
+    optional string         userlabel=8;
+	optional string			probe_id=9;
+}
+
+////////////////////////////////////
+// DocumentT
+message DocumentT  {
+	required string         dockey=1;
+	optional string         fts_attributes=2;
+	optional string         fullcontent=3;
+
+    message Flow {
+        required Timestamp  time=1;
+        required string     key=2;
+    }
+
+    repeated Flow          flows=4;
+	optional string		   probe_id=5;
+}
+
+
+//
+// Enums
+//
+enum AuthLevel {
+    ADMIN=1;
+    BASIC_USER=2;
+    FORENSIC_USER=3;
+    BLOCKED_USER=4;
+}
+
+enum CompressionType {
+    UNCOMPRESSED=1;
+    GZIP=2;
+}
+
+enum  PcapFormat {
+    LIBPCAP=1;
+    UNSNIFF=2;
+    LIBPCAPNOFILEHEADER=3;
+}
+
+enum DomainNodeType
+{
+	HUB=0;
+	PROBE=1;
+	CONFIG=2;
+	ROUTER=3;
+	WEB=4;
+	MONITOR=5;
+}
+
+enum DomainOperation {
+	GETNODES=1;
+	HEARTBEAT=2;
+	REGISTER=3;
+}
+
+message NameValue {
+	required string name=1;
+	optional string value=2;
+}
+
+//
+// Top level message is TRP::Message
+//  - wraps the actual request or response 
+// 
+message Message {
+    enum Command {  HELLO_REQUEST=1; 
+                    HELLO_RESPONSE=2;
+                    OK_RESPONSE=3;
+                    ERROR_RESPONSE=5;
+                    COUNTER_GROUP_TOPPER_REQUEST=6;
+                    COUNTER_GROUP_TOPPER_RESPONSE=7;
+                    COUNTER_ITEM_REQUEST=8;
+                    COUNTER_ITEM_RESPONSE=9;
+                    PCAP_REQUEST=14;
+                    PCAP_RESPONSE=15;
+                    SEARCH_KEYS_REQUEST=18;                   
+                    SEARCH_KEYS_RESPONSE=19;                        
+                    COUNTER_GROUP_INFO_REQUEST=20;              
+                    COUNTER_GROUP_INFO_RESPONSE=21;             
+                    SESSION_TRACKER_REQUEST=22;                     
+                    SESSION_TRACKER_RESPONSE=23;                    
+                    UPDATE_KEY_REQUEST=32;                            
+                    UPDATE_KEY_RESPONSE=33;                           
+                    QUERY_SESSIONS_REQUEST=34;                     
+                    QUERY_SESSIONS_RESPONSE=35;
+                    PROBE_STATS_REQUEST=38;                    
+                    PROBE_STATS_RESPONSE=39;                              
+                    QUERY_ALERTS_REQUEST=44;
+                    QUERY_ALERTS_RESPONSE=45;
+                    QUERY_RESOURCES_REQUEST=48;
+                    QUERY_RESOURCES_RESPONSE=49;
+					GREP_REQUEST=60;
+					GREP_RESPONSE=61;
+					KEYSPACE_REQUEST=70;
+					KEYSPACE_RESPONSE=71;
+					TOPPER_TREND_REQUEST=72;
+					TOPPER_TREND_RESPONSE=73;
+                    STAB_PUBSUB_CTL=80;
+                    QUERY_FTS_REQUEST=90;
+                    QUERY_FTS_RESPONSE=91;
+                    TIMESLICES_REQUEST=92;
+                    TIMESLICES_RESPONSE=93;
+                    DELETE_ALERTS_REQUEST=94;
+                    METRICS_SUMMARY_REQUEST=95;
+                    METRICS_SUMMARY_RESPONSE=96;
+                    PCAP_SLICES_REQUEST=97;
+                    SERVICE_REQUEST=101;
+                    SERVICE_RESPONSE=102;
+                    CONFIG_REQUEST=103;
+                    CONFIG_RESPONSE=104;
+                    LOG_REQUEST=105;
+                    LOG_RESPONSE=106;
+					CONTEXT_CREATE_REQUEST=108;
+					CONTEXT_DELETE_REQUEST=109;
+					CONTEXT_START_REQUEST=110;
+					CONTEXT_STOP_REQUEST=111;
+					CONTEXT_INFO_REQUEST=112;
+					CONTEXT_INFO_RESPONSE=113;
+					CONTEXT_CONFIG_REQUEST=114;
+					CONTEXT_CONFIG_RESPONSE=115;
+					DOMAIN_REQUEST=116;
+					DOMAIN_RESPONSE=117;
+					NODE_CONFIG_REQUEST=118;
+					NODE_CONFIG_RESPONSE=119;
+					ASYNC_REQUEST=120;
+					ASYNC_RESPONSE=121;
+					FILE_REQUEST=122;
+					FILE_RESPONSE=123;
+					SUBSYSTEM_INIT=124;			// init msg  used to prepare services 
+					SUBSYSTEM_EXIT=125;
+
+    }
+
+    required Command    trp_command=1;
+    optional HelloRequest hello_request=2;
+    optional HelloResponse hello_response=3;
+    optional OKResponse ok_response=4;
+    optional ErrorResponse error_response=5;
+    optional CounterGroupTopperRequest counter_group_topper_request=6;
+    optional CounterGroupTopperResponse counter_group_topper_response=7;
+    optional CounterItemRequest counter_item_request=8;
+    optional CounterItemResponse counter_item_response=9;
+    optional PcapRequest pcap_request=14;
+    optional PcapResponse pcap_response=15;
+    optional SearchKeysRequest search_keys_request=18;
+    optional SearchKeysResponse search_keys_response=19;
+    optional CounterGroupInfoRequest counter_group_info_request=20;
+    optional CounterGroupInfoResponse counter_group_info_response=21;
+    optional UpdateKeyRequest update_key_request=30;
+    optional QuerySessionsRequest query_sessions_request=31;
+    optional QuerySessionsResponse  query_sessions_response=32;
+    optional SessionTrackerRequest session_tracker_request=33;
+    optional SessionTrackerResponse session_tracker_response=34;
+    optional ProbeStatsRequest probe_stats_request=37;
+    optional ProbeStatsResponse probe_stats_response=38;
+    optional QueryAlertsRequest query_alerts_request=43;
+    optional QueryAlertsResponse  query_alerts_response=44;
+    optional QueryResourcesRequest query_resources_request=47;
+    optional QueryResourcesResponse  query_resources_response=48;
+    optional GrepRequest  grep_request=51;
+    optional GrepResponse  grep_response=52;
+    optional TopperTrendRequest  topper_trend_request=55;
+    optional TopperTrendResponse  topper_trend_response=56;
+    optional SubscribeCtl  subscribe_ctl=59;
+    optional QueryFTSRequest  query_fts_request=60;
+    optional QueryFTSResponse  query_fts_response=61;
+    optional TimeSlicesRequest  time_slices_request=62;
+    optional TimeSlicesResponse  time_slices_response=63;
+    optional DeleteAlertsRequest delete_alerts_request=64;
+	optional MetricsSummaryRequest metrics_summary_request=65;
+	optional MetricsSummaryResponse metrics_summary_response=66;
+	optional KeySpaceRequest key_space_request=67;
+	optional KeySpaceResponse  key_space_response=68;
+	optional PcapSlicesRequest  pcap_slices_request=69;
+	optional LogRequest  log_request=105;
+	optional LogResponse  log_response=106;
+	optional ContextCreateRequest  context_create_request=108;
+	optional ContextDeleteRequest  context_delete_request=109;
+	optional ContextStartRequest  context_start_request=110;
+	optional ContextStopRequest  context_stop_request=111;
+	optional ContextConfigRequest  context_config_request=112;
+	optional ContextConfigResponse  context_config_response=113;
+	optional ContextInfoRequest   context_info_request=114;
+	optional ContextInfoResponse   context_info_response=115;
+	optional DomainRequest   domain_request=116;
+	optional DomainResponse   domain_response=117;
+	optional NodeConfigRequest   node_config_request=118;
+	optional NodeConfigResponse   node_config_response=119;
+	optional AsyncRequest   async_request=120;
+	optional AsyncResponse   async_response=121;
+	optional FileRequest   file_request=122;
+	optional FileResponse    file_response=123;
+    optional string     destination_node=200; 	// todo move 2nd
+    optional string     probe_id=201;			// todo move 3rd 
+    optional bool       run_async=202;			// todo move 3rd 
+
+}
+
+
+//////////////////////////////////////////////////////////////
+// --------------- Messages Section -------------------------//
+// TRP is a synchronous request response protocol            //
+// Send a xyz_Request() and wait for xyz_Response            //
+// All requests necessarily get a response                   //
+// --------------- Messages Section -------------------------//
+//////////////////////////////////////////////////////////////
+
+///////////////////////////////
+// Hello 
+message HelloRequest{
+  required string   station_id=1;
+  optional string	message=2;
+}       
+
+message HelloResponse{
+  required string       station_id=1;
+  optional string       station_id_request=2;
+  optional string       message=3;
+  optional int64		local_timestamp=4;
+}
+
+///////////////////////////////
+// Error 
+message ErrorResponse{
+   required int64       original_command=1;
+   required int64       error_code=2;
+   required string      error_message=3;
+}
+
+///////////////////////////////
+// OK 
+message OKResponse{
+   required int64       original_command=1;
+   optional string      message=2;
+}
+
+
+///////////////////////////////
+// CounterItemRequest 
+message CounterItemRequest{
+    required string         counter_group=2;
+    optional int64          meter=3;
+    required KeyT     key=4;
+    required TimeInterval   time_interval=5;
+	optional int64			volumes_only=6 [default=0];
+}
+
+///////////////////////////////
+// CounterItemResponse  
+message CounterItemResponse{
+	required string			counter_group=1;
+	required KeyT			key=2;
+    optional StatsArray     totals=3;
+    repeated StatsArray     stats=4;
+}
+
+
+///////////////////////////////
+// CounterGroupTopperRequest 
+message CounterGroupTopperRequest{
+    required string         counter_group=2;
+    optional int64          meter=3 [default=0];
+    optional int64          maxitems=4 [default=100];
+    optional TimeInterval   time_interval=5;
+    optional Timestamp      time_instant=6;
+    optional int64          flags=7;
+    optional bool           resolve_keys=8 [default=true];
+}
+
+///////////////////////////////
+// CounterGroupTopperResponse  
+message  CounterGroupTopperResponse{
+    required string         counter_group=2;
+    required int64          meter=3;
+	optional int64			sysgrouptotal=4;
+    repeated KeyT     keys=6;
+}
+
+
+///////////////////////////////////////
+// SearchkeysRequest
+message SearchKeysRequest{
+    required string         counter_group=2;        
+    optional int64          maxitems=3[default=100];
+    optional string         pattern=4;        
+    optional string         label=5;
+    repeated string         keys=6;
+    optional int64          offset=7[default=0];
+    optional bool           get_totals=8[default=false];
+} 
+
+//////////////////////////////////////
+// SearchKeysResponse
+message SearchKeysResponse{
+    required string         counter_group=2;        
+    repeated KeyT     keys=3;
+    optional int64          total_count=4;
+
+} 
+
+/////////////////////////////////////
+/// CounterGroupInfoRequest
+message CounterGroupInfoRequest{
+    optional string        counter_group=2;
+	optional bool		   get_meter_info=3[default=false];
+}
+
+///////////////////////////////////
+/// CounterGroupInfoResponse
+message CounterGroupInfoResponse{
+    repeated CounterGroupT    group_details=2;
+}
+
+///////////////////////////////////
+// QuerySessions - any of the fields can be filled
+// 				   all the fields filled are treated as AND criteria 
+message QuerySessionsRequest {
+    optional string         session_group=2[default="{99A78737-4B41-4387-8F31-8077DB917336}"];
+    optional TimeInterval   time_interval=3;
+    optional string         key=4;
+	optional KeyT		    source_ip=5;
+	optional KeyT		    source_port=6;
+	optional KeyT			dest_ip=7;
+	optional KeyT			dest_port=8;
+	optional KeyT			any_ip=9;
+	optional KeyT			any_port=10;
+	repeated KeyT           ip_pair=11;			// array of 2 ips 
+	optional KeyT			protocol=12;
+	optional string			flowtag=13;
+	optional KeyT			nf_routerid=14;
+	optional KeyT			nf_ifindex_in=15;
+	optional KeyT			nf_ifindex_out=16;
+	optional string			subnet_24=17;
+	optional string			subnet_16=18;
+    optional int64          maxitems=19[default=100];
+    optional int64          volume_filter=20[default=0];
+	optional bool			resolve_keys=21[default=true];
+	optional string			outputpath=22;
+	repeated string			idlist=23;
+}
+
+/////////////////////////////////////
+// QuerySessionsResponse 
+message QuerySessionsResponse {
+    required string         	session_group=2;
+    repeated SessionT     		sessions=3;
+    optional string         	outputpath=4;
+}
+
+//////////////////////////////////////////////
+/// UpdatekeysRequest
+/// Response = OKResponse or ErrorResponse
+message UpdateKeyRequest{
+    required string         counter_group=2;
+    repeated KeyT     keys=4;
+}
+
+/////////////////////////////////////
+// SessionTrackerRequest
+message SessionTrackerRequest {
+    optional string         session_group=2[default="{99A78737-4B41-4387-8F31-8077DB917336}"];
+    required int64          tracker_id=3 [default=1];
+    optional int64          maxitems=4 [default=100];
+    required TimeInterval   time_interval=5;
+    optional bool           resolve_keys=6 [default=true];
+}
+
+///////////////////////////////////
+// SessionTrackerResponse 
+message SessionTrackerResponse{
+    required string         session_group=2;
+    repeated SessionT       sessions=3;
+    optional int64          tracker_id=4;
+}
+
+////////////////////////////////////
+// QueryAlertsRequest 
+message QueryAlertsRequest  {
+    required string         alert_group=2;
+    optional TimeInterval   time_interval=3;
+    optional int64          maxitems=5 [default=100];
+    optional KeyT      		source_ip=6;
+    optional KeyT     		source_port=7;
+    optional KeyT     		destination_ip=8;
+    optional KeyT     		destination_port=9;
+    optional KeyT     		sigid=10;
+    optional KeyT     		classification=11;
+    optional KeyT     		priority=12;
+    optional string         aux_message1=13;
+    optional string         aux_message2=14;
+    optional string         group_by_fieldname=15;
+	repeated string 		idlist=16;
+	optional bool			resolve_keys=17[default=true];
+    optional KeyT           any_ip=18;
+    optional KeyT           any_port=19;
+	repeated KeyT           ip_pair=20;			     // array of 2 ips 
+	optional string			message_regex=21;		// searech via regex 
+}
+
+/////////////////////////////////////
+// QueryAlertsResponse 
+message QueryAlertsResponse {
+    required string         alert_group=2;
+    repeated AlertT   		alerts=3;
+}
+////////////////////////////////////
+//  QueryResourcesRequest
+message QueryResourcesRequest {
+    required string         resource_group=2;
+    optional TimeInterval   time_interval=3;
+    optional int64          maxitems=4 [default=100];
+    optional KeyT     		source_ip=5;
+    optional KeyT     		source_port=6;
+    optional KeyT     		destination_ip=7; 
+    optional KeyT     		destination_port=8;
+    optional string         uri_pattern=9;
+    optional string         userlabel_pattern=10;
+    repeated string         regex_uri=12;            // cant be combined with others 
+	repeated string    		idlist=13;				 // resource ID list 
+	optional bool			resolve_keys=14 [default=true];
+    optional KeyT     		any_port=15;
+    optional KeyT     		any_ip=16;
+	repeated KeyT           ip_pair=17;			     // array of 2 ips 
+}
+
+/////////////////////////////////////
+// QueryResourceResponse  
+message QueryResourcesResponse {
+    required string        	resource_group=2;
+    repeated ResourceT     	resources=3;
+}
+
+
+
+////////////////////////////////////
+// KeySpaceRequest
+message KeySpaceRequest {
+    required string         counter_group=2;
+    required TimeInterval   time_interval=3;
+    optional int64          maxitems=4 [default=100];
+
+	message KeySpace {
+		required KeyT 	from_key=1;
+		required KeyT 	to_key=2;
+	}
+
+	repeated KeySpace       spaces=5;
+    optional bool           resolve_keys=6[default=true];
+}
+
+/////////////////////////////////////
+// KeySpaceResponse  
+message KeySpaceResponse  {
+    optional string         counter_group=2;
+    repeated KeyT         hits=3;
+}
+
+///////////////////////////////
+// TopperTrendRequest 
+message TopperTrendRequest {
+    required string         counter_group=2;
+    optional int64          meter=3 [default=0];
+    optional int64          maxitems=4 [default=100];
+    optional TimeInterval   time_interval=5;
+}
+
+///////////////////////////////
+// TopperTrendResponse   
+message  TopperTrendResponse {
+    required string         counter_group=2;
+    required int64          meter=3;
+    repeated KeyStats       keytrends=4;
+}
+
+
+
+///////////////////////////////////
+// Subscribe - add a subcription to the Real Time channel
+message SubscribeCtl  {
+
+	// from TrisulAPI 
+	enum StabberType 
+	{
+		ST_COUNTER_ITEM=0;
+		ST_ALERT=1;			
+		ST_FLOW=2;         
+		ST_TOPPER=3;     
+	}
+
+	enum CtlType
+	{
+		CT_SUBSCRIBE=0;
+		CT_UNSUBSCRIBE=1;
+	}
+
+	required string			context_name=1;
+	required CtlType		ctl=2;
+	required StabberType	type=3;
+	optional string			guid=4;
+	optional string			key=5;
+	optional int64			meterid=6;
+}
+
+
+
+// FTS
+//  query to return docs, docids, and flows based on keyword search
+//
+
+message QueryFTSRequest  {
+
+    required TimeInterval       time_interval=2;
+	required string			    fts_group=3;
+    required string             keywords=4;
+    optional int64              maxitems=5[default=100];
+}
+
+
+message QueryFTSResponse {
+
+	required string			    fts_group=2;
+    repeated DocumentT    		documents=3;   
+
+}
+
+
+// Timeslices
+//
+// get the METERS METASLICE info 
+// .. response = TimeSlicesResponse
+
+message TimeSlicesRequest  {
+	optional bool	get_disk_usage=1[default=false];
+	optional bool	get_all_engines=2[default=false];
+	optional bool	get_total_window=3[default=false];
+}
+
+// .. response = TimeSlicesResponse
+// get the PCAP METASLICE based info 
+message PcapSlicesRequest {
+	required string context_name=1;
+	optional bool	get_total_window=2[default=false];
+}
+
+message TimeSlicesResponse  {
+	message SliceT
+	{
+		required TimeInterval   time_interval=1;
+		optional string 		name=2;
+		optional string 		status=3;
+		optional int64          disk_size=4;
+		optional string         path=5;
+		optional bool			available=6;
+	};
+
+	repeated SliceT		    slices=1;
+    optional TimeInterval   total_window=2;
+	optional string			context_name=3;
+}
+
+
+// DeleteAlerts
+//  - very limited exception to Trisul rule of not having delete options 
+message DeleteAlertsRequest  {
+    required string         alert_group=2;
+    required TimeInterval   time_interval=3;
+    optional KeyT     		source_ip=6;
+    optional KeyT     		source_port=7;
+    optional KeyT     		destination_ip=8;
+    optional KeyT     		destination_port=9;
+    optional KeyT     		sigid=10;
+    optional KeyT     		classification=11;
+    optional KeyT     		priority=12;
+    optional KeyT     		any_ip=18;
+    optional KeyT     		any_port=19;
+	optional string			message_regex=21;		// delete using regex 
+} 
+
+//////////////////////////////////
+// MetricsSummaryRequest
+message MetricsSummaryRequest{
+     optional  TimeInterval   time_interval=1;
+     required  string         metric_name=2;
+	 optional  bool			  totals_only=3[default=true];
+}
+
+//////////////////////////////////
+// MetricsSummaryResponse
+message MetricsSummaryResponse {
+    required  string         metric_name=2;
+    repeated  StatsTuple     vals=3;
+}
+
+
+
+//////////////////////////////////
+// LogRequest  - want log file 
+message LogRequest  {
+
+     required  string         context_name=1;
+     required  string         log_type=2;
+     optional  string         regex_filter=4;
+     optional  int64          maxlines=5[default=1000];
+	 optional  string		  continue_logfilename=6;
+	 optional  int64		  continue_seekpos=7;
+	 optional  bool			  latest_run_only=8[default=false];
+}
+
+
+message LogResponse  {
+
+     required  string         context_name=1;
+	 optional  string		  logfilename=6;
+	 optional  int64		  seekpos=7;
+     repeated  string         log_lines=8; // compressed gz 
+}
+
+
+// messages to routerX backend 
+message DomainRequest {
+	required 	DomainOperation cmd=1;
+	optional	string	station_id=2;
+	optional	string	params=3;
+	optional 	DomainNodeType nodetype=4;
+}
+
+message DomainResponse {
+
+
+	message Node {
+
+		required string	id=1;
+		required DomainNodeType  nodetype=2;
+		optional string station_id=3; 
+		optional string extra_info=4;
+		optional Timestamp register_time=5; 
+		optional Timestamp heartbeat_time=6; 
+
+	}
+
+	required DomainOperation	cmd=1;
+	repeated Node nodes=2;
+	optional string req_params=3;
+	optional string params=4;
+	optional bool need_reconnect=5[default=false];
+}
+
+
+message NodeConfigRequest {
+	optional string message=1;
+
+	message IntelFeed {
+		required string		guid=1; 			// identifying feed group (eg Geo, Badfellas)
+		optional string		name=2; 			// name
+		optional string		download_rules=3;	// xml file with feed update instructions
+		repeated string	 	uri=4;				// individual files in config//.. for FileRequest download 
+	}
+
+	optional IntelFeed 		add_feed=2;
+	optional IntelFeed 		process_new_feed=3;
+	optional bool	   		get_all_nodes=4[default=true];
+	repeated NameValue	   	query_config=5;
+
+}
+
+message NodeConfigResponse {
+
+	message Node {
+		required string	id=1;
+		required DomainNodeType  nodetype=2;
+		required string	description=3;
+		required string	public_key=4;
+	}
+
+	repeated Node				domains=1;
+	repeated Node				hubs=2;
+	repeated Node				probes=3;
+	repeated string				feeds=4;
+	repeated NameValue	   		config_values=5;
+}
+
+
+//////////////////////////////////
+// ContextRequest  - Context methods 
+// 	response Ok or Error, follow up with ContextInfo to print details 
+// 
+message ContextCreateRequest  {
+     required  string         context_name=1;
+     optional  string         clone_from=2;
+}
+
+//////////////////////////////////
+// ContextInfo : one or all contexts
+//	use is_init to prime with config 
+message ContextInfoRequest {
+     optional   string         context_name=1;     // if not  set all context get in 
+	 optional   bool		   get_size_on_disk=2[default=false]; //  get size on disk (expensive) 
+}
+
+message ContextInfoResponse {
+
+
+	message Item
+	{
+		required string 		context_name=1;
+		required bool			is_initialized=2;
+		required bool   		is_running=3;
+		optional int64			size_on_disk=4;
+		optional TimeInterval	time_interval=5;
+		optional bool   		is_clean=6;
+		optional string			extrainfo=7;
+		repeated TimeInterval   run_history=8;
+		optional string			profile=9;
+		optional string			runmode=10;
+		optional string         node_version=11;
+	}
+
+	repeated  Item 	items=1;
+}
+
+//////////////////////////////////
+// ContextDelete  : initialize 
+//		reset data only .. 
+message ContextDeleteRequest   {
+     required   string         context_name=1; 		// if not  set all context get in 
+	 optional   bool		   reset_data=2;	// reset data dont delete everything
+}
+
+// ContextStart  : run 
+//		run data only .. 
+message ContextStartRequest   {
+     required   string         context_name=1; 		// if not  set all context get in 
+	 optional   string		   mode=2;
+	 optional   bool           background=3;
+	 optional   string		   pcap_path=4;
+	 optional   string		   run_tool=5;			// snort, suricata supported..
+	 optional   string		   tool_ids_config=6;
+	 optional   string		   tool_av_config=7;
+
+}
+
+// ContextSttop  : kill 
+message ContextStopRequest   {
+     required   string         context_name=1; 		// if not  set all context get in 
+	 optional   string		   run_tool=5;			// snort, suricata , trp, flushd supported..
+}
+
+
+//////////////////////////////////
+// ContextConfigRequest - start stop status 
+// 	OK or ERROR response 
+//  Status = OK if running with PID etc in message text 
+message ContextConfigRequest {
+     required  string         context_name=1;
+     optional  string         profile=2;
+     optional  string         params=3;
+	 optional  bytes		  push_config_blob=4;     // push this .. 
+	 repeated  NameValue	  query_config=5;    	  // query, leave the .value field blank
+	 repeated  NameValue	  set_config_values=6;    // push this ..  (name=value;name=value ..)
+}
+
+
+message ContextConfigResponse {
+
+	message Layer
+	{
+		required int64	layer=1;
+		required string probe_id=2;
+		optional string probe_description=3;
+	}
+
+	required  string         	context_name=1;
+	optional  string         	profile=2;
+	optional  string		  	params=3;	   				// what kind of config you want 
+	optional  bytes		  		pull_config_blob=4;	// config 
+	optional  bytes          	config_blob=5; 			// compress tar.gz ..
+	repeated  string		  	endpoints_flush=6;
+	repeated  string		  	endpoints_query=7;
+	repeated  string		  	endpoints_pub=8;
+	repeated  NameValue	  		config_values=10;    	  // query, leave the .value field blank
+	repeated  Layer 		  	layers=11;
+
+}
+
+///////////////////////////////
+// PcapReqiest
+//  NOTE - only one of the various filters are supported
+//  sending > 1 will result in error 
+//	
+// Modes
+//	1.  nothing set => PCAP file in contents
+//	2.  save_file_prefix set =>  file download token
+//	3.  merge_pcap_files => file download token 
+// 
+message PcapRequest {
+	required string				context_name=1;
+    optional int64              max_bytes=2[default=100000000]; // 100MB , can increase to 0.75 Filesystem freespace
+    optional CompressionType    compress_type=3[default=UNCOMPRESSED];              
+	optional TimeInterval       time_interval=4;                // not needed for merge option 
+    optional string             save_file_prefix=5;
+	optional string             filter_expression=6;
+	repeated string				merge_pcap_files=7;
+	optional bool			    delete_after_merge=8[default=true];
+    optional PcapFormat         format=9[default=LIBPCAP];                                 
+}
+
+
+/////////////////////////////////////
+// FileredDatagaramResponse
+message PcapResponse  {
+	required string			context_name=1;
+    optional PcapFormat     format=2[default=LIBPCAP];                                 
+    optional CompressionType compress_type=3[default=UNCOMPRESSED];                   
+    optional TimeInterval   time_interval=4;                
+    optional int64          num_bytes=5;      
+    optional string         sha1=6;
+    optional bytes          contents=7;
+	optional string			save_file=8;		//use FileRequest framework to download 
+}
+
+////////////////////////////////////
+// GrepRequest
+message GrepRequest {
+	required string			context_name=1;
+    required TimeInterval   time_interval=2;
+    optional int64          maxitems=3 [default=100];
+    optional int64          flowcutoff_bytes=4;
+    optional string         pattern_hex=5;
+    optional string         pattern_text=6;
+    optional string         pattern_file=7;
+	repeated string         md5list=8;
+    optional bool           resolve_keys=9 [default=true];
+}
+
+/////////////////////////////////////
+// GrepResponse  
+message GrepResponse  {
+	required string			context_name=1;
+    repeated SessionT       sessions=2;
+    repeated string         hints=3;
+	optional string			probe_id=4;
+}
+
+//////////////////////////////////
+// ProbeStatsRequest
+message ProbeStatsRequest{
+	 required  string		context_name=1;
+     optional  string       param=2;
+}
+
+//////////////////////////////////
+// ProbeStatsResponse
+message ProbeStatsResponse {
+	required string			context_name=1;
+    required string         instance_name=2;
+    required int64          connections=3;
+    required int64          uptime_seconds=4;
+    required double         cpu_usage_percent_trisul=5;
+    required double         cpu_usage_percent_total=6;
+    required double         mem_usage_trisul=7;
+    required double         mem_usage_total=8;
+    required double         mem_total=9;
+    required double         drop_percent_cap=10;
+    required double         drop_percent_trisul=11;
+	optional int64			proc_bytes=12;
+	optional int64			proc_packets=13;
+	optional string			offline_pcap_file=14;
+	optional bool			is_running=15;
+}
+
+/////////////////////////////////////
+// AsyncResponse  
+message AsyncResponse  {
+    required int64          token=1;
+	optional string 		response_message=3;
+	optional Message		response=4;
+}
+
+//////////////////////////////////
+// AsyncRequest
+//		response taken from original (if ready) or not_ready flag set 	
+message AsyncRequest {
+	 required  int64		token=1;
+     optional  string       request_message =2; // basically extra text for logging 
+}
+
+/////////////////////////////////////
+// FileRequest  
+message FileRequest  {
+	required string 		uri=1;
+    required int64          position=2;
+	optional string			params=3;	// local meaning sentback n response
+	optional string			context_name=4;
+	optional bool			delete_on_eof=5[default=false];
+}
+
+//////////////////////////////////
+// FileResponse
+//		one chunk at at time, Trisul has slightly inefficient File Transfer
+// 		for very large files, since most files are data feeds  < 100MB fine for now
+message FileResponse  {
+	 required  string 		uri=1;
+	 required  bool		    eof=2;
+     optional  int64        position=3;
+     optional  bytes        content=4;
+     optional  string       request_params =5; 
+	 optional string		context_name=6;
+}
+
+
