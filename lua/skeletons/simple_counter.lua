@@ -46,7 +46,7 @@ TrisulPlugin = {
 
   -- simple_counter  block
   -- 
-  simple_counter = {
+  simplecounter = {
 
     -- Required field : which protocol (layer) do you wish to attach to 
     -- as admin > Profile > Trisul Protocols for a list 
