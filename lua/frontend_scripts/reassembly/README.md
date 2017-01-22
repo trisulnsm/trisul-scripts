@@ -13,6 +13,7 @@ Filename             |                    What it does                  | Demons
 reass1.lua   | prints reassembly call messages | Minimal script demonstrates hooks into reassembly 
 reass_filter.lua  | selectively request reassembly support | use of the filter method, accessing IP, Ports from flow object 
 savetcp.lua  | save fully reassembled TCP payloads into separate files | saving reassmbled buffers, use lookup tables 
+ftp.lua | FTP file extraction with filenames | State management, onmessage(..), selective reassembly, techniques | 
 
 
 
