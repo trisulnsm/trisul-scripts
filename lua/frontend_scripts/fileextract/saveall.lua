@@ -29,6 +29,9 @@ TrisulPlugin = {
     -- save all content to /tmp/kk 
     --
     onfile_http  = function ( engine, timestamp, flowkey, path, req_header, resp_header, length , is_chunk )
+		
+        -- you can get 0 length for HTTP 304, etc - skip it 
+        if length == 0 then return; end 
 
 		if is_chunk then 
 		   local fn = path:match("^.+/(.+)%.%d+.part$")
