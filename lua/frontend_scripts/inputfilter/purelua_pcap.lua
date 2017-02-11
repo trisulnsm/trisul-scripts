@@ -18,17 +18,17 @@ typedef uint16_t sa_family_t;
 typedef uint32_t socklen_t;
 
 struct constants {
-	static const int AF_UNIX=1;
-	static const int AF_INET=2;
-	static const int SOCK_DGRAM=2;		 /* socket.h        */
-	static const int MSG_DONTWAIT=0x40;  /* socket_type.h   */
+  static const int AF_UNIX=1;
+  static const int AF_INET=2;
+  static const int SOCK_DGRAM=2;     /* socket.h        */
+  static const int MSG_DONTWAIT=0x40;  /* socket_type.h   */
 };
 
 int     socket(int domain, int type, int protocol);
 
 struct sockaddr {
-	sa_family_t sa_family;          
-	char        sa_data[14];       
+  sa_family_t sa_family;          
+  char        sa_data[14];       
 };
 
 struct sockaddr_un {
@@ -50,8 +50,8 @@ local K = ffi.new("struct constants");
 -- socket 
 local socket = ffi.C.socket( K.AF_UNIX, K.SOCK_DGRAM, 0);
 if  socket == -1 then 
-	print("Error socket() " .. strerror())
-	return 
+  print("Error socket() " .. strerror())
+  return 
 end 
 
 local strerror = function()
@@ -69,8 +69,8 @@ local ret = ffi.C.bind( socket,  ffi.cast("const struct sockaddr *", addr) , ffi
 
 print ("Ret = "..ret.." pah="..ffi.string(addr.sun_path) )
 if ret == -1 then
-	print("Error bind() " .. strerror())
-	return
+  print("Error bind() " .. strerror())
+  return
 end
 
 

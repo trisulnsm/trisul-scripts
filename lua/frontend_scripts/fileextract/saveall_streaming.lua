@@ -17,11 +17,11 @@ TrisulPlugin = {
 
 
   onload = function()
-  	print("LOADED : fx_video.lua  ")
+    print("LOADED : fx_video.lua  ")
   end,
 
   onunload = function()
-  	print("BYE: fx_video.lua ")
+    print("BYE: fx_video.lua ")
   end,
 
   -- 
@@ -35,19 +35,19 @@ TrisulPlugin = {
     -- filter : decide if you want to reassemble this file or not.. 
     --
     filter = function( engine,  timestamp, flowkey, header)
-        if header:is_response() or header:is_method("post") then 
-            local ct = header:get_value("Content-Type")
-            if ct and ct:match("video")   then
-                print(">>>>>  Saving video file for analysis "..ct.."flow - "..flowkey:id() ) 
-                return true
-            else
-                return false
-            end
-        else 
-            -- request
-            -- always return true 
-            return true
+      if header:is_response() or header:is_method("post") then 
+        local ct = header:get_value("Content-Type")
+        if ct and ct:match("video")   then
+          print(">>>>>  Saving video file for analysis "..ct.."flow - "..flowkey:id() ) 
+          return true
+        else
+          return false
         end
+      else 
+        -- request
+        -- always return true 
+        return true
+      end
     end,
 
 
@@ -55,29 +55,27 @@ TrisulPlugin = {
     --
     onfile_http  = function ( engine, timestamp, flowkey, path, req_header, resp_header, length , partial_flag )
 
-	    local ct = resp_header:get_value("Content-Type")
-	    if ct and ct:match("video")   then
-		if partial_flag then 
-		   local fn = path:match("^.+/(.+)%.%d+.part$")
-		   print(">>>>>  PARTIAL VIDEO AsyncCat ."..fn)
-		   --  just a chunk , concatenate with prev 
-		   --
-		   T.async:cat( path, "/tmp/filex/video/"..fn)
+      local ct = resp_header:get_value("Content-Type")
+      if ct and ct:match("video")   then
+        if partial_flag then 
+          local fn = path:match("^.+/(.+)%.%d+.part$")
+          print(">>>>>  PARTIAL VIDEO AsyncCat ."..fn)
+          --  just a chunk , concatenate with prev 
+          --
+          T.async:cat( path, "/tmp/filex/video/"..fn)
 
-		else
-		   -- full file 
-		   --
-		   local fn = path:match("^.+/(.+)$")
+        else
+          -- full file 
+          --
+          local fn = path:match("^.+/(.+)$")
 
-		   T.async:copy( path, "/tmp/filex/video/"..fn)
+          T.async:copy( path, "/tmp/filex/video/"..fn)
 
-		end 
-	    end
-
-
+        end 
+      end
     end,
 
- }
+  }
 
 }
 

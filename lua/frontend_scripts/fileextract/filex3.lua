@@ -17,11 +17,11 @@ TrisulPlugin = {
 
 
   onload = function()
-  	print("LOADED : filex.lua ")
+    print("LOADED : filex.lua ")
   end,
 
   onunload = function()
-  	print("BYE: filex.lua ")
+    print("BYE: filex.lua ")
   end,
 
   -- 
@@ -36,7 +36,7 @@ TrisulPlugin = {
     --  no   : skip this flow 
     -- 
     filter_flow  = function( engine,  timestamp, flowkey)
-        return true
+      return true
     end,
 
 
@@ -45,8 +45,8 @@ TrisulPlugin = {
     -- filter : decide if you want to reassemble this file or not.. 
     --
     filter = function( engine,  timestamp, flowkey, header)
-        print("LUA FILTER  ");
-        return true
+      print("LUA FILTER  ");
+      return true
     end,
 
 
@@ -55,19 +55,19 @@ TrisulPlugin = {
     --
     onfile_http  = function ( engine, timestamp, flowkey, req_header, resp_header, path , length )
 
-       local fn = path:match("^.+/(.+)$")
+      local fn = path:match("^.+/(.+)$")
 
-        print("LUA filename ="..fn);
-        print("LUA length="..length);
+      print("LUA filename ="..fn);
+      print("LUA length="..length);
 
-        local ct = resp_header:get_value("content-type")
-        if ct and ct:match("image") then 
-            T.async:copy( path, "/tmp/kk/"..fn)
-        end 
+      local ct = resp_header:get_value("content-type")
+      if ct and ct:match("image") then 
+        T.async:copy( path, "/tmp/kk/"..fn)
+      end 
 
-        if path:match("tab_left.gif") then 
-            engine:disable_reassembly(flowkey:id())
-        end 
+      if path:match("tab_left.gif") then 
+        engine:disable_reassembly(flowkey:id())
+      end 
 
 
     end,

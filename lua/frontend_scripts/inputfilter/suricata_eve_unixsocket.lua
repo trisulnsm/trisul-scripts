@@ -78,8 +78,8 @@ TrisulPlugin = {
     -- socket 
     local socket = ffi.C.socket( K.AF_UNIX, K.SOCK_DGRAM, 0 );
     if  socket == -1 then 
-        T.log(T.K.loglevel.ERROR,"Error socket() " .. strerror())
-        return 
+      T.log(T.K.loglevel.ERROR,"Error socket() " .. strerror())
+      return 
     end 
 
     -- bind to unix socket endpoint
@@ -110,32 +110,32 @@ TrisulPlugin = {
     -- 
     step_alert  = function()
 
-        local MAX_MSG_SIZE=2048;
-        local rbuf  = ffi.new("char[?]", MAX_MSG_SIZE);
+      local MAX_MSG_SIZE=2048;
+      local rbuf  = ffi.new("char[?]", MAX_MSG_SIZE);
 
-        -- this block is repeated 
-        -- 1. until an 'alert' JSON is found (suricata sends other types of info too via EVE))
-        -- 2. EOF on socket 
-        local p = nil 
-        repeat 
-            local ret = ffi.C.recv(T.socket, rbuf,MAX_MSG_SIZE,K.MSG_DONTWAIT)
-            if ret < 0 then
-                if ffi.errno()  == K.EAGAIN then 
-                    print("Nothing to read" )
-                    return nil
-                else 
-                    print("Error ffi.recv " .. strerror())
-                    return nil 
-                end 
-            end
+      -- this block is repeated 
+      -- 1. until an 'alert' JSON is found (suricata sends other types of info too via EVE))
+      -- 2. EOF on socket 
+      local p = nil 
+      repeat 
+        local ret = ffi.C.recv(T.socket, rbuf,MAX_MSG_SIZE,K.MSG_DONTWAIT)
+        if ret < 0 then
+          if ffi.errno()  == K.EAGAIN then 
+            print("Nothing to read" )
+            return nil
+          else 
+            print("Error ffi.recv " .. strerror())
+            return nil 
+          end 
+        end
 
-            if ret >= MAX_MSG_SIZE then
-                T.log("Ignoring large JSON, probably not an alert len="..ret);
-                return nil
-            end
+        if ret >= MAX_MSG_SIZE then
+          T.log("Ignoring large JSON, probably not an alert len="..ret);
+          return nil
+        end
 
-            local alert_string = ffi.string(rbuf)
-            p = JSON:decode(alert_string)
+        local alert_string = ffi.string(rbuf)
+        p = JSON:decode(alert_string)
 
         until p["event_type"] ==   "alert" 
 
@@ -143,32 +143,29 @@ TrisulPlugin = {
         -- basically a mapping of EVE to Trisul Alert
         -- notice the AlertGUID 9AF.. this is what Trisul uses to show IDS alerts from Snort
         -- if you want you can create your own AlertGroup using the alert group LUA 
-        local tv_sec, tv_usec = epoch_secs( p["timestamp"]);
-        local ret =  {
+      local tv_sec, tv_usec = epoch_secs( p["timestamp"]);
+      local ret =  {
 
-            AlertGroupGUID='{9AFD8C08-07EB-47E0-BF05-28B4A7AE8DC9}',     -- Trisul alert group = External IDS 
-            TimestampSecs = tv_sec,                                      -- Epoch based time stamps
-            TimestampUsecs = tv_usec,
-            SigIDKey = p.alert["signature_id"],                          -- SigIDKey is mandatory 
-            SigIDLabel = p.alert["signature"],                           -- User Label for the above SigIDKey 
-            SourceIP = p["src_ip"],                                      -- IP and Port pretty direct mappings
-            SourcePort = p["src_port"],
-            DestIP = p["dest_ip"],
-            DestPort = p["dest_port"],
-            Protocol = protocol_num(p["proto"]),                         -- convert TCP to 6 
-            SigRev = p.alert["rev"],
-            Priority = p.alert["severity"],
-            ClassificationKey = p.alert["category"],
-            AlertStatus=p.alert["action"],                                -- allowed/blocked like ALARM/CLEAR
-            AlertDetails=p.alert["signature"]                             -- why waste a text field 'AlertDetails'?
-        };
-
-
-        return ret;
+        AlertGroupGUID='{9AFD8C08-07EB-47E0-BF05-28B4A7AE8DC9}',     -- Trisul alert group = External IDS 
+        TimestampSecs = tv_sec,                                      -- Epoch based time stamps
+        TimestampUsecs = tv_usec,
+        SigIDKey = p.alert["signature_id"],                          -- SigIDKey is mandatory 
+        SigIDLabel = p.alert["signature"],                           -- User Label for the above SigIDKey 
+        SourceIP = p["src_ip"],                                      -- IP and Port pretty direct mappings
+        SourcePort = p["src_port"],
+        DestIP = p["dest_ip"],
+        DestPort = p["dest_port"],
+        Protocol = protocol_num(p["proto"]),                         -- convert TCP to 6 
+        SigRev = p.alert["rev"],
+        Priority = p.alert["severity"],
+        ClassificationKey = p.alert["category"],
+        AlertStatus=p.alert["action"],                                -- allowed/blocked like ALARM/CLEAR
+        AlertDetails=p.alert["signature"]                             -- why waste a text field 'AlertDetails'?
+      };
 
 
+      return ret;
     end
-
 
   },
 

@@ -17,11 +17,11 @@ TrisulPlugin = {
 
 
   onload = function()
-  	print("LOADED : filex.lua ")
+    print("LOADED : filex.lua ")
   end,
 
   onunload = function()
-  	print("BYE: filex.lua ")
+    print("BYE: filex.lua ")
   end,
 
   -- 
@@ -37,15 +37,15 @@ TrisulPlugin = {
 
 
        
-       local fn = path:match("^.+/(.+)$")
+      local fn = path:match("^.+/(.+)$")
 
-        print("LUA filename ="..fn);
-        print("LUA length="..length);
+      print("LUA filename ="..fn);
+      print("LUA length="..length);
 
-        local ct = resp_header:get_value("content-type")
-        if ct and ct:match("image") then 
-            T.async:copy( path, "/tmp/kk/"..fn)
-        end 
+      local ct = resp_header:get_value("content-type")
+      if ct and ct:match("image") then 
+        T.async:copy( path, "/tmp/kk/"..fn)
+      end 
 
 
     end,

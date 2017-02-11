@@ -47,16 +47,16 @@ TrisulPlugin = {
     --
     filter = function( engine,  timestamp, flowkey, header)
 
-        if header:is_response() then 
-            local ct = header:get_value("Content-Type")
-            if ct and ct == "text/html" then
-                print("KEEPING TEXT HTML with flowkey = "..flowkey:ipa_readable() )
-                return true
-            else
-                return false
-            end
+      if header:is_response() then 
+        local ct = header:get_value("Content-Type")
+        if ct and ct == "text/html" then
+          print("KEEPING TEXT HTML with flowkey = "..flowkey:ipa_readable() )
+          return true
+        else
+          return false
         end
-        return true
+      end
+      return true
     end,
 
   -- 

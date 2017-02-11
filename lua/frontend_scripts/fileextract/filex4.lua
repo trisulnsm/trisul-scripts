@@ -34,7 +34,7 @@ TrisulPlugin = {
     -- http payload
     --
     onpayload_http  = function(engine, timestamp, flowkey, direction, seekpos, buffer)
-        print("---- Payload DIRECTION "..direction.." LENGTH = "..buffer:size().." OFFSET = "..seekpos)
+      print("---- Payload DIRECTION "..direction.." LENGTH = "..buffer:size().." OFFSET = "..seekpos)
     end,
 
     
@@ -43,8 +43,8 @@ TrisulPlugin = {
     -- save all content to /tmp/kk 
     --
     onfile_http  = function ( engine, timestamp, flowkey, req_header, resp_header, path , length )
-       local fn = path:match("^.+/(.+)$")
-       T.async:copy( path, "/tmp/kk/"..fn)
+      local fn = path:match("^.+/(.+)$")
+      T.async:copy( path, "/tmp/kk/"..fn)
     end,
 
  }

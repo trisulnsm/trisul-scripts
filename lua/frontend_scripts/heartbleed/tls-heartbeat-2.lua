@@ -24,9 +24,9 @@ TrisulPlugin = {
   end,
 
 
-  flowmonitor  = {
+  reassembly_handler  = {
 
-    onflowattribute = function(engine,flow,timestamp, nm, valbuff)
+    onattribute = function(engine,flow,timestamp, nm, valbuff)
 
       if nm == "TLS:RECORD" then
         local  content_type = valbuff:hval_8(0)

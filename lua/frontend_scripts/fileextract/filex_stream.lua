@@ -24,7 +24,6 @@ TrisulPlugin = {
 
   filex_monitor  = {
 
-
     -- save all content to /tmp/kk 
     --
     onpayload_http   = function ( engine, timestamp, flowkey, path, req_header, resp_header, dir , seekpos , buffer )

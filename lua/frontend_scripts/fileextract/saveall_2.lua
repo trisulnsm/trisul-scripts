@@ -18,7 +18,7 @@ TrisulPlugin = {
 
   -- ensure present 
   onload = function()
-  	os.execute("mkdir -p /tmp/kk")
+    os.execute("mkdir -p /tmp/kk")
   end,
 
   -- 
@@ -30,8 +30,8 @@ TrisulPlugin = {
     -- save all content to /tmp/kk 
     --
     onfile_http  = function ( engine, timestamp, flowkey, path, req_header, resp_header, length )
-       local fn = path:match("^.+/(.+)$")
-       T.async:copy( path, "/tmp/kk/"..fn)
+      local fn = path:match("^.+/(.+)$")
+      T.async:copy( path, "/tmp/kk/"..fn)
     end,
 
  }

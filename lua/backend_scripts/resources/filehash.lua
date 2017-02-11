@@ -24,7 +24,7 @@ TrisulPlugin = {
 		-- Login as admin/admin , then context0 > Resource Groups to view list of 
 		-- installed resource GUIDs
 		--
-	    resource_guid = '{9781db2c-f78a-4f7f-a7e8-2b1a9a7be71a}',
+	  resource_guid = '{9781db2c-f78a-4f7f-a7e8-2b1a9a7be71a}',
 
 		onnewresource  = function(engine, newresource )
 			print("timestamp "..  os.date('%c',newresource:timestamp()))
