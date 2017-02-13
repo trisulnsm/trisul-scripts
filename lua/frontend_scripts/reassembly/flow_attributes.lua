@@ -31,7 +31,7 @@ TrisulPlugin = {
       if attr_type == "Host" then
         print("Attribute "..attr_type.." = "..attr_value)
       end
-     end,
+    end,
   },
 
 }

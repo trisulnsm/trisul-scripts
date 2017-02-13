@@ -17,7 +17,7 @@ TrisulPlugin = {
 
 
   onload = function()
-  	os.execute('mkdir -p /tmp/kk')
+    os.execute('mkdir -p /tmp/kk')
   end,
 
 
@@ -28,12 +28,12 @@ TrisulPlugin = {
     --
     onpayload_http   = function ( engine, timestamp, flowkey, path, req_header, resp_header, dir , seekpos , buffer )
 
-	
-	    local fn = path:match("^.+/(.+)$")
-	    T.async:copybuffer( buffer, "/tmp/kk/"..fn)
+  
+      local fn = path:match("^.+/(.+)$")
+      T.async:copybuffer( buffer, "/tmp/kk/"..fn)
 
     end,
 
- }
+  }
 
 }
