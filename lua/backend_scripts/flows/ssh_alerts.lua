@@ -36,7 +36,7 @@ TrisulPlugin = {
 
 				local total_bytes =  newflow:az_bytes() + newflow:za_bytes()
 
-				if total_bytes > 10000 then
+				if total_bytes  < 1000 then
 					engine:add_alert('{0409EAC7-1E60-43D3-C0FA-A87429F99728}',
 									 newflow:flow():id(),
 									 'SSHXFER',

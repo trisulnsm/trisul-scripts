@@ -56,10 +56,10 @@ TrisulPlugin = {
     onfile_http  = function ( engine, timestamp, flowkey, path, req_header, resp_header, length )
       local ct = resp_header:get_value("Content-Type")
       if ct and ct:match("jpeg") and length > 500000   then
-         local fn = path:match("^.+/(.+)$")
+        local fn = path:match("^.+/(.+)$")
          if fn then
-       T.async:copy( path, "/tmp/filex/largejpg/"..fn)
-         end
+          T.async:copy( path, "/tmp/filex/largejpg/"..fn)
+        end
       end 
     end,
 

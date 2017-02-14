@@ -1,4 +1,4 @@
--- eve_unixsocket.lua
+-- suricata_eve_unixsocket.lua
 --
 -- same as eve.json file but uses Unix Sockets (via Luajit FFI) 
 --

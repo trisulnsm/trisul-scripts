@@ -1,4 +1,4 @@
--- suricata-eve.lua
+-- suricata_eve.lua
 --
 -- EVE (Extensible Event Format) is a new output method for alerts, flows, etc
 -- and is the preferred method for Suricata because it is just JSON !! 
