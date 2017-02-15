@@ -62,13 +62,17 @@ TrisulPlugin = {
         if ( tls_version_major < 3 ) then
 
           engine:add_alert("{5E97C3A3-41DB-4e34-92C3-87C904FAB83E}",
-            flow:id(), "OBSOLETE_TLS_VER", 
+            flow:id(), 
+			"OBSOLETE_TLS_VER", 
+			1,
             "Seen old SSLv3 TLS traffic maj="..tls_version_major.." min="..tls_version_minor);
         
         elseif tls_version_major ==  3 and  tls_version_minor < 3 then
 
           engine:add_alert("{5E97C3A3-41DB-4e34-92C3-87C904FAB83E}",
-            flow:id(), "OBSOLETE_TLS_VER", 
+            flow:id(), 
+			"OBSOLETE_TLS_VER", 
+			1,
             "Seen Older TLS version traffic maj="..tls_version_major.." min="..tls_version_minor);
 
         end
