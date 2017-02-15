@@ -1,3 +1,5 @@
+File|Path|Description|
+--- |--- |--- |
 print_alerts.lua|[alerts/print_alerts.lua](https://github.com/trisulnsm/trisul-scripts/tree/master/lua/backend_scripts/alerts/print_alerts.lua)|Print all Badlist alerts
 print_alerts2.lua|[alerts/print_alerts2.lua](https://github.com/trisulnsm/trisul-scripts/tree/master/lua/backend_scripts/alert/print_alerts2.lua)|Print all alerts that matched name External IDS alert group 
 dyndns-alert.lua|[dyndns-alert/dyndns-alert.lua](https://github.com/trisulnsm/trisul-scripts/tree/master/lua/backend_scripts/dyndns-alert/dyndns-alert.lua)|Add alert when Dynamic DNS is resource is accessed
