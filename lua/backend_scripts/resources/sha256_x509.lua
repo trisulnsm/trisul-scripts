@@ -14,7 +14,7 @@
 -- 2. Feed back the new SHA256 certificate hash into Trisul resources pipelines 
 --  
 
-local dbg=require'debugger'
+-- local dbg=require'debugger'
 
 TrisulPlugin = {
 
@@ -63,7 +63,7 @@ TrisulPlugin = {
       pipeout:close()
 
       print("Cert sha256 fingerprint "..sha256sum:match("%w+"))
-      dbg()
+      -- dbg()
 
       -- feed the SHA256 sum back into Trisul as a new type of resource 
       engine:add_resource('{9781db2c-f78a-4f7f-a7e8-2b1a9a7be71a}',  -- represents FileHash resource in Trisul 

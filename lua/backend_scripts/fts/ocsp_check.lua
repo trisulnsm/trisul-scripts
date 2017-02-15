@@ -7,7 +7,7 @@
 --				use this to play with the framework. The full version of this 
 -- 				script is ocsp_check_async.lua in this dir. 
 
-local dbg=require'debugger'
+-- local dbg=require'debugger'
 
 TrisulPlugin = { 
   
@@ -25,7 +25,6 @@ TrisulPlugin = {
 
 
   onload = function()
-  T.dbg = require("debugger")
 
   end,
 
