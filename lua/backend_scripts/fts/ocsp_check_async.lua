@@ -20,11 +20,8 @@ TrisulPlugin = {
   -- id block
   -- 
   id =  {
-    name = "HTTP Header Monitor",
-    description = "Monitor your fts HTTP Headers and do xyz",
-    author = "Unleash",                       -- optional
-    version_major = 1,                        -- optional
-    version_minor = 0,                        -- optional
+    name = "OCSP checker",
+    description = "Use openssl ocsp to verify top cert",
   },
 
 
@@ -100,7 +97,7 @@ TrisulPlugin = {
       -- the command you want to run asyns (due to network I/O)  
       local ocsp_cmd  = "openssl ocsp -noverify -issuer  "..issuer_pem..
                                " -cert "..subject_pem.." -url ".. ocspservers[1]..
-                                 " -header 'EHOST' ".."'"..ocspservers[1]:match('http://([%w%.]+)').."'" ;
+                                 " -header 'HOST' ".."'"..ocspservers[1]:match('http://([%w%.]+)').."'" ;
 
       -- schedule an ASYNC execution 
       -- the schedule(..) method returns immediately
@@ -119,11 +116,11 @@ TrisulPlugin = {
 
               -- [ on slow path, another thread ]
               onexecute = function( json_cmd  )
-                 -- we need this because the outside JSON is not an upvalue, 
-                 -- visible inside the ASYNC context
-                 local JSON=require'JSON'
+                  -- we need this because the outside JSON is not an upvalue, 
+                  -- visible inside the ASYNC context
+                  local JSON=require'JSON'
 
-                 -- unpack the command 
+                  -- unpack the command 
                   local work_item = JSON:decode(  json_cmd) 
 
                   -- run cmd 

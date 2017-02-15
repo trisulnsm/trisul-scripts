@@ -1,11 +1,11 @@
---
--- fts_ssl_certs.lua skeleton
+-- ocsp_print.lua skeleton
 --
 -- TYPE:        BACKEND SCRIPT
 -- PURPOSE:     Full text search documents streaming
 -- DESCRIPTION: Check the leaf ssl cert with issuer ssl cert using OCSP
---              
--- 
+--              this just prints the results INLINE 
+--				use this to play with the framework. The full version of this 
+-- 				script is ocsp_check_async.lua in this dir. 
 
 local dbg=require'debugger'
 
