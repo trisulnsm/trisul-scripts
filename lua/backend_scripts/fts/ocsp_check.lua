@@ -43,17 +43,17 @@ TrisulPlugin = {
     onnewfts  = function(engine, fts )
 
 
-	  local certchain = {} 
-	  for cert in fts:text():gmatch("%-*BEGIN CERTIFICATE.-END CERTIFICATE%-*")  do 
-	  	certchain[#certchain+1]=cert
-	  end
+    local certchain = {} 
+    for cert in fts:text():gmatch("%-*BEGIN CERTIFICATE.-END CERTIFICATE%-*")  do 
+      certchain[#certchain+1]=cert
+    end
 
-	  local ocspservers = {}
+    local ocspservers = {}
 
-	  for ocspsvr  in fts:text():gmatch("OCSP %- URI:(%S+)") do
-	  	ocspservers[#ocspservers+1] = ocspsvr
-	  	print(ocspsvr)
-	  end
+    for ocspsvr  in fts:text():gmatch("OCSP %- URI:(%S+)") do
+      ocspservers[#ocspservers+1] = ocspsvr
+      print(ocspsvr)
+    end
 
       local subject_pem  = "/tmp/subject_"..engine:id()..".pem"
       local sp,err  = io.open(subject_pem,"w")
@@ -65,17 +65,12 @@ TrisulPlugin = {
       ip:write(certchain[2]);
       ip:close()
 
-
-
-
       local ocsp = io.popen("openssl ocsp -noverify -issuer  "..issuer_pem..
-	  						   " -cert "..subject_pem.." -url ".. ocspservers[1]..
-							   	 " -header 'HOST' ".."'"..ocspservers[1]:match('http://(%S+)').."'" )
+                   " -cert "..subject_pem.." -url ".. ocspservers[1]..
+                   " -header 'HOST' ".."'"..ocspservers[1]:match('http://(%S+)').."'" )
       print(ocsp:read("*a"))
 
-	  dbg() 
-
-
+      -- dbg() 
 
       os.remove(subject_pem)
       os.remove(issuer_pem)
