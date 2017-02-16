@@ -2,6 +2,7 @@
 -- pktlen.lua
 --
 --  Working sample adds a new counter group called "Packet Length"
+--  as seen in Tutorial2 of LUA documentation
 --
 TrisulPlugin = {
 
