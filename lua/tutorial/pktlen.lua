@@ -42,8 +42,8 @@ TrisulPlugin = {
     --  meter 0 -  bytes by packet len
     --  meter 1 -  number of packets of each length 
     meters = {
-        {  0, T.K.vartype.COUNTER, 10, "Bytes", "bytes" , "B" },
-        {  1, T.K.vartype.COUNTER, 10, "Packets", "packets",  "Pkts" },
+        {  0, T.K.vartype.RATE_COUNTER, 10, "Bytes", "bytes" , "bps" },
+        {  1, T.K.vartype.COUNTER,      10, "Packets", "packets",  "Pkts" },
     },
 
   },
