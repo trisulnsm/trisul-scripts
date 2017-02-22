@@ -86,14 +86,14 @@ TrisulPlugin = {
       local namea = T.iplookup[ipa]
       local namez = T.iplookup[ipz]
 
-      local intop1m = false  
 
       --    dbg() 
 
-      intop1m = intop1m or namea and not  T.host:is_homenet(ipa) and T.top1m[namea] 
-      intop1m = intop1m or namez and not  T.host:is_homenet(ipz) and T.top1m[namez] 
+      local need_alert  = false
+      need_alert = need_alert or not T.host:is_homenet(ipa) and namea and not T.top1m[namea]
+      need_alert = need_alert or not T.host:is_homenet(ipz) and namez and not T.top1m[namez]
 
-      if not intop1m then 
+      if need_alert then
         -- outside top 1m - tag this flow 
         print("Tagging flow outside top 1m"..f:flow():to_s()  );
         engine:tag_flow(f:flow():id(), "NOTCISCOTOP1M")
