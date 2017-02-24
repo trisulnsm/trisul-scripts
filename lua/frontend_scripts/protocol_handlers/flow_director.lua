@@ -20,8 +20,17 @@ TrisulPlugin = {
   onload = function ()
 
   	T.ip_protocol_map = { 
-		["180.179.17.253"] = "{462919DD-EE84-497C-AC6F-05D1162BCC5B}",   --  sflow  
-		["180.179.17.254"] = "{CEF0774D-F1F3-40A6-8987-168BD69D9901}"    --  netflow 
+		["10.20.126.1"]    = "{462919DD-EE84-497C-AC6F-05D1162BCC5B}",   --  sflow  
+		["10.20.126.2"]    = "{462919DD-EE84-497C-AC6F-05D1162BCC5B}",   --  sflow  
+		["10.20.17.253"]   = "{462919DD-EE84-497C-AC6F-05D1162BCC5B}",   --  sflow  
+		["10.20.17.254"]   = "{462919DD-EE84-497C-AC6F-05D1162BCC5B}",   --  sflow  
+		["192.168.105.169"]  = "{462919DD-EE84-497C-AC6F-05D1162BCC5B}",   --  sflow  
+		["192.168.105.161"]  = "{462919DD-EE84-497C-AC6F-05D1162BCC5B}",   --  sflow  
+
+		["10.20.197.253"]  = "{CEF0774D-F1F3-40A6-8987-168BD69D9901}",   --  netflow 
+		["10.20.197.254"]  = "{CEF0774D-F1F3-40A6-8987-168BD69D9901}",   --  netflow 
+		["10.20.237.253"]  = "{CEF0774D-F1F3-40A6-8987-168BD69D9901}",   --  netflow 
+		["10.20.237.254"]  = "{CEF0774D-F1F3-40A6-8987-168BD69D9901}"    --  netflow 
 	}
 
   end,
@@ -48,7 +57,7 @@ TrisulPlugin = {
 
 		local nextprotocol = T.ip_protocol_map[ipa]
 		if nextprotocol then
-			print("ip ="..ipa.. " next proto="..nextprotocol)
+			-- print("ip = "..ipa.." protoc="..nextprotocol)
 			return 0, nextprotocol
 		end
 	
