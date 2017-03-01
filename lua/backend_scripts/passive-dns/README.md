@@ -1,5 +1,7 @@
 # Passive DNS Extractor
 
+Links : LUA Scripting API http://trisul.org/docs/lua 
+
 
 Passive DNS is a technique where you listen to DNS messages between clients and servers, 
 then extract IP and Domain Name into a historical database.
