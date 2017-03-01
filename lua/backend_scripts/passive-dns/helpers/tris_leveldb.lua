@@ -73,20 +73,21 @@ local tris_leveldb = {}
 
 --
 -- open : casts a leveldb_t pointer into a Hex String and use that to initialize the DB using
---		  from_addr(..) function 
+--      from_addr(..) function 
 --        
 tris_leveldb.open = function( database_path )
 
-	local errmsg = ffi.new(' char *[1]') 
-	local db_opts  = L.leveldb_options_create();
-	L.leveldb_options_set_create_if_missing( db_opts, 1 );
+  local errmsg = ffi.new(' char *[1]') 
+  local db_opts  = L.leveldb_options_create();
+  L.leveldb_options_set_create_if_missing( db_opts, 1 );
 
-	local db = L.leveldb_open(db_opts,   database_path  , errmsg)
-	if db == nil    then
-		print('Error creating leveldb database'..ffi.string(errmsg[0])  )
-		return  nil, ffi.string(errmsg[0])
-	end
-	return string.format("%X",tonumber(ffi.cast("intptr_t",db)));
+  local db = L.leveldb_open(db_opts,   database_path  , errmsg)
+  if db == nil    then
+    print('Error creating leveldb database'..ffi.string(errmsg[0])  )
+    return  nil, ffi.string(errmsg[0])
+  end
+  return string.format("%X",tonumber(ffi.cast("intptr_t",db)));
+
 end
 
 --
@@ -97,63 +98,67 @@ end
 -- 
 tris_leveldb.from_addr  = function( dbaddr)
 
-	local dbaddr_i = ffi.C.strtoull(dbaddr,nil,16)
-	print("opening  database at address "..tostring(dbaddr_i))
-	local db = ffi.cast( "leveldb_t*", dbaddr_i  )
+  local dbaddr_i = ffi.C.strtoull(dbaddr,nil,16)
+  print("opening  database at address "..tostring(dbaddr_i))
+  local db = ffi.cast( "leveldb_t*", dbaddr_i  )
 
-	-- close writer function 
-	local writefn_up = function()
+  --
+  -- close writer function 
+  local writefn_up = function()
 
-		local _db = db; -- upvalue 
-		local write_opts  = L.leveldb_writeoptions_create();
-		local errmsg = ffi.new(' char *[1]') 
+    local _db = db; -- upvalue 
+    local write_opts  = L.leveldb_writeoptions_create();
+    local errmsg = ffi.new(' char *[1]') 
 
-		-- true if success, false , errmsg otherwise 
-		return function(k,v)
-			L.leveldb_put( db, write_opts, k,#k, v, #v, errmsg)
-			if errmsg[0] == nil then
-				return true, ""
-			else
-				local emsg = ffi.string(errmsg[0]);
-				L.leveldb_free( errmsg[0] ) 
-				return false, emsg
-			end
-		end 
-	end
+    -- true if success, false , errmsg otherwise 
+    return function(k,v)
+      L.leveldb_put( db, write_opts, k,#k, v, #v, errmsg)
+      if errmsg[0] == nil then
+        return true, ""
+      else
+        local emsg = ffi.string(errmsg[0]);
+        L.leveldb_free( errmsg[0] ) 
+        return false, emsg
+      end
+    end 
+  end
 
-	-- close reader fun 
-	local readfn_up = function()
+  --
+  -- close reader fun 
+  local readfn_up = function()
 
-		local _db = db; -- upvalue 
-		local read_opts  = L.leveldb_readoptions_create();
-		local errmsg = ffi.new(' char *[1]') 
-		local readlen = ffi.new(' size_t  [1]') 
+    local _db = db; -- upvalue 
+    local read_opts  = L.leveldb_readoptions_create();
+    local errmsg = ffi.new(' char *[1]') 
+    local readlen = ffi.new(' size_t  [1]') 
 
-		-- value or nil
-		return function(k,v)
-			local val = L.leveldb_get( _db, read_opts, k, #k, readlen, errmsg);
-			if val == nil  then 
-				return nil
-			else 
-				return ffi.string(val,readlen[0])
-			end 
-		end 
+    -- value or nil
+    return function(k,v)
+      local val = L.leveldb_get( _db, read_opts, k, #k, readlen, errmsg);
+      if val == nil  then 
+        return nil
+      else 
+        return ffi.string(val,readlen[0])
+      end 
+    end 
 
-	end
+  end
 
-	-- closer 
-	local closerfn_up = function()
+  --
+  -- closer 
+  local closerfn_up = function()
 
-		local _db = db; -- upvalue 
+    local _db = db; -- upvalue 
 
-		-- value or nil
-		return function()
-			L.leveldb_close(_db);
-		end 
+    -- value or nil
+    return function()
+      L.leveldb_close(_db);
+    end 
 
-	end
+  end
 
-	return writefn_up(), readfn_up(),closerfn_up() 
+  -- three closures you need to use for reading/writing/closing DB 
+  return writefn_up(), readfn_up(),closerfn_up() 
 
 end
 

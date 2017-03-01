@@ -4,17 +4,14 @@
 -- TYPE:        BACKEND SCRIPT
 -- PURPOSE:     Creates a real time PASSIVE DNS database 
 -- DESCRIPTION: A passive DNS database observes DNS traffic and builds a IP->name
---				and name->IP lookup over time. For NSM purposes an IP->Name mapping is 
---				a crucial capability for real time streaming analytics. 
+--        and name->IP lookup over time. For NSM purposes an IP->Name mapping is 
+--        a crucial capability for real time streaming analytics. 
 --
---				This script does the following
---				1. leveldb			- uses LUAJIT FFI to build a LEVELDB backend 
+--        This script does the following
+--        1. leveldb      - uses LUAJIT FFI to build a LEVELDB backend 
 --              2. fts monitor      - listens to DNS and updates the ldb  CNAME/A
 -- 
 local leveldb=require'tris_leveldb'
-
---
--- LUAJIT FFI Magic 
 
 TrisulPlugin = { 
 
@@ -23,26 +20,28 @@ TrisulPlugin = {
     description = "Listens to DNS traffic and builds a IP->Name passive DNS database", 
   },
 
-	onmessage=function(msgid, msg)
-		if msgid=='{4349BFA4-536C-4310-C25E-E7C997B92244}' then
-			local dbaddr = msg:match("newleveldb=(%S+)")
-			T.LevelWriter,_,T.LevelCloser = leveldb.from_addr(dbaddr);
-		end
-	end,
+  onmessage=function(msgid, msg)
+    if msgid=='{4349BFA4-536C-4310-C25E-E7C997B92244}' then
+      local dbaddr = msg:match("newleveldb=(%S+)")
+      T.LevelWriter,_,T.LevelCloser = leveldb.from_addr(dbaddr);
+    end
+  end,
 
 
   -- open the LevelDB database  & create the reader/writer 
   onload = function() 
-  	T.pending,T.owner=false,false
+    T.pending,T.owner=false,false
   end,
+
 
   -- close 
   onunload = function()
-  	if T.owner then 
-		print("Closing Leveldb from owner")
-		T.LevelCloser()
-	end 
+    if T.owner then 
+      print("Closing Leveldb from owner")
+      T.LevelCloser()
+    end 
   end, 
+
 
   -- fts_monitor  block 
   --
@@ -57,16 +56,16 @@ TrisulPlugin = {
     --
     onnewfts  = function(engine, fts )
 
-	  if T.LevelWriter == nil then 
-	  	if engine:instanceid() == "0" and not T.pending then
-			local dbfile = T.env.get_config("App>DBRoot").."/config/PassiveDNSDB.level";
-			T.dbaddr = leveldb.open(dbfile); -- dont use local to prevent GC 
-			T.pending = true
-			T.owner=true
-			engine:post_message_backend('{4349BFA4-536C-4310-C25E-E7C997B92244}', "newleveldb="..T.dbaddr) 
-		end
-	  	return
-	  end
+      if T.LevelWriter == nil then 
+        if engine:instanceid() == "0" and not T.pending then
+          local dbfile = T.env.get_config("App>DBRoot").."/config/PassiveDNSDB.level";
+          T.dbaddr = leveldb.open(dbfile); -- dont use local to prevent GC 
+          T.pending = true
+          T.owner=true
+          engine:post_message_backend('{4349BFA4-536C-4310-C25E-E7C997B92244}', "newleveldb="..T.dbaddr) 
+        end
+        return
+      end
 
       local doc = fts:text()
       if doc:match("^RESPONSE") then
@@ -77,12 +76,9 @@ TrisulPlugin = {
         local a = doc:gmatch("A%s*IN%s*([%d%.]+)")
 
         for s in a do 
-			if T.LevelWriter then
-				print("Engine:".. engine:instanceid().." Saved "..s.." => "..q)
-				T.LevelWriter(s,q)
-			end
-		end 
-
+          print("Engine:".. engine:instanceid().." Saved "..s.." => "..q)
+          T.LevelWriter(s,q)
+        end 
 
       end 
     end,
