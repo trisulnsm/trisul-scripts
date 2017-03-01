@@ -17,11 +17,11 @@ TrisulPlugin = {
 
 
   onload = function()
-  	print("LOADED : filex_largeimage.lua ")
+    print("LOADED : filex_largeimage.lua ")
   end,
 
   onunload = function()
-  	print("BYE: filex_largeimage.lua ")
+    print("BYE: filex_largeimage.lua ")
   end,
 
   -- 
@@ -35,32 +35,32 @@ TrisulPlugin = {
     -- filter : decide if you want to reassemble this file or not.. 
     --
     filter = function( engine,  timestamp, flowkey, header)
-        if header:is_response() or header:is_method("post") then 
-            local ct = header:get_value("Content-Type")
-            if ct and ct:match("jpeg")   then
-                T.log(">>>>>  Saving JPG  file for analysis "..ct) 
-                return true
-            else
-                return false
-            end
-        else 
-            -- request
-            -- always return true 
+      if header:is_response() or header:is_method("post") then 
+        local ct = header:get_value("Content-Type")
+        if ct and ct:match("jpeg")   then
+            T.log(">>>>>  Saving JPG  file for analysis "..ct) 
             return true
+        else
+            return false
         end
+      else 
+        -- request
+        -- always return true 
+        return true
+      end
     end,
 
 
     -- save all content to /tmp/kk 
     --
     onfile_http  = function ( engine, timestamp, flowkey, path, req_header, resp_header, length )
-	    local ct = resp_header:get_value("Content-Type")
-	    if ct and ct:match("jpeg") and length > 500000   then
-	       local fn = path:match("^.+/(.+)$")
-	       if fn then
-		   T.async:copy( path, "/tmp/filex/largejpg/"..fn)
-	       end
-	    end 
+      local ct = resp_header:get_value("Content-Type")
+      if ct and ct:match("jpeg") and length > 500000   then
+        local fn = path:match("^.+/(.+)$")
+         if fn then
+          T.async:copy( path, "/tmp/filex/largejpg/"..fn)
+        end
+      end 
     end,
 
  }

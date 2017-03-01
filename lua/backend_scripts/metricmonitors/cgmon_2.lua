@@ -29,9 +29,9 @@ TrisulPlugin = {
 
     counter_guid = "{C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}",
 
-	onupdate = function(dbengine,key,tvsec,metrics) 
-	   print(string.format("onupdate  [%d]   %d  %10s %s", T.contextid, tvsec, key, table.concat(metrics,' ')  )) 
-	end,
+    onupdate = function(dbengine,key,tvsec,metrics) 
+      print(string.format("onupdate  [%d]   %d  %10s %s", T.contextid, tvsec, key, table.concat(metrics,' ')  )) 
+    end,
 
   },
 

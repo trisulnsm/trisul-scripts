@@ -5,10 +5,6 @@ Send network flows to elastisearch
 -------------
   Send network flows to elastic search using curl linux tool
 
-  **Prerequisites**
-   1. lua-cjson
-
-      luarocks install lua-cjson
 
 
 2. es_socket_flow.lua

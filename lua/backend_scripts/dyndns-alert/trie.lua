@@ -5,48 +5,48 @@
 local _M = {}
 
 local mt = {
-    __index = _M
+  __index = _M
 }
 
 
 function _M.new()
-    local t = { }
-    return setmetatable(t, mt)
+  local t = { }
+  return setmetatable(t, mt)
 end
 
 function _M.add(t, domain, source_intel  )
 
-	-- reverse the domain and split by .
-    local l = t
-    for p in domain:reverse():gmatch("[a-zA-Z0-9\\-]+")  do
-        if not l[p] then
-            l[p] = {}
-			l.__value=nil
-        end
-        l =  l[p]
+  -- reverse the domain and split by .
+  local l = t
+  for p in domain:reverse():gmatch("[a-zA-Z0-9\\-]+")  do
+    if not l[p] then
+      l[p] = {}
+      l.__value=nil
     end
-    l.__value = source_intel 
+    l =  l[p]
+  end
+  l.__value = source_intel 
 end
 
 function _M.get(t, key)
 
 
-    -- this may be nil
-    local l = t
-	
+  -- this may be nil
+  local l = t
+  
 
-	-- reverse the domain and split by .
-    local l = t
-    for p in key:reverse():gmatch("[a-zA-Z\\-]+")  do
-        if l[p] then
-            l = l[p]
-        else
-            break
-        end
+  -- reverse the domain and split by .
+  local l = t
+  for p in key:reverse():gmatch("[a-zA-Z\\-]+")  do
+    if l[p] then
+      l = l[p]
+    else
+      break
     end
+  end
 
-    -- may be nil
-    return l.__value 
+  -- may be nil
+  return l.__value 
 end
 
 return _M

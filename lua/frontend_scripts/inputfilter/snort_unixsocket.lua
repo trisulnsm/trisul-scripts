@@ -5,7 +5,7 @@
 -- 
 -- The UNIX_SOCKETFILE is the socket file path to which snort writes out alerts
 -- when you run snort as  
--- 		'snort -A unsock -l /tmp/s1 ... " 
+--    'snort -A unsock -l /tmp/s1 ... " 
 --
 -- The cool thing is you you can install any number of this file with different
 -- sockets. That allows alerts from multiple sources to enter the Trisul system.
@@ -143,52 +143,52 @@ TrisulPlugin = {
     -- 
     step_alert  = function()
 
-        local rbuf  = ffi.new("char[?]", ffi.sizeof("Alertpkt"));
+      local rbuf  = ffi.new("char[?]", ffi.sizeof("Alertpkt"));
 
-        local ret = ffi.C.recv(T.socket, rbuf,ffi.sizeof("Alertpkt"),K.MSG_DONTWAIT)
-        if ret < 0 then
-            if ffi.errno()  == K.EAGAIN then 
-                print("Nothing to read" )
-                return nil
-            else 
-                print("Error ffi.recv " .. strerror())
-                return nil 
-            end 
-        end
+      local ret = ffi.C.recv(T.socket, rbuf,ffi.sizeof("Alertpkt"),K.MSG_DONTWAIT)
+      if ret < 0 then
+        if ffi.errno()  == K.EAGAIN then 
+          print("Nothing to read" )
+          return nil
+        else 
+          print("Error ffi.recv " .. strerror())
+          return nil 
+        end 
+      end
 
-        print ("Read bytes=".. ret);
+      print ("Read bytes=".. ret);
 
-        local alert_pkt  = ffi.cast( "Alertpkt*", rbuf);
-        local buf = ffi.new("char[?]",32);
+      local alert_pkt  = ffi.cast( "Alertpkt*", rbuf);
+      local buf = ffi.new("char[?]",32);
 
-        local source_ip = ffi.string(ffi.C.inet_ntop( K.AF_INET,  alert_pkt.pkt + alert_pkt.nethdr + 12,  buf, 32)); 
-        local dest_ip   = ffi.string(ffi.C.inet_ntop( K.AF_INET,  alert_pkt.pkt + alert_pkt.nethdr + 16,  buf, 32)); 
-        local source_port = ffi.C.ntohs( ffi.cast("uint16_t*", alert_pkt.pkt + alert_pkt.transhdr + 0)[0]);
-        local dest_port = ffi.C.ntohs( ffi.cast("uint16_t*", alert_pkt.pkt + alert_pkt.transhdr + 2)[0]);
-        local ip_protocol = ffi.cast("uint8_t*", alert_pkt.pkt + alert_pkt.nethdr + 9)[0];
+      local source_ip = ffi.string(ffi.C.inet_ntop( K.AF_INET,  alert_pkt.pkt + alert_pkt.nethdr + 12,  buf, 32)); 
+      local dest_ip   = ffi.string(ffi.C.inet_ntop( K.AF_INET,  alert_pkt.pkt + alert_pkt.nethdr + 16,  buf, 32)); 
+      local source_port = ffi.C.ntohs( ffi.cast("uint16_t*", alert_pkt.pkt + alert_pkt.transhdr + 0)[0]);
+      local dest_port = ffi.C.ntohs( ffi.cast("uint16_t*", alert_pkt.pkt + alert_pkt.transhdr + 2)[0]);
+      local ip_protocol = ffi.cast("uint8_t*", alert_pkt.pkt + alert_pkt.nethdr + 9)[0];
 
-        local ret =  {
+      local ret =  {
 
-            AlertGroupGUID='{9AFD8C08-07EB-47E0-BF05-28B4A7AE8DC9}',     -- Trisul alert group = External IDS 
-            TimestampSecs = alert_pkt.event.tm_sec,                      -- Epoch based time stamps
-            TimestampUsecs = alert_pkt.event.tm_usec,
-            SigIDKey = alert_pkt.event.sig_id,                           -- SigIDKey is mandatory 
-            SigIDLabel = ffi.string(alert_pkt.alertmsg),                 -- User Label for the above SigIDKey 
-            SourceIP = source_ip,                                        -- IP and Port pretty direct mappings
-            SourcePort = source_port,
-            DestIP = dest_ip,
-            DestPort = dest_port,
-            Protocol = ip_protocol,                                       -- TCP to 6 , UDP to 11 etc
-            SigRev = alert_pkt.event.sig_rev,
-            Priority = alert_pkt.event.priority,
-            ClassificationKey = alert_pkt.event.classification,
-            AlertStatus="FIRED",                                          -- allowed/blocked like ALARM/CLEAR
-            AlertDetails="from socket1"                                   -- why waste a text field 'AlertDetails'?
-        };
+        AlertGroupGUID='{9AFD8C08-07EB-47E0-BF05-28B4A7AE8DC9}',     -- Trisul alert group = External IDS 
+        TimestampSecs = alert_pkt.event.tm_sec,                      -- Epoch based time stamps
+        TimestampUsecs = alert_pkt.event.tm_usec,
+        SigIDKey = alert_pkt.event.sig_id,                           -- SigIDKey is mandatory 
+        SigIDLabel = ffi.string(alert_pkt.alertmsg),                 -- User Label for the above SigIDKey 
+        SourceIP = source_ip,                                        -- IP and Port pretty direct mappings
+        SourcePort = source_port,
+        DestIP = dest_ip,
+        DestPort = dest_port,
+        Protocol = ip_protocol,                                       -- TCP to 6 , UDP to 11 etc
+        SigRev = alert_pkt.event.sig_rev,
+        Priority = alert_pkt.event.priority,
+        ClassificationKey = alert_pkt.event.classification,
+        AlertStatus="FIRED",                                          -- allowed/blocked like ALARM/CLEAR
+        AlertDetails="from socket1"                                   -- why waste a text field 'AlertDetails'?
+      };
 
---      dbg();
+      -- dbg();
 
-        return ret;
+      return ret;
 
     end
 

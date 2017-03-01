@@ -7,7 +7,7 @@
 --  1. Use of filter(..) to only save text/html content 
 --
 --  2. We dont do anything else, so this script only impacts what files get 
---	   the built in MD5 file hashing
+--     the built in MD5 file hashing
 --
 TrisulPlugin = {
 
@@ -24,21 +24,21 @@ TrisulPlugin = {
 
     -- 
     -- filter : Check the response content type and decide 
-	--   If the response header matches the regex '(application|javascript)'
-	-- 	 then process the file and do its MD5, else skip
+  --   If the response header matches the regex '(application|javascript)'
+  --   then process the file and do its MD5, else skip
     --
     filter = function( engine,  timestamp, flowkey, header)
 
-        if header:is_response() then 
-            if header:match_value("Content-Type", "(application|javascript)") then  
-                return true
-            else
-                return false
-            end
+      if header:is_response() then 
+        if header:match_value("Content-Type", "(application|javascript)") then  
+          return true
+        else
+          return false
         end
-		-- always return true  if header is a HTTP Request because you dont know the
-		-- content type yet
-        return true
+      end
+      -- always return true  if header is a HTTP Request because you dont know the
+      -- content type yet
+      return true
     end,
  }
 

@@ -12,9 +12,9 @@ to the LUA Plugins as well. These include statistical sketching (top-n, cardinat
 
 File | Path |Description
 --- | --- |---
-socialalert.lua|alerts|Generates an ALERT when you access  social networks like Facebook,Twitter 
+socialalert.lua|forntend/alerts|Generates an ALERT when you access  social networks like Facebook,Twitter 
 tcphdr.lua|buffer|Prints the TCP header  - does not actually meter anything 
-rstcounter.lua|counters|Count Number of RST packets seen
+rstcounter.lua|forntend/counters|Count Number of RST packets seen
 hello.lua|hello|Basic working script, just prints hello
 hello2.lua|hello|Calls a bunch of methods on T.host inside onload
 httpsvr.lua|httpserver|Counts HTTP traffic per HTTP Server

@@ -17,24 +17,23 @@ TrisulPlugin = {
 
 
   onload = function()
-  	os.execute('mkdir -p /tmp/kk')
+    os.execute('mkdir -p /tmp/kk')
   end,
 
 
 
   filex_monitor  = {
 
-
     -- save all content to /tmp/kk 
     --
     onpayload_http   = function ( engine, timestamp, flowkey, path, req_header, resp_header, dir , seekpos , buffer )
 
-	
-	    local fn = path:match("^.+/(.+)$")
-	    T.async:copybuffer( buffer, "/tmp/kk/"..fn)
+  
+      local fn = path:match("^.+/(.+)$")
+      T.async:copybuffer( buffer, "/tmp/kk/"..fn)
 
     end,
 
- }
+  }
 
 }

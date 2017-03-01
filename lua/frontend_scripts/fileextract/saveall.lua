@@ -15,7 +15,7 @@ TrisulPlugin = {
 
 
   onload = function()
-  	os.execute("mkdir -p /tmp/trisul_files")
+    os.execute("mkdir -p /tmp/trisul_files")
   end,
 
   -- 
@@ -29,28 +29,28 @@ TrisulPlugin = {
     -- save all content to /tmp/kk 
     --
     onfile_http  = function ( engine, timestamp, flowkey, path, req_header, resp_header, length , is_chunk )
-		
-        -- you can get 0 length for HTTP 304, etc - skip it 
-        if length == 0 then return; end 
+    
+      -- you can get 0 length for HTTP 304, etc - skip it 
+      if length == 0 then return; end 
 
-		if is_chunk then 
-		   local fn = path:match("^.+/(.+)%.%d+.part$")
-		   --  just a chunk , concatenate with prev 
-		   --
-		   T.async:cat( path, "/tmp/trisul_files/"..fn)
+      if is_chunk then 
+       local fn = path:match("^.+/(.+)%.%d+.part$")
+       --  just a chunk , concatenate with prev 
+       --
+       T.async:cat( path, "/tmp/trisul_files/"..fn)
 
-		else
-		   -- full file 
-		   --
-		   local fn = path:match("^.+/(.+)$")
+      else
+       -- full file 
+       --
+       local fn = path:match("^.+/(.+)$")
 
-		   T.async:copy( path, "/tmp/trisul_files/"..fn)
+       T.async:copy( path, "/tmp/trisul_files/"..fn)
 
-		end 
+      end 
 
     end,
 
- }
+  }
 
 }
 

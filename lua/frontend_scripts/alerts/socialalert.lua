@@ -30,12 +30,12 @@ TrisulPlugin = {
   end,
 
 
-  reassembly  = {
+  reassembly_handler  = {
     -- 
     -- Called for each flow attribute, we ignore all except TLS:O 
     -- which is the Org/CN found in the certificate 
     --
-    onflowattribute = function(engine,flow,timestamp,attribute_name,attribute_value)
+    onattribute = function(engine,flow,timestamp,attribute_name,attribute_value)
 
       if attribute_name == "TLS:O" then
 

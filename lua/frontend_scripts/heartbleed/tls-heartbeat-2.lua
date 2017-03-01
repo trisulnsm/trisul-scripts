@@ -24,9 +24,9 @@ TrisulPlugin = {
   end,
 
 
-  flowmonitor  = {
+  reassembly_handler  = {
 
-    onflowattribute = function(engine,flow,timestamp, nm, valbuff)
+    onattribute = function(engine,flow,timestamp, nm, valbuff)
 
       if nm == "TLS:RECORD" then
         local  content_type = valbuff:hval_8(0)
@@ -40,7 +40,7 @@ TrisulPlugin = {
           if req_len ~= valbuff:size()  then
 
             -- this is how you add an alert to Trisul 
-            engine:add_alert_ids( 
+            engine:add_alert_full( 
               "{9AFD8C08-07EB-47E0-BF05-28B4A7AE8DC9}", -- GUID for IDS 
               flow:id(),                                -- flow 
               "sid-8000002",                            -- a sigid (private range)

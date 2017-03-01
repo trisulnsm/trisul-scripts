@@ -51,7 +51,7 @@ TrisulPlugin = {
 
       -- get 4 bit frame offset 
       print("Frame offset words  = " .. T.util.bitval32(layer:getbyte(12),7,4))
-	  -- or from the buffer
+      -- or from the buffer
       print("Frame offset words = " .. T.util.bitval32(buff:hval_8(12),7,4))
 
 
