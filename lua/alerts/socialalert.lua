@@ -30,7 +30,7 @@ TrisulPlugin = {
   end,
 
 
-  flowmonitor  = {
+  reassembly  = {
     -- 
     -- Called for each flow attribute, we ignore all except TLS:O 
     -- which is the Org/CN found in the certificate 
