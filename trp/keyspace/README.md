@@ -8,7 +8,6 @@ This request can be used to retrieve all IPs seen in the 10.x.x.x private IP ran
 This directory has two scripts
 
 1. active_keys.rb - Print all active keys in Trisul Key Format 
-2. active_keys2.rb - Print all readable resolved keys, uses an additional message called KeyLookup 
 
 
 ### TRP Messages used
@@ -16,7 +15,6 @@ This directory has two scripts
 The scripts uses the following TRP Messages
 
 1. [KeySpace](http://trisul.org/docs/ref/trpprotomessages.html#keyspace)  - to retrieve keys in a range 
-2. [KeyLookup](http://trisul.org/docs/ref/trpprotomessages.html#keylookup)  - used by active_keys2.rb to convert keys into human readable resolved format 
 
 
 ### Sample run
@@ -27,13 +25,9 @@ this equate port 0 to port 4096
 
 Note that "Apps" counter group has the GUID {C51..} and the keys are in Trisul Key Format.
 
-The active_keys2.rb script extends the base script to convert human readable keys into Trisul Key Format. We've separated the two scripts to highlight use of the KeySpace message.
-
-
 
 ```
-[vivek@longdog trp]$ ruby active_keys.rb  192.168.1.22  12001 {C51B48D4-7876-479E-B0D9-BD9EFF03CE2E} p-0000 p-1000
-Enter PEM pass phrase:
+[vivek@longdog trp]$ ruby active_keys.rb  tcp://192.168.1.22:12001 {C51B48D4-7876-479E-B0D9-BD9EFF03CE2E} p-0000 p-1000
 Found 15 matches
 Hit Key  p-000D 
 Hit Key  p-0016 
@@ -50,30 +44,6 @@ Hit Key  p-076C
 Hit Key  p-078F 
 Hit Key  p-0BB8 
 Hit Key  p-0C3B 
-
-
-```
-This is how active_keys2.rb works for the same input 
-
-````
-[vivek@longdog trp]$ ruby active_keys2.rb  192.168.1.22  12001 {C51B48D4-7876-479E-B0D9-BD9EFF03CE2E} p-0000 p-1000
-Enter PEM pass phrase:
-Found 15 matches
-Hit Key  p-000D  daytime 
-Hit Key  p-0016  ssh 
-Hit Key  p-0035  domain 
-Hit Key  p-0043  bootps 
-Hit Key  p-0050  http 
-Hit Key  p-007B  ntp 
-Hit Key  p-0089  netbios-ns 
-Hit Key  p-008A  netbios-dgm 
-Hit Key  p-01BB  https 
-Hit Key  p-03E1  imaps 
-Hit Key  p-076C  ssdp 
-Hit Key  p-078F  macromedia-fcs 
-Hit Key  p-0BB8  remoteware-cl 
-Hit Key  p-0C3B  netbookmark 
-
 
 ````
 
