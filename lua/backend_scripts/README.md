@@ -1,3 +1,37 @@
+Backend scripts
+===============
+
+Backend scripts listen on metrics and artifact streams and then generate further metrics or feedback into the processing. 
+
+The backend script types are 
+
+1.[engine_monitor](engine_monitor.html) -- called before and after every stream snapshot interval (1 min by default) 
+2 [cg_monitor](cg_monitor.html) -- metric stream per counter group 
+3 [sg_monitor](sg_counter.html) -- Flow metrics | On new flow, when flow is flushed,  |
+4 [alert_monitor](alert_monitor.html) -- alerts 
+5 [resource_monitor](resource_monitor.html) -- Metadata Resources HTTP requests, DNS events, TLS, File hashes stream|
+6 [fts_monitor](fts_monitor.html)  -- Full text document. TLS Certificates, DNS Domains, HTTP Headers, etc 
+7 [flow_tracker](flow_tracker.html ) -- Create your own custom flow tracker - top-K flow snapshots |
+
+
+Where to start ? 
+-----------------
+
+1. The simplest backend scripts are probably those that listen to particular stream types ( think of them as 'topics') look at the content and just print them. You can start with `flows/sg1.lua`. 
+2. If you are interested in exporting Trisul flow data to third party systems. Check out `elasticsearch` 
+
+
+Skeletons
+---------
+
+If you want to get started and write your own scripts - you can copy a from the `skeleton` directory one level down.
+
+
+
+Featured samples
+================
+
+
 File|Path|Description|
 --- |--- |--- |
 print_alerts.lua|[alerts/print_alerts.lua](https://github.com/trisulnsm/trisul-scripts/tree/master/lua/backend_scripts/alerts/print_alerts.lua)|Print all Badlist alerts
