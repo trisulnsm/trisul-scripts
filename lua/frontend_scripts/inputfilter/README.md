@@ -27,38 +27,6 @@ Alerts
 You can interface to Suricata EVE (which is a great new JSON based format) or to traditional Unified/Unified2 
 binary formats using these LUA input filter scripts. We use LuaJIT FFI to talk Unix Sockets. 
 
-### kiwisyslog.lua
-Read a text file containing FLOW information in any arbitrary format, in this case we use Netflow exported 
-from ArcSight via KIWISYSLOG.  This script uses each flow record in the text file and drives the Trisul analysis.
-
-To run this script
-
-1. Download the @kiwisyslog.lua@ file 
-2. Create a new context @trisulctl_probe create context test111@ 
-3. Start the hub @trisulctl_probe start context test111@hub0@
-4. Run the script on a data file as shown below
-
-````
-trisul -nodemon /usr/local/etc/trisul/domain0/probe0/context_test111/trisulProbeConfig.xml -mode lua -in kiwisyslog.lua -args NetflowDump.txt 
-````
-5. Then login to see reports. You can re-run the script after setting the Home Networks by resetting the context @test111@. Reset keeps the 
-config but removes the data.
-
-6. Make all changes to configuration on the UI, then reset and re-import
-
-````
-trisulctl_probe 
->> stop context test111
->> reset context test111
->> start context test1111@hub0
-````
-
-Then reimport the file as shown above.
-
-
-
-
-
 
 ### suricata_eve.lua
 Suricata writes alerts (and other stuff) to eve.json using the EVE JSON format for IDS alerts.
@@ -88,6 +56,39 @@ and constructs an alert {..} object.   Suitable for use with Security Onion, jus
 ````
 output alert_unixsock
 ````
+
+Network Flows:  kiwisyslog.lua 
+===============
+
+Read a text file containing FLOW information in any arbitrary format, in this case we use Netflow exported 
+from ArcSight via KIWISYSLOG.  This script uses each flow record in the text file and drives the Trisul analysis.
+
+To run this script
+
+1. Download the `kiwisyslog.lua` file 
+2. Create a new context `trisulctl_probe create context test111` 
+3. Start the hub `trisulctl_probe start context test111@hub0`
+4. Run the script on a data file as shown below
+
+````
+trisul -nodemon /usr/local/etc/trisul/domain0/probe0/context_test111/trisulProbeConfig.xml 
+     -mode lua -in kiwisyslog.lua -args NetflowDump.txt 
+````
+5. Then login to see reports. You can re-run the script after setting the Home Networks by resetting the context `test111`. Reset keeps the 
+config but removes the data.
+
+6. Make all changes to configuration on the UI, then reset and re-import
+
+````
+trisulctl_probe 
+>> stop context test111
+>> reset context test111
+>> start context test1111@hub0
+````
+
+Then reimport the file as shown above.
+
+
 
 
 
