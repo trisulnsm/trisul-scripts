@@ -195,9 +195,11 @@ TrisulPlugin = {
         if dir=="AZ" then 
           engine:update_flow( keyformats.flow, 0,rec.dOctets);
           engine:update_flow( keyformats.flow, 2,rec.dPkts);
+          engine:new_flow_record( keyformats.flow,  rec.dOctets,0,  rec.dPkts,0);
         else 
           engine:update_flow( keyformats.flow, 1,rec.dOctets);
           engine:update_flow( keyformats.flow, 3,rec.dPkts);
+          engine:new_flow_record( keyformats.flow,  0, rec.dOctets, 0,rec.dPkts);
         end 
 
 
