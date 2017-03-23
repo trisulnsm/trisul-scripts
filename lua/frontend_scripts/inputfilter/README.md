@@ -2,6 +2,7 @@
 Links
 =====
 1. [kiwisyslog.lua](#network-flows--kiwisysloglua) import arbitrary text netflow 'like records' into Trisul
+2. [suricate_eve.lua](#alerts) Various methods to import ALERTS from IDS like Suricata 
 
 
 
