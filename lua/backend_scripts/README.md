@@ -5,13 +5,13 @@ Backend scripts listen on metrics and artifact streams and then generate further
 
 Here are a list of backend script types.  Clicking on the link will open the relevant LUA Documentation 
 
-1. [engine_monitor](trisul.org/docs/lua/engine_monitor.html) -- called before and after every stream snapshot interval (1 min by default) 
-2. [cg_monitor](trisul.org/docs/lua/cg_monitor.html) -- metric stream per counter group 
-3. [sg_monitor](trisul.org/docs/lua/sg_counter.html) -- Flow metrics | On new flow, when flow is flushed,  |
-4. [alert_monitor](trisul.org/docs/lua/alert_monitor.html) -- alerts 
-5. [resource_monitor](trisul.org/docs/lua/resource_monitor.html) -- Metadata Resources HTTP requests, DNS events, TLS, File hashes stream|
-6. [fts_monitor](trisul.org/docs/lua/fts_monitor.html)  -- Full text document. TLS Certificates, DNS Domains, HTTP Headers, etc 
-7. [flow_tracker](trisul.org/docs/lua/flow_tracker.html ) -- Create your own custom flow tracker - top-K flow snapshots |
+1. [engine_monitor](http://trisul.org/docs/lua/engine_monitor.html) -- called before and after every stream snapshot interval (1 min by default) 
+2. [cg_monitor](http://trisul.org/docs/lua/cg_monitor.html) -- metric stream per counter group 
+3. [sg_monitor](http://trisul.org/docs/lua/sg_counter.html) -- Flow metrics | On new flow, when flow is flushed,  |
+4. [alert_monitor](http://trisul.org/docs/lua/alert_monitor.html) -- alerts 
+5. [resource_monitor](http://trisul.org/docs/lua/resource_monitor.html) -- Metadata Resources HTTP requests, DNS events, TLS, File hashes stream|
+6. [fts_monitor](http://trisul.org/docs/lua/fts_monitor.html)  -- Full text document. TLS Certificates, DNS Domains, HTTP Headers, etc 
+7. [flow_tracker](http://trisul.org/docs/lua/flow_tracker.html ) -- Create your own custom flow tracker - top-K flow snapshots |
 
 
 Where to start ? 
