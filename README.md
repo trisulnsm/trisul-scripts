@@ -1,16 +1,25 @@
 Welcome to Trisul Scripts Repository
 ====================================
 
+Trisul Network Analytics http://www.trisul.org is designed to be a platform on which you can build your own tooling.
 
-Please select the lua or trp subdirectories to proceed. 
+There are two APIs available.
 
 
-1. LUA scripts
+
+1. LUA API 
    -----------
 
-   Lua scripts are used to include your custom metering, alerting into the Trisul engine
+   Lua scripts are used to customize the Trisul Real Time analytics engine. 
 
-2. TRP scripts
+   The LUA API is documented  at http://www.trisul.org/docs/lua 
+
+
+2. TRP API 
    -----------
 
-   Ruby scripts used to automate network analysis tasks. 
+   Trisul Remote Protocol use scripts in Ruby, Javascript, or Python to query and hunt through historical data. 
+
+   The TRP API is documented  at http://www.trisul.org/docs/trp 
+
+
