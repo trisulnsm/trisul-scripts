@@ -25,3 +25,10 @@ Samples
 
 The sample scripts here demonstrate the approach.
 
+
+Note
+----
+
+All FTS Scripts work only if you have the corresponding FTS type enabled in trisulProbeConfig.xml
+
+The config file is usually found in `/usr/local/etc/trisul-probe/domain0/probe0/context0/trisulProbeConfig.xml` 

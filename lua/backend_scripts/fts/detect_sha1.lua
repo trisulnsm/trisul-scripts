@@ -1,12 +1,13 @@
 --
--- signalgo.lua
+-- detect_sha1.lua
 --
 -- TYPE:        BACKEND SCRIPT
--- PURPOSE:     Alert on WEAK signature algoritms used in SSL Certs 
+-- PURPOSE:     Alert on SHA1 signature algoritms used in SSL Certs 
 -- DESCRIPTION: Inspired by latest release of Google Chrome which blocks access to SSL sites
 --              that use sha1 
 -- 
 -- how this script works :  listens to SSL Certs FTS stream and parses the documents using Regex
+-- 		we are looking for     Signature Algorithm: sha1WithRSAEncryption
 -- 
 -- local dbg=require'debugger'
 
