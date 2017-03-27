@@ -49,14 +49,15 @@ To do that the script
 
 You need to first install leveldb ; use the following steps
 
-* We will be installing the LUA Scripts in a probe-local context at ````/usr/local/var/lib/trisul-probe/domain0/probe0/context0/config/local-lua```` See http://trisul.org/docs/lua/basics.html#installing_and_uninstalling 
+* We will be installing the LUA Scripts in a probe-local context at `/usr/local/var/lib/trisul-probe/domain0/probe0/context0/config/local-lua`` See http://trisul.org/docs/lua/basics.html#installing_and_uninstalling 
 
 
 1. Download and compile LevelDB from https://github.com/google/leveldb/releases
-2. Copy the libleveldb.so library (found in out-shared) in the ````../local-lua```` directory
-3. Copy the helpers/tris_leveldb.lua in a ````../local-lua/helpers```` subdirectory
-4. Copy the other lua files into the ````../local-lua``` directory
-5. Restart trisul-probe 
+2. Copy the libleveldb.so library (found in out-shared) into the `../local-lua` directory
+3. Copy the helpers/tris_leveldb.lua in a `/local-lua/helpers` subdirectory
+4. Copy the other lua files into the `/local-lua` directory
+5. Type `trisulctl_probe list lua default@probe0` to check if the scripts loads 
+6. Restart trisul-probe 
 
 
 
