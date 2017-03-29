@@ -4,7 +4,7 @@
 -- 
 -- Used in Trisul Network Analytics Passive DNS 
 --
--- S
+-- 
 local ffi=require'ffi'
 local L=ffi.load'./libleveldb.so'
 
@@ -46,6 +46,13 @@ char* leveldb_get(
 leveldb_iterator_t* leveldb_create_iterator(
     leveldb_t* db,
     const leveldb_readoptions_t* options);
+
+
+void leveldb_delete(
+    leveldb_t* db,
+    const leveldb_writeoptions_t* options,
+    const char* key, size_t keylen,
+    char** errptr);
 
 void leveldb_iter_destroy(leveldb_iterator_t*);
 unsigned char leveldb_iter_valid(const leveldb_iterator_t*);
@@ -150,7 +157,7 @@ end
 tris_leveldb.from_addr  = function( dbaddr)
 
 	local dbaddr_i = ffi.C.strtoull(dbaddr,nil,16)
-	print("opening  database at address "..tostring(dbaddr_i))
+	-- print("opening  database at address "..tostring(dbaddr_i))
 	local db = ffi.cast( "leveldb_t*", dbaddr_i  )
 
 	-- close writer function 
@@ -185,13 +192,34 @@ tris_leveldb.from_addr  = function( dbaddr)
 		return function(k,v)
 			local val = L.leveldb_get( _db, read_opts, k, #k, readlen, errmsg);
 			if val == nil  then 
-				return nil
+				return nil 
 			else 
 				return ffi.string(val,readlen[0])
 			end 
 		end 
 
 	end
+
+	-- delete reader fun 
+	local deletefn_up = function()
+
+		local _db = db; -- upvalue 
+		local write_opts  = L.leveldb_writeoptions_create();
+		local errmsg = ffi.new(' char *[1]') 
+
+		-- delete a k
+		return function(k)
+			L.leveldb_delete( db, write_opts, k,#k ,errmsg)
+			if errmsg[0] == nil then
+				return true
+			else
+				local emsg = ffi.string(errmsg[0]);
+				L.leveldb_free( errmsg[0] ) 
+				return false, emsg
+			end
+		end 
+	end
+
 
 	-- closer 
 	local closerfn_up = function()
@@ -205,7 +233,7 @@ tris_leveldb.from_addr  = function( dbaddr)
 
 	end
 
-	return writefn_up(), readfn_up(),closerfn_up() 
+	return writefn_up(), readfn_up(),closerfn_up() ,deletefn_up() 
 
 end
 
