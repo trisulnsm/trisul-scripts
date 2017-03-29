@@ -3,15 +3,18 @@ Minimal LUAJIT interface to LevelDB
 
 A fast and minimal LUAJIT interface to LevelDB. 
 
-````
+```lua
 local LDB=require'tris_leveldb'
 
-local writer,reader  = LDB.from_addr(LDB.open("mydatabase.ldb"))
+local writer,reader,closer  = LDB.from_addr(LDB.open("mydatabase.ldb"))
 
 writer("key1","foobar")
 print( reader("key1"))
+closer()
 
-````
+LDB.dump("mydatabase.ldb") 
+
+```
 
 Supports the following 
 
