@@ -45,7 +45,7 @@ This API allows you do the following
 
 Worker 0
 
-````
+```lua
 
 local LDB=require'tris_leveldb'
 
@@ -58,11 +58,11 @@ local writer,reader  = LDB.from_addr(dbstr);
 writer("key1","foobar")
 print( "key 1 is ".. reader("key1"))
 
-````
+```
 
 Worker 1
 
-````
+```lua
 
 OnMessage( dbstr)  -- received a leveldb handle 
 
@@ -71,7 +71,7 @@ local writer,reader  = LDB.from_addr(dbstr);
 
 print( "key 1 is ".. reader("key1"))
 
-````
+```
 
 
 
