@@ -42,7 +42,12 @@ TrisulPlugin = {
     -- load the top 1M 
     T.log("Loading Top 1M Domains from Cisco Umbrella Feed from file ".. TOP1MFILE)
 
-    local f = io.open(TOP1MFILE,"r")
+    local f,err = io.open(TOP1MFILE,"r")
+	if not f then
+		T.logerror("Unable to open Cisco Umbrella Feed file="..TOP1MFILE.." err="..err);
+		return false;
+	end
+
     for l in f:lines() do 
       local h = l:match("%d+,(%S+)")
       T.top1m[h] = true
