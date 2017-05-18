@@ -9,16 +9,16 @@ Skeleton selector
 these operate on fast path. Front end scripts
 
 
-What do I want to do ? Listen to .. |  Script type 
---------------------  | ------------ | ------------ 
+What do I want to do ? Listen to .. |Use this skeleton 
+---|---|---
 every packet at a given protocol layer |  simple_counter 
 each TCP reassembled segment | reassembly_handler  
-each HTTP URI, header, TLS certificate, etc | reassembly_handler | https://www.trisul.org/docs/lua/reassembly.html 
+each HTTP URI, header, TLS certificate, etc | reassembly_handler 
 read a custom PCAP file or Flow file as input to Trisul |  input_filter 
 listen to alerts from custom sources and feed into Trisul pipeline |  input_filter 
 a custom protocol not supported by Trisul  | protocol_handler 
 control PCAP storage on a per-flow basis | packet_storage  
-HTTP file extraction | filex_monitor |  s  
+HTTP file extraction | filex_monitor |    
 
 
 these define new objects 
