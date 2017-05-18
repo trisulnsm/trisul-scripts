@@ -7,13 +7,13 @@ Trisul LUA API documentation at https://trisul.org/docs/lua
 
 What do I want to do ? Listen to .. |Use this skeleton 
 ---|---
-every packet at a given protocol layer |  simple_counter 
-each TCP reassembled segment | reassembly_handler  
-each HTTP URI, header, TLS certificate, etc | reassembly_handler 
-read a custom PCAP file or Flow file as input to Trisul |  input_filter 
-listen to alerts from custom sources and feed into Trisul pipeline |  input_filter 
-a custom network protocol not supported by Trisul  | protocol_handler 
-control PCAP storage on a per-flow basis | packet_storage  
+every packet at a given protocol layer |  simple_counter.lua 
+each TCP reassembled segment | reassembly_handler.lua 
+each HTTP URI, header, TLS certificate, etc | reassembly_handler.lua 
+read a custom PCAP file or Flow file as input to Trisul |  input_filter.lua
+listen to alerts from custom sources and feed into Trisul pipeline |  input_filter.lua 
+a custom network protocol not supported by Trisul  | protocol_handler.lua 
+control PCAP storage on a per-flow basis | packet_storage.lua  
 HTTP file extraction | filex_monitor.lua     
 create a new counter group | new_counter_group.lua 
 create a new alert group | new_alert_group.lua 
