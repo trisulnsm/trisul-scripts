@@ -3,7 +3,7 @@ rev-ssh.lua
 
 SSH Tunnels are really problematic in a number of ways as described in this blog post [Detecting SSH Tunnels](https://trisul.org/blog/reverse-ssh/post.html). In that we mention that it is possible to perform traffic analysis of SSH Tunnels to detect them. 
 
-*This is an adaptation of the Bro script originally written by John B Stackhouse III. The scripts are available at https://github.com/darkphyber/bro*
+_*This is an adaptation of the Bro script originally written by John B Stackhouse III. The scripts are available at https://github.com/darkphyber/bro*_
 
 
 You can think of Trisul roughly as Bro but with LUA and an emphasis on traffic metering and streaming analytics.  The LUA API lets you hook into [TCP reassembly](https://trisul.org/docs/lua/reassembly.html) , [HTTP file extraction](https://trisul.org/docs/lua/fileextractoverview.html), and a number of other [points](https://trisul.org/docs/lua/basics.html)
@@ -115,7 +115,7 @@ local CHARACTERS_TRIGGER = 3
 local MIN_ALERT_INTERVAL_SECS = 300 
 ````
 
-####. 3. Single seek pointer for all scripts 
+#### 3. Single seek pointer for all scripts 
 
 If you notice we are also maintaining a 'seek position ' as part of the flow state. This again has to do with co-operative handling of multiple scripts. There is only one seek position per flow per direction for all reassembly scripts to share. So it is possible you get double-called for the same segment. The seek position will move only when all scripts move it.
 
