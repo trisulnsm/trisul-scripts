@@ -2,11 +2,7 @@ Skeleton selector
 ===========
 
 
-1 Frontend scripts work on Packet Stream (fast path)
-2 Backend scripts work on Analytics Stream  (slow path)
-
-
-these operate on fast path. Front end scripts
+Trisul LUA API documentation at https://trisul.org/docs/lua
 
 
 What do I want to do ? Listen to .. |Use this skeleton 
