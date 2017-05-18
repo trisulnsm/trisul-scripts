@@ -10,7 +10,7 @@ these operate on fast path. Front end scripts
 
 
 What do I want to do ? Listen to .. |Use this skeleton 
----|---|---
+---|---
 every packet at a given protocol layer |  simple_counter 
 each TCP reassembled segment | reassembly_handler  
 each HTTP URI, header, TLS certificate, etc | reassembly_handler 
@@ -24,7 +24,7 @@ HTTP file extraction | filex_monitor |
 these define new objects 
 
 What do I want to do ? Listen to .. |  Script type 
---------------------  | ------------ | ------------
+---|---
 create a new counter group | new_counter_group.lua 
 create a new alert group | new_alert_group.lua 
 create a new resource group | new_resource_group.lua 
@@ -33,7 +33,7 @@ create a new resource group | new_resource_group.lua
 these operate on analytics streams. Backend scripts
 
 What do I want to do ? Listen to .. |  Script type 
---------------------  | ------------ | ------------ 
+--------------------  | ------------ 
 when a streaming window is opened, closed | engine_monitor.lua 
 each new alert . Eg IDS alert, Flow Tracker, etc | alert_monitor.lua 
 each new resource in stream. Eg DNS, SSL Cert, HTTP URI, etc| resource_monitor.lua 
