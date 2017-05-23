@@ -65,6 +65,12 @@ and constructs an alert {..} object.   Suitable for use with Security Onion, jus
 output alert_unixsock
 ````
 
+Flow Import Helper : flowimport.lua
+===================
+
+A helper LUA library to import Netflow "like" records into Trisul. All you have to do it write the *transform* function extract the flow details and call the ````process_flow(..)```` method 
+
+
 Network Flows:  kiwisyslog.lua 
 ===============
 
@@ -73,7 +79,7 @@ from ArcSight via KIWISYSLOG.  This script uses each flow record in the text fil
 
 To run this script
 
-1. Download the `kiwisyslog.lua` file 
+1. Download the `kiwisyslog.lua` file and `flowimport.lua` helper 
 2. Create a new context `trisulctl_probe create context test111` 
 3. Start the hub `trisulctl_probe start context test111@hub0`
 4. Run the script on a data file as shown below
