@@ -1,12 +1,18 @@
 silk.lua
 ========
 
-Import silk data dumps into Trisul for further analysis.
+Import SilK (https://tools.netsa.cert.org/silk/docs.html)  data dumps into Trisul for further analysis.
+
+SiLK is a suite of tools that work with large scale Netflow/IPFIX monitoring.  The flows are stored in "packed" files by the packing tools. Then there is another set of analysis tools to read data off the packed files and perform some analysis.
+
+This script allows you to feed the packed files as input to the Trisul Streaming Analytics pipelines. This gives you spectacular visibility that would be quite hard to put together with the tools alone. 
+
+
 
 How this works ?
 -----------------
 
-The tool @rwcat@ is used to read SiLK dump files and write them to a named pipe, this lua script reads from the named pipe, converts the binary record, and pushes into Trisul pipeline.
+The tool `rwcat` is used to read SiLK dump files and write them to a named pipe, this lua script (silk.lua) readsfrom the named pipe, converts each binary record, and pushes into Trisul pipeline.
 
 
 Running the script
@@ -32,7 +38,7 @@ To view the progress you can check the logs
 Once the import is done, you can log in and voilA! 
 
 
-A note about SiLk 
+A note about SiLK and ifIndex  
 ------------------
 By default SiLK suite do not seem to store the SNMP input and output inteface numbers that are present in Netflow.  Trisul uses the interface information to enable device based drilldowns.    
 
