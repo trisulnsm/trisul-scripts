@@ -25,15 +25,16 @@ This script depends on the helper module `flowimport.lua` available in the paren
 3. `rwcat --ipv4-output --compression=none file1.17  -o /tmp/silkpipe` to write records
 
 Then you need to start Trisul, the best way is to create a new context and use that.
+
 1. Run `trisulctl_probe`
-2. `create context silk111'
+2. Create a new context using `create context silk111'
 3. `start context silk111 mode=initdb`
 4. At this time you can login and set home networks and other settings
 5. Start trisul `trisulctl_probe importlua /tmp/silk.lua  /tmp/silkpipe`
 
 To view the progress you can check the logs
 1. trisulctl_probe 
-2. 'log silk111@probe0 log=ns tail' to view
+2. View log file for progress using `log silk111@probe0 log=ns tail' to view
 
 Once the import is done, you can log in and voilA! 
 
