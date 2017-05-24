@@ -2,14 +2,18 @@
 --  silk.lua 
 --
 --  Type : InputFilter
+--  
+--  Process flow dumps from SiLK ( cert.org/netsa) in Trisul 
+--  
+--  1. Use rwcat to output flow records to a named pipe
+--  2. This LUA file will listen on the named pipe and push records into Trisul
+--     for streaming statistical analytics
+--  
+--  to run 
+--  1. mkfifo /tmp/silkpipe  
+--  2. rwcat --ipv4-output --compression=none file1.17 file1.18   -o /tmp/silkpipe
+--  3. trisulctl_probe importlua silk.lua  /tmp/silkpipe 
 --
---  Consume Netflow information exported from ARCSIGHT via KIWISYSLOG 
---  This version uses the flowimport helper library (flowimport.lua) 
---
--- the format looks like this 
--- 2017-03-21 11:07:13,Local7.Debug,172.24.21.58,"""srcaddr=7338388383,SysUptime=3693443660,dst_as=00,dstport=80,DevicePort=52435,dstaddr=7338388383,pad1=0,pad2=0,output=1,Last=7338388383,prot=6,DeviceAddress=7338388383tcp_flags=26,dPkts=463,tos=0,First=7338388383,src_as=61999,dst_mask=27,unix_nsecs=0,count=30,src_mask=0,version=05,nexthop=8888888888,dOctets=33355,input=3,engine_type=0,unix_secs=1490079998,engine_id=0,reserved=0,srcport=32173,flow_sequence=1044333853"""
-
-
 
 -- local dbg = require("debugger")
 local FI=require'flowimport'
@@ -32,8 +36,8 @@ struct rwGenericRec_V5_st {
     uint16_t        dPort;       /* 14-15  Destination port */
 
     uint8_t         proto;       /* 16     IP protocol */
-    uint8_t  		flow_type;  /* 17     Class & Type info */
-    uint16_t  		sID;         /* 18-19  Sensor ID */
+    uint8_t     flow_type;  /* 17     Class & Type info */
+    uint16_t      sID;         /* 18-19  Sensor ID */
 
     uint8_t         flags;       /* 20     OR of all flags (Netflow flags) */
     uint8_t         init_flags;  /* 21     TCP flags in first packet
@@ -51,9 +55,9 @@ struct rwGenericRec_V5_st {
     uint32_t        pkts;        /* 32-35  Count of packets */
     uint32_t        bytes;       /* 36-39  Count of bytes */
 
-    uint32_t     	sIP;         /* 40-43  (or 40-55 if IPv6) Source IP */
-    uint32_t     	dIP;         /* 44-47  (or 56-71 if IPv6) Destination IP */
-    uint32_t     	nhIP;        /* 48-51  (or 72-87 if IPv6) Routr NextHop IP*/
+    uint32_t      sIP;         /* 40-43  (or 40-55 if IPv6) Source IP */
+    uint32_t      dIP;         /* 44-47  (or 56-71 if IPv6) Destination IP */
+    uint32_t      nhIP;        /* 48-51  (or 72-87 if IPv6) Routr NextHop IP*/
 };
 
 ]] 
@@ -86,58 +90,43 @@ TrisulPlugin = {
       -- read the next line and update flow metrics 
       step  = function(packet, engine)
 
-	  	if T.count==0 then
-			local ignoreheader = datfile:read(52)
-		end
-		T.count = T.count+1
+      if T.count==0 then
+        local ignoreheader = datfile:read(52)
+      end
+      T.count = T.count+1
 
 
-        local nextline = datfile:read(52)
-		if nextline == nil then return false; end 
+      local nextline = datfile:read(52)
+      if nextline == nil then return false; end 
 
-		local cCast = ffi.cast("struct rwGenericRec_V5_st *", nextline)
-		local stime = tonumber(cCast.sTime)/1000
-		local ltime=stime+tonumber(cCast.elapsed)/1000
+      local cCast = ffi.cast("struct rwGenericRec_V5_st *", nextline)
+      local stime = tonumber(cCast.sTime)/1000
+      local ltime=stime+tonumber(cCast.elapsed)/1000
 
-		-- set fields in table and call helper library to import into Trisul 
-        packet:set_timestamp(stime)
-		FI.process_flow(engine, {
-			first_timestamp=stime,
-			last_timestamp=stime+tonumber(cCast.elapsed)/1000,
-			router_ip= T.util.ntop(cCast.sID),
-			source_ip= T.util.ntop(cCast.sIP),
-			source_port= cCast.sPort,
-			destination_ip= T.util.ntop(cCast.dIP),
-			destination_port= cCast.dPort,
-			protocol= cCast.proto,
-			input_interface=tonumber(cCast.input),
-			output_interface=tonumber(cCast.output),
-			bytes=tonumber(cCast.bytes),
-			packets=tonumber(cCast.pkts),
-		});
-		local jjj =  {
-			first_timestamp=stime,
-			last_timestamp=stime+tonumber(cCast.elapsed)/1000,
-			router_ip= T.util.ntop(cCast.sID),
-			source_ip= T.util.ntop(cCast.sIP),
-			source_port= cCast.sPort,
-			destination_ip= T.util.ntop(cCast.dIP),
-			destination_port= cCast.dPort,
-			protocol= cCast.proto,
-			input_interface=tonumber(cCast.input),
-			output_interface=tonumber(cCast.output),
-			bytes=tonumber(cCast.bytes),
-			packets=tonumber(cCast.pkts),
-		};
+      -- set fields in table and call helper library to import into Trisul 
+      packet:set_timestamp(stime)
+      FI.process_flow(engine, {
+        first_timestamp=stime,
+        last_timestamp=stime+tonumber(cCast.elapsed)/1000,
+        router_ip= T.util.ntop(cCast.sID),
+        source_ip= T.util.ntop(cCast.sIP),
+        source_port= cCast.sPort,
+        destination_ip= T.util.ntop(cCast.dIP),
+        destination_port= cCast.dPort,
+        protocol= cCast.proto,
+        input_interface=tonumber(cCast.input),
+        output_interface=tonumber(cCast.output),
+        bytes=tonumber(cCast.bytes),
+        packets=tonumber(cCast.pkts),
+      });
 
-		-- progress every 10K records 
-        if T.count % 10000==0 then 
-          print("Processed "..T.count .. " flows")
-        end 
-        T.count = T.count + 1
+      -- progress every 10K records 
+      if T.count % 10000==0 then 
+        print("Processed "..T.count .. " flows")
+      end 
 
-		-- true return, means there is more 
-        return true 
+      -- true return, means there is more 
+      return true 
             
     end,
 
