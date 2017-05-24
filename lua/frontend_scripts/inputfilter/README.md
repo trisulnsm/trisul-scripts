@@ -1,14 +1,5 @@
-
-Links
-=====
-1. [kiwisyslog.lua](#network-flows--kiwisysloglua) import arbitrary text netflow 'like records' into Trisul
-2. [suricate_eve.lua](#alerts) Various methods to import ALERTS from IDS like Suricata 
-
-
-
 Input Filters 
 =============
-
 
 Input filters are LUA scripts you write that let you drive Trisul using custom input.
 
@@ -18,13 +9,19 @@ Documentation for _input filters_ can be found at http://trisul.org/docs/lua/inp
 Samples in this directory demonstrate how to 
 
 1.  Interface to various IDS alert systems (simulataneously) Demonstates the 'step_alert' function
-2.  Read Flow and Packet data from custom formats. Demonstrates the 'step' function 
+2.  Read Flow information contained in arbitrary formats into Trisul
+3.  Read Packet data from custom formats. Demonstrates the 'step' function 
+
+Flow Import Helper : flowimport.lua
+===================
+
+A helper LUA library to import Netflow "like" records into Trisul. All you have to do it write the *transform* function from the custom format and call the `process_flow(..)` method 
 
 
 Installing these scripts
 ========================
 
-Simply pop the .lua files  in /usr/local/var/lib/trisul-probe/domain0/probe0/context0/config/local-lua 
+Simply put  the .lua files  in /usr/local/var/lib/trisul-probe/domain0/probe0/context0/config/local-lua 
 
 For more details see http://trisul.org/docs/lua/basics.html#installing_and_uninstalling
 
@@ -65,10 +62,6 @@ and constructs an alert {..} object.   Suitable for use with Security Onion, jus
 output alert_unixsock
 ````
 
-Flow Import Helper : flowimport.lua
-===================
-
-A helper LUA library to import Netflow "like" records into Trisul. All you have to do it write the *transform* function extract the flow details and call the ````process_flow(..)```` method 
 
 
 Network Flows:  kiwisyslog.lua 
