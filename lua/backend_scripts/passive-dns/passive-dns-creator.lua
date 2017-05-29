@@ -63,6 +63,7 @@ TrisulPlugin = {
           T.pending = true
           T.owner=true
           engine:post_message_backend('{4349BFA4-536C-4310-C25E-E7C997B92244}', "newleveldb="..T.dbaddr) 
+          engine:post_message_frontend('{4349BFA4-536C-4310-C25E-E7C997B92244}', "newleveldb="..T.dbaddr) 
         end
         return
       end
