@@ -32,6 +32,15 @@ There are a number of other Lua LevelDB wrappers out there, but we had some very
 3. had to be LuaJIT - that is what we embed in Trisul 
 
 
+## Note
+
+You may be wondering why open(..) returns a string representing the address and then uses that 
+address  as upvalues to read(..) and write(..) methods. The reason is the way Trisul hosts your 
+LUA scripts. It is multi threaded and multiple instances of your LUA script can be loaded at the 
+same time and the only way you share state is via post_message(..).  then passes the opaque pointer 
+as a C-String, then any LUA script can listen to this message and use the leveldb object.  
+
+
 Requirements
 ------------
 
