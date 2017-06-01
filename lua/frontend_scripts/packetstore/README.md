@@ -1,10 +1,6 @@
 Fine control of PCAP storage 
 ======
 
-
-Also see  : [packet_storage documentation](http://trisul.org/docs/lua/packet_storage.html) 
-
-
 Control packet storage on a per-flow basis.
 
 1. You get asked ONCE at start of a flow how you want to handle packet storage
@@ -18,6 +14,8 @@ Streaming Budget
 Since the _new flow_ rate is orders of magnitude lesser than the _packet rate_  you have some headroom for some computations. 
 
 
+Some guidelines:
+
 1. No network IO 
 2. Budget typically less than 1 sec per decision
 3. That is usually plenty to lookup a table with millions of entries 
@@ -25,6 +23,8 @@ Since the _new flow_ rate is orders of magnitude lesser than the _packet rate_  
 
 
 Samples
-=======
+------ 
 
-1. skip_ssh.lua  -- why waste 100s of GB of disk by storing SSH traffic? this simple script skips that 
+1. skip_ssh.lua  -- why waste 100s of GB of disk by storing SSH/SFTP traffic? this simple script skips that 
+
+2. Also see  : [packet_storage documentation](http://trisul.org/docs/lua/packet_storage.html) 
