@@ -9,7 +9,7 @@
 
 -- Setup LUAJIT2.1 FFI into libcrypto.so for MD5 
 local ffi=require('ffi')
-local C = ffi.load('crypto')
+local C = ffi.load('libcrypto.so.1.0.0')
 local dbg=require'debugger'
 
 ffi.cdef[[
@@ -106,6 +106,28 @@ local xtractors = {
 
 }
 
+-- you dont want to be messing with these
+-- hi there Chromium !!  https://tools.ietf.org/html/draft-davidben-tls-grease-00
+local GREASE_tbl =
+{
+      [0x0A0A] = true,
+      [0x1A1A] = true,
+      [0x2A2A] = true,
+      [0x3A3A] = true,
+      [0x4A4A] = true,
+      [0x5A5A] = true,
+      [0x6A6A] = true,
+      [0x7A7A] = true,
+      [0x8A8A] = true,
+      [0x9A9A] = true,
+      [0xAAAA] = true,
+      [0xBABA] = true,
+      [0xCACA] = true,
+      [0xDADA] = true,
+      [0xEAEA] = true,
+      [0xFAFA] = true
+};
+
 
 -- plugin ; reassembly_handler + resource_group 
 TrisulPlugin = { 
@@ -186,6 +208,14 @@ TrisulPlugin = {
         ja3f.SSLExtension[#ja3f.SSLExtension+1]=ext_type 
       end
 
+	  -- kick out GREASE extensions  from all tables (see RFC) 
+	  for _, ja3f_tbl in ipairs( { ja3f.Cipher, ja3f.SSLExtension, ja3f.EllipticCurve} ) do 
+		  for i, v in ipairs(ja3f_tbl) do 
+			if  GREASE_tbl[v] then ja3f_tbl[i]=0;  end
+		  end
+	  end 
+
+
       local ja3_str = ja3f.SSLVersion .. "," ..
                table.concat(ja3f.Cipher,"-")..","..
                table.concat(ja3f.SSLExtension,"-")..","..
@@ -193,7 +223,7 @@ TrisulPlugin = {
                table.concat(ja3f.EllipticCurvePointFormat,"-")
       local ja3_hash = md5sum(ja3_str)
 
-      -- print(string = ".. ja3_str.. " hash="..md5sum(ja3_str))
+      -- print("string = ".. ja3_str.. " hash="..md5sum(ja3_str))
       engine:add_resource('{E8D3E68F-B320-49F3-C83D-66751C3B485F}', -- the JA3 resource guid
         flowkey:id(),
         ja3_hash,
