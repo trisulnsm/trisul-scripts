@@ -1,24 +1,24 @@
 IOC based on Client Hello fingerprinting 
 ======================
 
-An experiment at collecting client hello fingerprints for malware detection
-application.
-
+An experimental Trisul plugin for collecting client hello fingerprints. 
 
 This method is an implementation of https://github.com/salesforce/ja3  
 
+Change to original 
+------
+I deployed this script on a live Trisul system and noticed a unexpectedly huge number of hashes streaming by.  I dug a bit deeper and found that  Google Chrome was the culprit, they were using randomly inserted reserved values of TLS Ciphers, Extensions, and EllipticCurve  in the Client Hello.  Why on earth would they do that !!  Well it turns out there is a Draft-RFC called (GREASE)[https://tools.ietf.org/html/draft-davidben-tls-grease-01) 
+that explains this behavior.
 
-What ja3.lua does 
+I added a bit of code to replace all GREASE values in the ja3 hash fields with 0 and re-calculate the MD5. The noise immediately died down and the signatures are now proving to be interesting. I might publish a set of fingerprints once we have enough data. 
+
+What jahash.lua does 
 --------------
 
-1. A LUA  `reassembly_handler` that listens to reconstructed TLS records as they
-stream by. Ignores everything except Client Hello Handshake records. 
+It does 2 things.
 
-2. Dissects the Client Hello record and pulls out the required fields for JA3.
-!Hey - its not as hard as it sounds - check out the helper methods in the lua
-file.
+1. A *reassembly_handler*  -- parses Client Hello and pulls out the fields required for the ja3 hash.  The chunk of LuaJIT code at the beginning is a neat way to safely parse packets in LUA. 
 
-3. Adds a new Resource Group called "JA3 Hash" and adds hashes to that group.
-The flow ID is also added, so Trisul can pivot off that to PCAPs etc.
+2. A *resource_group*  -- creates a new type of resource to which we add discovered hashes. 
 
 
