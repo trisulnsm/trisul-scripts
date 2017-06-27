@@ -1,14 +1,14 @@
-toja3
+toja3.rb
 =====
 
-quick script generate a ja3_hash for this fantastic fingerprint DB from https://github.com/LeeBrotherston/tls-fingerprinting/blob/master/fingerprints/fingerprints.json
+Quick script to generate a ja3_hash from this awesome fingerprint DB from https://github.com/LeeBrotherston/tls-fingerprinting/blob/master/fingerprints/fingerprints.json
 
 
 Run
 ---
 
 ````
-ruby toja3 fingerprints.json > ja3_fingerprints.json
+ruby toja3.rb fingerprints.json > ja3_fingerprints.json
 ````
 
 
