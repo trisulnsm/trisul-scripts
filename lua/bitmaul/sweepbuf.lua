@@ -1,0 +1,168 @@
+-- sweepbuf.lua
+-- a one-pass scan buffer 
+-- 
+-- 
+local dbg=require'debugger'
+local SweepBuf  = {
+
+  u8 = function(tbl)
+    return string.byte(tbl.buff,tbl.seekpos)
+  end,
+
+  u16 = function(tbl)
+    return string.byte(tbl.buff,tbl.seekpos)*256 +
+           string.byte(tbl.buff,tbl.seekpos+1);
+  end,
+
+  u24 = function(tbl)
+    return string.byte(tbl.buff,tbl.seekpos)*4096 +
+           string.byte(tbl.buff,tbl.seekpos+1)*256 + 
+           string.byte(tbl.buff,tbl.seekpos+2)
+  end,
+
+  u32 = function(tbl)
+    return string.byte(tbl.buff,tbl.seekpos)*65536 +
+           string.byte(tbl.buff,tbl.seekpos+1)*4096 +
+           string.byte(tbl.buff,tbl.seekpos+2)*256 + 
+           string.byte(tbl.buff,tbl.seekpos+3)
+  end,
+
+  next_u8 = function(tbl)
+    local r = tbl:u8()
+    tbl:inc(1)
+    return r
+  end,
+
+  next_u8_arr = function(tbl,nitems)
+    local ret = {}
+    while nitems > 0 do
+      ret[#ret+1] = tbl:next_u8()
+      nitems = nitems - 1
+    end
+    return ret;
+  end,
+
+  next_u16 = function(tbl)
+    return tbl:next_u8()*256 + tbl:next_u8()
+  end,
+
+  next_str_to_pattern = function(tbl, patt)
+  	local f =string.find(tbl.buff,patt,tbl.seekpos,true) 
+	if f then
+		local r = string.sub(tbl.buff,tbl.seekpos,f+#patt-1)
+		tbl.seekpos = f+#patt
+		return r
+	else
+		return nil 
+	end
+  end,
+
+  next_str_to_len = function(tbl, slen)
+  	if tbl:bytes_left() > slen then 
+		local r = string.sub(tbl.buff,tbl.seekpos,tbl.seekpos+slen)
+		tbl:inc(slen)
+		return r
+	else
+		return nil
+	end 
+  end,
+
+  next_u16_arr = function(tbl,nitems)
+    local ret = {}
+    while nitems > 0 do
+      ret[#ret+1] = tbl:next_u16()
+      nitems = nitems - 1
+    end
+    return ret;
+  end,
+
+  next_u24 = function(tbl)
+    return tbl:next_u8()*4096 + tbl:next_u8()*256 + tbl:next_u8()
+  end,
+
+  next_u32 = function(tbl)
+    return tbl:next_u16()*65536 + tbl:next_u16() 
+  end,
+
+  next_u32_arr = function(tbl,nitems)
+    local ret = {}
+    while nitems > 0 do
+      ret[#ret+1] = tbl:next_u32()
+      nitems = nitems - 1
+    end
+    return ret;
+  end,
+
+  inc = function(tbl, n)
+    tbl.seekpos = tbl.seekpos + n 
+  end,
+
+  skip = function(tbl, n)
+    tbl.seekpos = tbl.seekpos + n 
+    return true
+  end,
+
+  reset = function(tbl)
+    tbl.seekpos=1
+    fence=#tbl.buff
+  end,
+
+  has_more = function(tbl)
+    return tbl.seekpos < #tbl.buff 
+  end,
+
+  bytes_left = function(tbl)
+    return #tbl.buff - tbl.seekpos 
+  end,
+
+  push_fence = function(tbl,delta_ahead)
+    tbl.fence = tbl.seekpos + delta_ahead
+  end ,
+
+  pop_fence = function(tbl)
+    tbl.fence=#tbl.buff
+  end,
+
+}
+
+
+-- metatbl - use a common mt (LuaJIT opt)
+local smt = {
+	__index = SweepBuf,
+
+	__le    = function(s1, s2) 
+				return s1.left >= s2.left and s1.right <= s2.right
+			  end,
+
+	__add   = function(s1, s2) 
+				local ol = s1.right-s2.left
+				return setmetatable({
+					left=s1.left,
+					right=s2.right,
+					seekpos=1,
+				    buff = string.sub(s1.buff,s1.seekpos).. string.sub(s2.buff,ol)
+				},getmetatable(s1));
+			  end,
+
+	__tostring = function(s)
+					 return string.format( "SB: Len=%d Seek=%d Avail=%d L=%d R=%d S=%s ", 
+					 				#s.buff, s.seekpos, s:bytes_left(), s.left, s.right, s.buff )
+				 end
+}
+
+local sweepbuf = { 
+
+   new = function( rawbuffer , pos) 
+   	   pos = pos or 1 
+	   return setmetatable(  {
+		   buff=rawbuffer,
+		   left=pos,
+		   right=pos+#rawbuffer,
+		   seekpos=1,
+		   fence=nil 
+	    }, smt)
+
+	end
+} 
+
+return sweepbuf 
