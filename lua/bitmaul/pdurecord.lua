@@ -66,21 +66,22 @@ local pmt = {
 	__index = PDURecord ,
 	__tostring = function(p) 
 			  return string.format( "PDU/%s  State=%d  Pos=%d Next=%d B=%s", 
-									p.id, p.state, p.stream_pos, p.next_pdu,  p.current_buf)
+									p.id, p.state, p.stream_pos, p.next_pdu,  tostring(p.current_buf))
 	end
 
 }
 
 local pdurecord = {
 
-		new = function( id  ) 
+		new = function( id , userdata  ) 
 
 			local pstate = { 
 				state =  0,   
 				next_pdu = 0,
 				stream_pos = 0,
 			    current_buf = SweepBuf.new(""),
-				id = id 
+				id = id ,
+				data = userdata 
 			}
 				
 			return setmetatable( pstate, pmt) 

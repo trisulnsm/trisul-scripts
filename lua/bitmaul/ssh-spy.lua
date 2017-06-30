@@ -21,8 +21,6 @@ TrisulPlugin = {
 
   onload  = function()
   	T.PDUStreamers = {} 
-
-
   end,
 
 
@@ -42,13 +40,10 @@ TrisulPlugin = {
 
         if flowkey:id():match("p-0016")  == nil then return; end
 
-		local ins =   PDURecord.new(flowkey:id() ,0);
-		local outs =   PDURecord.new(flowkey:id() ,1);
+		local ins =   PDURecord.new(flowkey:id().."/0", { ssh_state = 0} );
+		local outs =   PDURecord.new(flowkey:id().."/1", { ssh_state = 0} );
 
-		ins:want_to_pattern("\r\n")
-		outs:want_to_pattern("\r\n")
-	
-		T.PDUStreamers[flowkey:id()] = {  ins, outs }
+		T.PDUStreamers[flowkey:id()] = { [0]=  ins, [1]= outs }
 	end,
 
 
@@ -60,9 +55,25 @@ TrisulPlugin = {
 
         if flowkey:id():match("p-0016")  == nil then return; end
 
+		if direction == 1 then return; end 
+
 		local pdur = T.PDUStreamers[flowkey:id()][direction]
 
 		pdur:push_chunk(seekpos, buffer:tostring())
+
+		if pdur.data.ssh_state == 0  then 
+			local ver = pdur:want_to_pattern("\r\n")
+			if ver then
+				pdur.data.ssh_state = 1
+				print("VERSION = "..ver)
+			end
+		else
+			print(pdur)
+
+		end 
+
+
+
 
     end,
 
