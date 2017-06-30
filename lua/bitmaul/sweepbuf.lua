@@ -2,7 +2,6 @@
 -- a one-pass scan buffer 
 -- 
 -- 
-local dbg=require'debugger'
 local SweepBuf  = {
 
   u8 = function(tbl)
