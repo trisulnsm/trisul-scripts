@@ -2,7 +2,6 @@
 -- a one-pass scan buffer 
 -- 
 -- 
-local dbg=require'debugger'
 local SweepBuf  = {
 
   u8 = function(tbl)
@@ -145,8 +144,8 @@ local smt = {
 			  end,
 
 	__tostring = function(s)
-					 return string.format( "SB: Len=%d Seek=%d Avail=%d L=%d R=%d S=%s ", 
-					 				#s.buff, s.seekpos, s:bytes_left(), s.left, s.right, s.buff )
+					 return string.format( "SB: Len=%d Seek=%d Avail=%d L=%d R=%d ", 
+					 				#s.buff, s.seekpos, s:bytes_left(), s.left, s.right )
 				 end
 }
 
