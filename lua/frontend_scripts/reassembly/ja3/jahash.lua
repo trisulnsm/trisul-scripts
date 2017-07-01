@@ -10,7 +10,7 @@
 -- Setup LUAJIT2.1 FFI into libcrypto.so for MD5 
 local ffi=require('ffi')
 local C = ffi.load('libcrypto.so.1.0.0')
-local dbg=require'debugger'
+--local dbg=require'debugger'
 
 ffi.cdef[[
     typedef struct MD5state_st
@@ -208,12 +208,14 @@ TrisulPlugin = {
         ja3f.SSLExtension[#ja3f.SSLExtension+1]=ext_type 
       end
 
-	  -- kick out GREASE extensions  from all tables (see RFC) 
-	  for _, ja3f_tbl in ipairs( { ja3f.Cipher, ja3f.SSLExtension, ja3f.EllipticCurve} ) do 
-		  for i, v in ipairs(ja3f_tbl) do 
-			if  GREASE_tbl[v] then ja3f_tbl[i]=0;  end
-		  end
-	  end 
+      -- kick out GREASE values  from all tables (see RFC) 
+      -- since they can appear at random positions (generating a different hash)
+      -- we need to remove them completely 
+      for _, ja3f_tbl in ipairs( { ja3f.Cipher, ja3f.SSLExtension, ja3f.EllipticCurve} ) do 
+        for i=#ja3f_tbl,1,-1 do
+          if  GREASE_tbl[ja3f_tbl[i]] then table.remove(ja3f_tbl,i);  end
+        end
+      end 
 
 
       local ja3_str = ja3f.SSLVersion .. "," ..
@@ -223,7 +225,7 @@ TrisulPlugin = {
                table.concat(ja3f.EllipticCurvePointFormat,"-")
       local ja3_hash = md5sum(ja3_str)
 
-      -- print("string = ".. ja3_str.. " hash="..md5sum(ja3_str))
+      print("string = ".. ja3_str.. " hash="..md5sum(ja3_str))
       engine:add_resource('{E8D3E68F-B320-49F3-C83D-66751C3B485F}', -- the JA3 resource guid
         flowkey:id(),
         ja3_hash,

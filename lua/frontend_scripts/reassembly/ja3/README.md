@@ -10,7 +10,11 @@ Change to original  - handle GREASE
 I deployed this script on a live Trisul system and noticed a unexpectedly huge number of hashes streaming by.  I dug a bit deeper and found that  Google Chrome was the culprit, they were randomly inserting reserved values of TLS Ciphers, Extensions, and EllipticCurve  in the Client Hello.  *Why on earth would they do that !!*  Well it turns out there is a Draft-RFC called [GREASE](https://tools.ietf.org/html/draft-davidben-tls-grease-01) 
 that explains this behavior.
 
-I added a bit of code to replace all GREASE values in the ja3 hash fields with 0 and re-calculate the MD5. The noise immediately died down and the signatures are now proving to be interesting. I might publish a set of fingerprints once we have enough data. 
+~~I added a bit of code to replace all GREASE values in the ja3 hash fields with 0 and re-calculate the MD5~~. The noise immediately died down and the signatures are now proving to be interesting. I might publish a set of fingerprints once we have enough data.
+
+** Correction to above ** 
+Turns out the GREASE positions can be random within the lists, so replacing them with 0 is still no good. The script has now been modified to remove them completely before computing the hash.
+ 
 
 What jahash.lua does 
 --------------
@@ -28,12 +32,14 @@ Code
 The  relevant piece of code that removes the GREASE values 
 
 ````
-	  -- kick out GREASE extensions  from all tables (see draft RFC) 
-	  for _, ja3f_tbl in ipairs( { ja3f.Cipher, ja3f.SSLExtension, ja3f.EllipticCurve} ) do 
-		  for i, v in ipairs(ja3f_tbl) do 
-			if  GREASE_tbl[v] then ja3f_tbl[i]=0;  end
-		  end
-	  end 
+      -- kick out GREASE values  from all tables (see RFC) 
+      -- since they can appear at random positions (generating a different hash)
+      -- we need to remove them completely 
+      for _, ja3f_tbl in ipairs( { ja3f.Cipher, ja3f.SSLExtension, ja3f.EllipticCurve} ) do
+          for i=#ja3f_tbl,1,-1 do
+            if  GREASE_tbl[ja3f_tbl[i]] then table.remove(ja3f_tbl,i);  end
+          end
+      end
 
 ````
 
