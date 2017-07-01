@@ -24,12 +24,19 @@ local SSHDissector =
 	end ,
 
 
-}
+local sshdissector = {}
 
-return { 
-   	new = function() 
+sshdissector.new = function() 
 	   return setmetatable(  {ssh_state=0},   { __index = SSHDissector})
-	end
-} 
+end,
 
+sshdissector.new_pair = function()
+		local p = setmetatable(  {ssh_state=0},   { __index = SSHDissector})
+		local q = setmetatable(  {ssh_state=0},   { __index = SSHDissector})
+		p.paired_with=q
+		q.paired_with=p
+		return p,q
+end,
+
+return sshdissector;
 

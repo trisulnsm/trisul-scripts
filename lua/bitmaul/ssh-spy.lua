@@ -25,8 +25,9 @@ TrisulPlugin = {
 	-- new flow
 	onnewflow = function(engine, timestamp, flowkey) 
         if flowkey:id():match("p-0016")  == nil then return; end
-		local ins =   PDURecord.new(flowkey:id().."/0", SSHDissector.new() );
-		local outs =   PDURecord.new(flowkey:id().."/1",  SSHDissector.new() ); 
+		local ssh1, ssh2 = SSHDissector.new_pair()
+		local ins =   PDURecord.new(flowkey:id().."/0", ssh1)
+		local outs =   PDURecord.new(flowkey:id().."/1",  ssh2)
 		T.PDUStreamers[flowkey:id()] = { [0]=  ins, [1]= outs }
 	end,
 
