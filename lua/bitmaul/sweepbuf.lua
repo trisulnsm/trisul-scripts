@@ -2,7 +2,6 @@
 -- a one-pass scan buffer 
 -- 
 -- 
-local dbg=require'debugger'
 local SweepBuf  = {
 
   u8 = function(tbl)
@@ -126,6 +125,14 @@ local SweepBuf  = {
   pop_fence = function(tbl)
     tbl.fence=#tbl.buff
   end,
+
+  split = function(tbl, str, delim)
+      local ret = {}
+	  for word in str:gmatch("([^,]+)") do
+	      ret[#ret+1]=word
+	  end
+	  return ret
+  end
 
 }
 
