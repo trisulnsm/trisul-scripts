@@ -2,6 +2,7 @@
 -- a one-pass scan buffer 
 -- 
 -- 
+local dbg=require'debugger'
 local SweepBuf  = {
 
   u8 = function(tbl)
@@ -47,23 +48,23 @@ local SweepBuf  = {
 
   next_str_to_pattern = function(tbl, patt)
   	local f =string.find(tbl.buff,patt,tbl.seekpos,true) 
-	if f then
-		local r = string.sub(tbl.buff,tbl.seekpos,f+#patt-1)
-		tbl.seekpos = f+#patt
-		return r
-	else
-		return nil 
-	end
+  	if f then
+  		local r = string.sub(tbl.buff,tbl.seekpos,f+#patt)
+  		tbl.seekpos = f+#patt
+  		return r
+  	else
+  		return nil 
+  	end
   end,
 
   next_str_to_len = function(tbl, slen)
   	if tbl:bytes_left() > slen then 
-		local r = string.sub(tbl.buff,tbl.seekpos,tbl.seekpos+slen)
-		tbl:inc(slen)
-		return r
-	else
-		return nil
-	end 
+  		local r = string.sub(tbl.buff,tbl.seekpos,tbl.seekpos+slen-1)
+  		tbl:inc(slen)
+  		return r
+  	else
+	   	return nil
+	 end 
   end,
 
   next_u16_arr = function(tbl,nitems)
@@ -114,6 +115,10 @@ local SweepBuf  = {
     return #tbl.buff - tbl.seekpos 
   end,
 
+  abs_seek  = function() 
+    return tbl.left + tbl.seekpos
+  end,
+
   push_fence = function(tbl,delta_ahead)
     tbl.fence = tbl.seekpos + delta_ahead
   end ,
@@ -139,7 +144,7 @@ local smt = {
 					left=s1.left,
 					right=s2.right,
 					seekpos=1,
-				    buff = string.sub(s1.buff,s1.seekpos).. string.sub(s2.buff,ol)
+				  buff = string.sub(s1.buff,s1.seekpos).. string.sub(s2.buff,ol+1)
 				},getmetatable(s1));
 			  end,
 
