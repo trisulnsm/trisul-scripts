@@ -35,7 +35,6 @@ TrisulPlugin = {
     onpayload = function(engine, timestamp, flowkey, direction, seekpos, buffer) 
 
         if flowkey:id():match("p-0016")  == nil then return; end
-		if direction == 1 then return; end 
 		local pdur = T.PDUStreamers[flowkey:id()][direction]
 		pdur:push_chunk(seekpos, buffer:tostring())
     end,

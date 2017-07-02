@@ -87,7 +87,7 @@ local PDURecord = {
 	end,
 
 	-- cant restart from here , let GC pick up right away  
-	abort = function()
+	abort = function(tbl)
 		tbl.state = 4 
 		tbl._sweepbuffer = nil 
 	end,
