@@ -156,8 +156,7 @@ local smt = {
 			  end,
 
 	__tostring = function(s)
-					 return string.format( "SB: Len=%d Seek=%d Avail=%d L=%d R=%d ", 
-					 				#s.buff, s.seekpos, s:bytes_left(), s.left, s.right )
+					 return string.format( "SB: Len=%d Seek=%d Avail=%d L=%d R=%d ", #s.buff, s.seekpos, s:bytes_left(), s.left, s.right )
 				 end
 }
 

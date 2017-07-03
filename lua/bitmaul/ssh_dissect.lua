@@ -106,8 +106,9 @@ sshdissector.new = function()
 end
 
 sshdissector.new_pair = function()
-		local p = setmetatable(  {ssh_state=0, role="client", hshake = {}},   { __index = SSHDissector})
-		local q = setmetatable(  {ssh_state=0, role="server", hshake = {}},   { __index = SSHDissector})
+print("PAIRIR")
+		local p = setmetatable(  {ssh_state=0, role="server", hshake = {}},   { __index = SSHDissector})
+		local q = setmetatable(  {ssh_state=0, role="client", hshake = {}},   { __index = SSHDissector})
 		p.paired_with=q
 		q.paired_with=p
 		return p,q

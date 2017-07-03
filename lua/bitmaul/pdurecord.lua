@@ -64,6 +64,7 @@ local PDURecord = {
 				tbl.state=0
 			end
 		elseif st==0 then
+		print("STATE = "..tostring(tbl))
 			tbl.diss:what_next( tbl, tbl._sweepbuffer)
 		end
 
@@ -90,6 +91,7 @@ local PDURecord = {
 	abort = function(tbl)
 		tbl.state = 4 
 		tbl._sweepbuffer = nil 
+		print("ABORTED")
 	end,
 
 
@@ -98,8 +100,8 @@ local PDURecord = {
 local pmt = {
 	__index = PDURecord ,
 	__tostring = function(p) 
-			  return string.format( "PDU/%s  State=%d  Pos=%d Next=%d B=%s", 
-									p.id, p.state, p.seek, p.next_pdu,  tostring(p._sweepbuffer))
+			  return string.format( "PDU/%s  State=%d  B=%s", 
+									p.id, p.state, tostring(p._sweepbuffer))
 	end
 
 }
