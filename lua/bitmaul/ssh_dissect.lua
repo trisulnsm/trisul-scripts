@@ -8,18 +8,26 @@ local dbg =require'debugger'
 local SSHDissector = 
 {
 
+	-- 
 	-- how to get the next record 
+	-- SSH2.0 is simple - the first pkt looks for \r\n
+	-- the others Up-Until the NEW KEYS are length
+	-- after that *-etm HMACs have clear text length, others dead-end 
+	-- 
 	what_next =  function( tbl, pdur, swbuf)
 		if tbl.ssh_state  == 0 then
 			pdur:want_to_pattern("\r\n")
-		elseif tbl.ssh_state == 1 then
-			pdur:want_next(swbuf:u32() + 4)
-		else 
+		elseif tbl.ssh_state >= 4 then 
 			pdur:abort()
+		else 
+			pdur:want_next(swbuf:u32() + 4)
 		end 
 	end,
 
-	-- select neg
+	-- 
+	-- Helper method- select from client prefs also supported by server 
+	--
+	--
 	negotiated = function(client, server, fieldname )
 		local client_tbl, server_tbl = client[fieldname],server[fieldname]
 		for i,v in ipairs(client_tbl) do 
@@ -33,15 +41,18 @@ local SSHDissector =
 
 	-- handle a record
 	on_record = function( tbl, pdur, strbuf)
+	print("ONRECORD")
 		if tbl.ssh_state == 0 then
-			print("SSH version string = " .. strbuf)
+			tbl.ssh_version_string = strbuf
 			tbl.ssh_state=1
+		else 
 
-		elseif tbl.ssh_state==1 then
 			local sb = SweepBuf.new(strbuf)
-			print("LELELEL = ".. sb:next_u32())
+			sb:next_u32()
 			sb:next_u8()
-			local code = sb:next_u8()
+
+			local code=sb:next_u8()
+			print("CODE"..code)
 			if code == 20 then
 				print("KEY_EXCHANGE_INIT") 
 
@@ -80,7 +91,7 @@ local SSHDissector =
 						tbl.nego[ k] = tbl.negotiated(client_prefs,server_prefs,k)
 					end
 
-					print("----- NEGOTIATED SETTINGS ---- ")
+					print("----- SSH Session ---- ")
 					for k,v in pairs( tbl.nego ) do 
 						print(k.."="..v)
 					end
@@ -89,8 +100,8 @@ local SSHDissector =
 
 			elseif code==21 then
 				print("NEW_KEYS") 
-			elseif code==31 then
-				print("DIFFIE_HELLMAN_KEY_EXCHANGE_REPLY") 
+				tbl.ssh_state=4
+
 			end
 
 		end
