@@ -114,7 +114,7 @@ local SweepBuf  = {
     return #tbl.buff - tbl.seekpos 
   end,
 
-  abs_seek  = function() 
+  abs_seek  = function(tbl) 
     return tbl.left + tbl.seekpos
   end,
 

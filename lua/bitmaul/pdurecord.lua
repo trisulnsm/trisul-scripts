@@ -20,6 +20,12 @@ local PDURecord = {
 
 		local st = tbl.state
 
+		local newdatalen  = segment_seek + #incomingbuf - tbl.head_pos 
+		if newdatalen > 0 and tbl.diss.on_newdata then 
+			tbl.diss:on_newdata(tbl, string.sub(incomingbuf,-newdatalen))
+		end 
+		tbl.head_pos = tbl.head_pos + newdatalen
+
 		-- fast cases 
 		if st==4 then 
 			return 	-- abort
@@ -33,39 +39,44 @@ local PDURecord = {
 			return
 		end 
 
-		print("SWEEP + " .. tostring(tbl._sweepbuffer))
+		-- print("SWEEP + " .. tostring(tbl._sweepbuffer))
 
+		local run_pump = true
+		while run_pump do 
+			st=tbl.state 
 
+			run_pump=false
+			if st==4 then
+				-- STATE abort 
+			elseif st==3 then 
+				-- STATE skipping 
+				local ol = tbl.skip_to_pos - segment_seek
+				if ol  > 0  then 
+					tbl._sweepbuffer = SweepBuf.new(string.sub(incomingbuf,ol),tbl.skip_to_pos)
+					tbl.state=0
+				else
+					return
+				end
+			elseif st==2 then
+				-- STATE want pattern
+				local mb = tbl._sweepbuffer:next_str_to_pattern(tbl.want_pattern)
+				if mb then 
+					tbl.diss:on_record(tbl, mb ) 	--> * emit *
+					tbl.state=0
+					run_pump=true
+				end
+			elseif st==1 then
+				-- STATE_want bytes
+				if  tbl._sweepbuffer:bytes_left() >= tbl.want_bytes then  
+					local nbuff  = tbl._sweepbuffer:next_str_to_len(tbl.want_bytes)
+					tbl.diss:on_record(tbl, nbuff ) 	--> * emit *
+					tbl.state=0
+					run_pump=true
+				end
+			elseif st==0 then
+				tbl.diss:what_next( tbl, tbl._sweepbuffer)
+			end
 
-		if st==4 then
-			-- STATE abort 
-			return
-		elseif st==3 then 
-			-- STATE skipping 
-			local ol = tbl.skip_to_pos - segment_seek
-			if ol  > 0  then 
-				tbl._sweepbuffer = SweepBuf.new(string.sub(incomingbuf,ol),tbl.skip_to_pos)
-				tbl.state=0
-			else
-				return
-			end
-		elseif st==2 then
-			-- STATE want pattern
-			local mb = tbl._sweepbuffer:next_str_to_pattern(tbl.want_pattern)
-			if mb then 
-				tbl.diss:on_record(tbl, mb ) 	--> * emit *
-				tbl.state=0
-			end
-		elseif st==1 then
-			-- STATE_want bytes
-			if  tbl._sweepbuffer:bytes_left() >= tbl.want_bytes then  
-				local nbuff  = tbl._sweepbuffer:next_str_to_len(tbl.want_bytes)
-				tbl.diss:on_record(tbl, nbuff ) 	--> * emit *
-				tbl.state=0
-			end
-		elseif st==0 then
-		print("STATE = "..tostring(tbl))
-			tbl.diss:what_next( tbl, tbl._sweepbuffer)
 		end
 
 	end,
@@ -90,6 +101,7 @@ local PDURecord = {
 	-- cant restart from here , let GC pick up right away  
 	abort = function(tbl)
 		tbl.state = 4 
+		tbl.aborted_at_pos = tbl._sweepbuffer.right
 		tbl._sweepbuffer = nil 
 		print("ABORTED")
 	end,
@@ -114,6 +126,7 @@ local pdurecord = {
 				id = id ,
 				state =  0,   
 				diss = dissector,
+				head_pos = 0,
 			    _sweepbuffer = SweepBuf.new("",0)
 			}
 				
