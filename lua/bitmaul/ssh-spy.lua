@@ -36,6 +36,8 @@ TrisulPlugin = {
 			end
 		end
 		local pdur = ctl[direction]
+		pdur.engine=engine
+		pdur.timestamp=timestamp
 		pdur:push_chunk(seekpos, buffer:tostring())
     end,
 

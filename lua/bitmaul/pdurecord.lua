@@ -16,7 +16,7 @@ local PDURecord = {
 
 	-- TODO: unoptimized 
 	-- 
-	push_chunk = function( tbl, segment_seek, incomingbuf  )
+	push_chunk = function( tbl, segment_seek, incomingbuf )
 
 		local st = tbl.state
 
