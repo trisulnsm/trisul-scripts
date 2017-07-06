@@ -13,21 +13,28 @@ local SSHDissector =
 	--  ETM (unencrypted hdr) MACLEN,  KEYSTROKELEN,  TERMCAPLENLIUX, TERMCAPPUTTY
 	ControlTable   =  
 	{ 
-	["hmac-md5-etm@openssh.com"]        = {etm=true,  m=16,      k=16,     t={320}    },
-	["hmac-sha1-etm@openssh.com"]       = {etm=true,  m=20,      k=16,     t={320}    },		 -- checked 
-	["umac-64-etm@openssh.com"]         = {etm=true,  m=8,       k=16,     t={320}    },
-	["umac-128-etm@openssh.com"]        = {etm=true,  m=16,      k=16,     t={320}    },
-	["hmac-sha2-256-etm@openssh.com"]   = {etm=true,  m=32,      k=16,     t={320}    },
-	["hmac-sha2-512-etm@openssh.com"]   = {etm=true,  m=64,      k=16,     t={320}    },
-	["hmac-sha1-96-etm@openssh.com"]    = {etm=true,  m=12,      k=16,     t={320}    },
-	["hmac-md5-96-etm@openssh.com"]     = {etm=true,  m=12,      k=16,     t={320}    },
-	["chacha20-poly1305@openssh.com"]   = {etm=false, m=16,      k=36,	   t={376,436,288}},   
-	["hmac-sha2-256"]                   = {etm=false, m=32,      k=64,     t={304,304}    },
-	["hmac-sha1"]                       = {etm=false, m=20,      k=52,     t={460,304}    },
+	["hmac-md5-etm@openssh.com"]        = {etm=true,  m=16,      k=16,     t={320}        , rt={84} },
+	["hmac-sha1-etm@openssh.com"]       = {etm=true,  m=20,      k=16,     t={320}        , rt={88} },		 -- checked 
+	["umac-64-etm@openssh.com"]         = {etm=true,  m=8,       k=16,     t={320}        , rt={60} },
+	["umac-128-etm@openssh.com"]        = {etm=true,  m=16,      k=16,     t={320}        , rt={84} },
+	["hmac-sha2-256-etm@openssh.com"]   = {etm=true,  m=32,      k=16,     t={320}        , rt={84} },
+	["hmac-sha2-512-etm@openssh.com"]   = {etm=true,  m=64,      k=16,     t={320}        , rt={84} },
+	["hmac-sha1-96-etm@openssh.com"]    = {etm=true,  m=12,      k=16,     t={320}        , rt={84} },
+	["hmac-md5-96-etm@openssh.com"]     = {etm=true,  m=12,      k=16,     t={320}        , rt={84} },
+	["chacha20-poly1305@openssh.com"]   = {etm=false, m=16,      k=36,	   t={376,444,436,288}, rt={76} },   
+	["hmac-sha2-256"]                   = {etm=false, m=32,      k=64,     t={304,304}    , rt={84} },
+	["hmac-sha1"]                       = {etm=false, m=20,      k=52,     t={460,304}    , rt={84} },
    } ,
 
    MaxShellSegments = 20,
 
+   MaxEchoLatency = 3,
+
+   ST = {
+   	ETM_PAYLOAD=5,
+   	NON_ETM_PAYLOAD=4,
+	SHALLOW_ANALYSIS_MODE=99,
+   },
 
 	-- 
 	-- how to get the next record 
@@ -38,9 +45,11 @@ local SSHDissector =
 	what_next =  function( tbl, pdur, swbuf)
 		if tbl.ssh_state  == 0 then
 			pdur:want_to_pattern("\r\n")
-		elseif tbl.ssh_state == 99 then 
+		elseif tbl.ssh_state == tbl.ST.SHALLOW_ANALYSIS_MODE  then 
 			pdur:abort()
-		elseif tbl.ssh_state == 5 then 
+		elseif tbl.ssh_state == tbl.ST.NON_ETM_PAYLOAD then 
+			pdur:abort()
+		elseif tbl.ssh_state == tbl.ST.ETM_PAYLOAD  then 
 			pdur:want_next(4 + swbuf:u32() + tbl.nego.ctl_table.m)
 		else 
 			pdur:want_next(swbuf:u32() + 4)
@@ -62,9 +71,11 @@ local SSHDissector =
 	end ,
 
 	-- onnewdata - for traffic analysis
-	on_newdata = function( tbl, pdur, args )
-		if tbl.ssh_state == 4 then 
-			tbl:handle_post_newkeys(pdur,args)
+	on_newdata = function( tbl, pdur, len, strbuf )
+		if tbl.ssh_state == tbl.ST.NON_ETM_PAYLOAD then 
+			tbl:handle_post_newkeys(pdur,strbuf)
+		elseif tbl.ssh_state==tbl.ST.SHALLOW_ANALYSIS_MODE  then
+			tbl:check_tunnel_keypress(pdur,len)
 		end
 	end,
 
@@ -75,8 +86,7 @@ local SSHDissector =
 		if tbl.ssh_state == 0 then
 			tbl.ssh_version_string = strbuf
 			tbl.ssh_state=1
-		elseif tbl.ssh_state == 5 then 
-
+		elseif tbl.ssh_state == tbl.ST.ETM_PAYLOAD then 
 			-- check if login successful using the SSH-MSG-CHANNEL-REQUEST for pty
 			-- 
 			tbl:handle_post_newkeys(pdur,strbuf)
@@ -89,6 +99,7 @@ local SSHDissector =
 
 			local code=sb:next_u8()
 			if code == 20 then
+
 				sb:skip(16) -- cookie
 
 				-- store them in the state 
@@ -103,7 +114,6 @@ local SSHDissector =
 				tbl.hshake. compression_algorithms_server_to_client  = sb:split(sb:next_str_to_len(sb:next_u32()),",")
 				tbl.hshake. languages_client_to_server  = sb:split(sb:next_str_to_len(sb:next_u32()),",")
 				tbl.hshake. languages_server_to_client  = sb:split(sb:next_str_to_len(sb:next_u32()),",")
-
 
 				tbl.ssh_state=2
 
@@ -131,15 +141,24 @@ local SSHDissector =
 					for k,v in pairs( tbl.nego ) do 
 						print(k.."="..v)
 					end
+					print("------------------------------ ")
 
 					if tbl.nego.encryption_algorithms_client_to_server=="chacha20-poly1305@openssh.com" then 
 						tbl.nego.ctl_table =tbl.ControlTable['chacha20-poly1305@openssh.com']
 					else
 						tbl.nego.ctl_table =tbl.ControlTable[tbl.nego.mac_algorithms_client_to_server]
+
+						if tbl.nego.ctl_table ==nil then
+							-- rare cipher
+							pdur.engine:add_alert("{E713ED84-F2D9-4469-148C-00C119992926}",pdur.id,
+									"RAREHMAC", 1, 
+									"Rare/usual HMAC algorithm used " );
+
+						end
+
 					end
 					pair_st.nego = tbl.nego
 
-					print("------------------------------ ")
 
 
 				end
@@ -148,11 +167,11 @@ local SSHDissector =
 				-- if *-etm  the pktlen available use that 
 				if tbl.nego.ctl_table.etm  then 
 					print(tbl.role.. " NEW_KEYS - ETM will continue PDU ") 
-					tbl.ssh_state=5
+					tbl.ssh_state=tbl.ST.ETM_PAYLOAD
 					tbl.shell_segments=0
 				else
 					print(tbl.role.. " NEW_KEYS - non-ETM work with TCP buff") 
-					tbl.ssh_state=4
+					tbl.ssh_state=tbl.ST.NON_ETM_PAYLOAD
 					tbl.shell_segments=0
 				end
 			end
@@ -193,17 +212,34 @@ local SSHDissector =
 			plen = sb:u32()
 		end
 
+
 		-- check if login successful using the SSH-MSG-CHANNEL-REQUEST for pty
 		-- 
 		if tbl.role == 'client'   then 
+		 
 			if  tbl.is_member(plen,tbl.nego.ctl_table.t) then
 				print("((( LOGIN SUCCESS))))"..pdur.id)
+				pdur.engine:add_alert("{E713ED84-F2D9-4469-148C-00C119992926}",pdur.id,
+						"LOGIN", 3, 
+						"Successful login "  );
+
+				if not tbl.nego.ctl_table.etm  and
+					tbl.nego.encryption_algorithms_client_to_server~="chacha20-poly1305@openssh.com" then 
+						print("ALERT: HMAC non ETM")
+						pdur.engine:add_alert("{E713ED84-F2D9-4469-148C-00C119992926}",pdur.id,
+								"WEAKHMAC", 3, 
+								"Successful login using non-ETM MAC"  );
+				end
 			end
 			tbl.key_press =  (plen == tbl.nego.ctl_table.k) 
-		else 
+		elseif not tbl.key_press_alerted  then 
 			tbl.key_press =  (plen == tbl.nego.ctl_table.k) 
 			if tbl.key_press and tbl.paired_with.key_press then
-				print("((( KEY PRESS")
+				print("KEYPRESS ALERT ")
+				pdur.engine:add_alert("{E713ED84-F2D9-4469-148C-00C119992926}",pdur.id,
+						"KEYSTROKE", 3, 
+						"Keystrokes after successful login"  );
+				tbl.key_press_alerted=true
 			end
 			tbl.key_press=false
 			tbl.paired_with.key_press=false
@@ -212,10 +248,36 @@ local SSHDissector =
 		-- abort after a few segments past NEW_KEYS 
 		tbl.shell_segments = tbl.shell_segments + 1
 		if tbl.shell_segments  > tbl.MaxShellSegments then
-			tbl.ssh_state=99
+			tbl.ssh_state=tbl.ST.SHALLOW_ANALYSIS_MODE
 		end
-	end
+	end,
 
+
+	check_tunnel_keypress=function(tbl, pdur, plen)
+
+		-- check if login successful using the SSH-MSG-CHANNEL-REQUEST for pty
+		-- 
+		if tbl.role == 'client'   then 
+			tbl.key_press =  tbl.is_member(plen, tbl.nego.ctl_table.rt) 
+			tbl.key_press_ts = pdur.timestamp
+			tbl.paired_with.key_press=false
+		elseif tbl.paired_with.key_press_ts then 
+			tbl.key_press =  tbl.is_member(plen, tbl.nego.ctl_table.rt) 
+			if pdur.timestamp - tbl.paired_with.key_press_ts < tbl.MaxEchoLatency then 
+				if tbl.key_press and tbl.paired_with.key_press then
+					print("((( TUNNEL KEY PRESS")
+					pdur.engine:add_alert("{E713ED84-F2D9-4469-148C-00C119992926}",pdur.id,
+							"TUNNEL", 1, 
+							"Key pressed detected possible SSH tunnel" );
+
+				end
+			end 
+			tbl.key_press=false
+			tbl.paired_with.key_press=false
+			tbl.key_press_ts = 0
+		end
+
+	end
 
 }
 
@@ -223,9 +285,8 @@ local SSHDissector =
 local sshdissector = {}
 
 sshdissector.new_pair = function()
-		print("PAIRIR")
-		local p = setmetatable(  {ssh_state=0, role="server", hshake = {}},   { __index = SSHDissector})
-		local q = setmetatable(  {ssh_state=0, role="client", hshake = {}},   { __index = SSHDissector})
+		local p = setmetatable(  {ssh_state=0, role="server", hshake = {} },   { __index = SSHDissector})
+		local q = setmetatable(  {ssh_state=0, role="client", hshake = {} },   { __index = SSHDissector})
 		p.paired_with=q
 		q.paired_with=p
 		return p,q

@@ -1,6 +1,6 @@
 -- pdurecord.lua 
 -- 	PDU layer attached to a stream 
-
+--
 local SweepBuf=require'sweepbuf'
 
 -- local dbg=require 'debugger'
@@ -16,15 +16,22 @@ local PDURecord = {
 
 	-- TODO: unoptimized 
 	-- 
-	push_chunk = function( tbl, segment_seek, incomingbuf )
+	push_chunk = function( tbl, segment_seek, incomingbuf  )
 
 		local st = tbl.state
 
 		local newdatalen  = segment_seek + #incomingbuf - tbl.head_pos 
-		if newdatalen > 0 and tbl.diss.on_newdata then 
-			tbl.diss:on_newdata(tbl, string.sub(incomingbuf,-newdatalen))
-		end 
 		tbl.head_pos = tbl.head_pos + newdatalen
+		if newdatalen == 0  then
+			return
+		elseif tbl.diss.on_newdata then 
+			if tbl.state==99 then 
+				tbl.diss:on_newdata(tbl, nil, newdatalen ) 
+				return 
+			else
+				tbl.diss:on_newdata(tbl, newdatalen, string.sub(incomingbuf,-newdatalen))
+			end 
+		end 
 
 		-- fast cases 
 		if st==4 then 
@@ -127,6 +134,7 @@ local pdurecord = {
 				state =  0,   
 				diss = dissector,
 				head_pos = 0,
+				timestamp=0,
 			    _sweepbuffer = SweepBuf.new("",0)
 			}
 				

@@ -1,7 +1,8 @@
 -- sweepbuf.lua
--- a one-pass scan buffer 
--- 
--- 
+-- 	a one-pass scan buffer 
+-- 	for packet dissection 
+--
+-- 	TODO: unoptimized 
 local SweepBuf  = {
 
   u8 = function(tbl)
