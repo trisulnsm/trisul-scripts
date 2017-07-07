@@ -25,7 +25,7 @@ TrisulPlugin = {
 
 		local ctl = T.Pimpl[flowkey:id()] 
 		if not ctl then 
-			if seekpos==0 and not buffer:tostring():find("^SSH-2.0") then
+			if seekpos==0 and buffer:tostring():find("^SSH%-2%.0") == 1  then
 				print("New SSH Analyzer attached to a PDURecord f="..flowkey:id() )
 				local ssh1, ssh2 = SSHDissector.new_pair()
 				local ins =    PDURecord.new(flowkey:id(), ssh1)
@@ -45,7 +45,7 @@ TrisulPlugin = {
 
 	-- 
 	onterminateflow  = function(engine, timestamp, flowkey)
-		print("Terminating SSH Analyzer attached to a PDURecord f="..flowkey:id() )
+		-- print("Terminating SSH Analyzer attached to a PDURecord f="..flowkey:id() )
 		T.Pimpl[flowkey:id()]  = nil 
 	end,
 
