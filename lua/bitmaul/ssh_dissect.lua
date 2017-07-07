@@ -31,6 +31,8 @@ local SSHDissector =
    MaxEchoLatency = 3,
 
    ST = {
+   	START=0,
+   	BEFORE_NEWKEYS=1,
    	ETM_PAYLOAD=5,
    	NON_ETM_PAYLOAD=4,
 	SHALLOW_ANALYSIS_MODE=99,
@@ -38,12 +40,13 @@ local SSHDissector =
 
 	-- 
 	-- how to get the next record 
-	-- SSH2.0 is simple - the first pkt looks for \r\n
-	-- the others Up-Until the NEW KEYS are length
-	-- after that *-etm HMACs have clear text length, others dead-end 
+	-- SSH2.0 is simple - 
+	--  1. the first pkt looks for \r\n
+	--  2. the others Up-Until the NEW KEYS are length
+	--  3. after that *-etm HMACs have clear text length, others dead-end 
 	-- 
 	what_next =  function( tbl, pdur, swbuf)
-		if tbl.ssh_state  == 0 then
+		if tbl.ssh_state  == tbl.ST.START  then
 			pdur:want_to_pattern("\r\n")
 		elseif tbl.ssh_state == tbl.ST.SHALLOW_ANALYSIS_MODE  then 
 			pdur:abort()
@@ -56,21 +59,8 @@ local SSHDissector =
 		end 
 	end,
 
-	-- 
-	-- Helper method- select from client prefs also supported by server 
+	-- onnewdata only the delta payloads 
 	--
-	--
-	negotiated = function(client, server, fieldname )
-		local client_tbl, server_tbl = client[fieldname],server[fieldname]
-		for i,v in ipairs(client_tbl) do 
-			for k,v2 in ipairs(server_tbl) do 
-				if v==v2 then return v end
-			end
-		end
-		return nil 
-	end ,
-
-	-- onnewdata - for traffic analysis
 	on_newdata = function( tbl, pdur, len, strbuf )
 		if tbl.ssh_state == tbl.ST.NON_ETM_PAYLOAD then 
 			tbl:handle_post_newkeys(pdur,strbuf)
@@ -81,17 +71,20 @@ local SSHDissector =
 
 
 	-- handle a record
+	--   the main task here : handle the cipher/mac exchange so we know what packetlengths
+	--   to expect for successful login, keystroke, and keystroke within tunnel 
+	--
 	on_record = function( tbl, pdur, strbuf)
 
-		if tbl.ssh_state == 0 then
+		if tbl.ssh_state ==  tbl.ST.START then
 			tbl.ssh_version_string = strbuf
-			tbl.ssh_state=1
+			tbl.ssh_state=tbl.ST.BEFORE_NEWKEYS
 		elseif tbl.ssh_state == tbl.ST.ETM_PAYLOAD then 
 			-- check if login successful using the SSH-MSG-CHANNEL-REQUEST for pty
 			-- 
 			tbl:handle_post_newkeys(pdur,strbuf)
 
-		else 
+		elseif tbl.ssh_state == tbl.ST.BEFORE_NEWKEYS 
 
 			local sb = SweepBuf.new(strbuf)
 			sb:next_u32()
@@ -115,11 +108,11 @@ local SSHDissector =
 				tbl.hshake. languages_client_to_server  = sb:split(sb:next_str_to_len(sb:next_u32()),",")
 				tbl.hshake. languages_server_to_client  = sb:split(sb:next_str_to_len(sb:next_u32()),",")
 
-				tbl.ssh_state=2
+				tbl.hshake.complete=true
 
 				-- How Negotiation works - go through CLIENT preference 
 				local pair_st = tbl.paired_with
-				if pair_st.ssh_state==2 then
+				if pair_st.hshake.complete then
 
 					local client_prefs  , server_prefs
 					if tbl.role == 'client' then
@@ -180,29 +173,15 @@ local SSHDissector =
 	end ,
 
 
-	is_member = function( val, tbl) 
-		for _,v in ipairs(tbl) do 
-			if v == val then return true end
-		end
-		return false
-	end,
 
-	print_table = function(tbl, indent )
-
-		indent = indent or ""
-		for k,v in pairs(tbl) do 
-
-			if type(v) == "table" then 
-				print(indent..k)
-				self.print_table( v, indent.."   ")
-			else
-				print(indent..k.."      "..v)
-			end
-		end 
-	end,
-
-
-
+	--
+	-- after NEW KEYS
+	--    we check for the following (but only for the first  MaxShellSegments(20)
+	--
+	--    1. successful login - mapping the SSH-MSG-CHANNEL Terminal Capabilites
+	--    2. login keys pressed after login
+	--    3. whether non-etm keys are being used 
+	--
 	handle_post_newkeys=function(tbl, pdur, strbuf)
 
 		local plen = #strbuf
@@ -252,7 +231,25 @@ local SSHDissector =
 		end
 	end,
 
+	-- 
+	-- Helper method- select from client prefs also supported by server 
+	--
+	--
+	negotiated = function(client, server, fieldname )
+		local client_tbl, server_tbl = client[fieldname],server[fieldname]
+		for i,v in ipairs(client_tbl) do 
+			for k,v2 in ipairs(server_tbl) do 
+				if v==v2 then return v end
+			end
+		end
+		return nil 
+	end ,
 
+
+	-- 
+	-- tunnel key press 
+	--   just looks at packet lenght without obtaining a buffer
+	--
 	check_tunnel_keypress=function(tbl, pdur, plen)
 
 		-- check if login successful using the SSH-MSG-CHANNEL-REQUEST for pty
@@ -277,7 +274,32 @@ local SSHDissector =
 			tbl.key_press_ts = 0
 		end
 
-	end
+	end,
+
+	-- helper: is val a member of tbl array 
+	is_member = function( val, tbl) 
+		for _,v in ipairs(tbl) do 
+			if v == val then return true end
+		end
+		return false
+	end,
+
+	-- helper: prnt table
+	print_table = function(tbl, indent )
+
+		indent = indent or ""
+		for k,v in pairs(tbl) do 
+
+			if type(v) == "table" then 
+				print(indent..k)
+				self.print_table( v, indent.."   ")
+			else
+				print(indent..k.."      "..v)
+			end
+		end 
+	end,
+
+
 
 }
 
