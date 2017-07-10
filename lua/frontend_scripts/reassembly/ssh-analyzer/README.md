@@ -15,7 +15,9 @@ The files are
 - ssh-alert-group.lua -- a new alert group to house the alerts 
 
 
-The scripts uses the `PDURecord` and `SweepBuffer` helpers from the BitMaul library.
+The scripts uses the `PDURecord` and `SweepBuffer` helpers from the [BitMaul stream to PDU library](https://github.com/trisulnsm/trisul-scripts/tree/master/lua/bitmaul)
+
+
 
 
 
