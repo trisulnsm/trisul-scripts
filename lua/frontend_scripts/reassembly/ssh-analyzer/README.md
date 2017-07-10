@@ -2,7 +2,7 @@ ssh passive analysis
 ====================
 
 
-Uses the techniques described in [Traffic Analysis of Secure Shell ](http://localhost:3000/blog/analysing-ssh/post.html)  to
+Uses the techniques described in [Traffic Analysis of Secure Shell ](https://trisul.org/blog/analysing-ssh/post.html)  to
 
 1. detect successful logins
 2. detect keystrokes after a successful login
