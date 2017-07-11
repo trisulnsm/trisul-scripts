@@ -4,7 +4,7 @@
 --
 local SweepBuf=require'sweepbuf'
 
--- local dbg=require 'debugger'
+local dbg=require 'debugger'
 
 local PDURecord = {
 
@@ -26,8 +26,8 @@ local PDURecord = {
       if newdatalen == 0  then
         return
       elseif tbl.diss.on_newdata then 
-        if tbl.state==99 then 
-            tbl.diss:on_newdata(tbl, nil, newdatalen ) 
+        if tbl.state==4 then 
+            tbl.diss:on_newdata(tbl, newdatalen , nil ) 
             return 
         else
             tbl.diss:on_newdata(tbl, newdatalen, string.sub(incomingbuf,-newdatalen))
@@ -43,7 +43,6 @@ local PDURecord = {
         -- update buffer  
         tbl._sweepbuffer = tbl._sweepbuffer + SweepBuf.new(incomingbuf,segment_seek)
       elseif not tbl._sweepbuffer:has_more() then
-        print("EMPTY BUFFER")
         return
       end 
 
@@ -81,9 +80,12 @@ local PDURecord = {
               tbl.state=0
               run_pump=true
           end
-        elseif st==0 then
+        elseif st==0 and tbl._sweepbuffer:has_more() then
           tbl.diss:what_next( tbl, tbl._sweepbuffer)
+		  run_pump = (tbl.state ~= 0)
         end
+
+		run_pump = run_pump and (tbl.state ~= 4) 
 
       end
 
@@ -111,7 +113,6 @@ local PDURecord = {
       tbl.state = 4 
       tbl.aborted_at_pos = tbl._sweepbuffer.right
       tbl._sweepbuffer = nil 
-      print("ABORTED")
     end,
 
 

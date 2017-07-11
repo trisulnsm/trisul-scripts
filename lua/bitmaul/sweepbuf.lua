@@ -3,6 +3,7 @@
 -- 	for packet dissection 
 --
 -- 	TODO: unoptimized 
+-- local dbg=require'debugger'
 local SweepBuf  = {
 
   u8 = function(tbl)
@@ -25,6 +26,13 @@ local SweepBuf  = {
            string.byte(tbl.buff,tbl.seekpos+1)*4096 +
            string.byte(tbl.buff,tbl.seekpos+2)*256 + 
            string.byte(tbl.buff,tbl.seekpos+3)
+  end,
+
+  peek_u16 = function(tbl, offset)
+	tbl:inc(offset)
+	local reclen  = tbl:u16()
+	tbl:inc(-offset)
+	return reclen
   end,
 
   next_u8 = function(tbl)
@@ -58,7 +66,7 @@ local SweepBuf  = {
   end,
 
   next_str_to_len = function(tbl, slen)
-  	if tbl:bytes_left() > slen then 
+  	if tbl:bytes_left() >= slen then 
   		local r = string.sub(tbl.buff,tbl.seekpos,tbl.seekpos+slen-1)
   		tbl:inc(slen)
   		return r
@@ -104,15 +112,19 @@ local SweepBuf  = {
 
   reset = function(tbl)
     tbl.seekpos=1
-    fence=#tbl.buff
+	tbl.fence={#tbl.buff}
+  end,
+
+  top_fence = function(tbl)
+  	return tbl.fence[#tbl.fence]
   end,
 
   has_more = function(tbl)
-    return tbl.seekpos < #tbl.buff 
+    return tbl.seekpos < tbl:top_fence() 
   end,
 
   bytes_left = function(tbl)
-    return #tbl.buff - tbl.seekpos 
+    return #tbl.buff - tbl.seekpos + 1
   end,
 
   abs_seek  = function(tbl) 
@@ -120,11 +132,11 @@ local SweepBuf  = {
   end,
 
   push_fence = function(tbl,delta_ahead)
-    tbl.fence = tbl.seekpos + delta_ahead
+    tbl.fence[#tbl.fence+1] = tbl.seekpos + delta_ahead
   end ,
 
   pop_fence = function(tbl)
-    tbl.fence=#tbl.buff
+    tbl.fence[#tbl.fence]=nil 
   end,
 
   split = function(tbl, str, delim)
@@ -148,16 +160,18 @@ local smt = {
 
 	__add   = function(s1, s2) 
 				local ol = s1.right-s2.left
+				local newbuff = string.sub(s1.buff,s1.seekpos).. string.sub(s2.buff,ol+1)
 				return setmetatable({
 					left=s1.left,
 					right=s2.right,
 					seekpos=1,
-				  buff = string.sub(s1.buff,s1.seekpos).. string.sub(s2.buff,ol+1)
+					buff = newbuff,
+					fence={#newbuff}
 				},getmetatable(s1));
 			  end,
 
 	__tostring = function(s)
-					 return string.format( "SB: Len=%d Seek=%d Avail=%d L=%d R=%d ", #s.buff, s.seekpos, s:bytes_left(), s.left, s.right )
+					 return string.format( "SB: Len=%d Seek=%d Avail=%d L=%d R=%d F=%d", #s.buff, s.seekpos, s:bytes_left(), s.left, s.right, s:top_fence() )
 				 end
 }
 
@@ -170,7 +184,7 @@ local sweepbuf = {
 		   left=pos,
 		   right=pos+#rawbuffer,
 		   seekpos=1,
-		   fence=nil 
+		   fence={#rawbuffer} 
 	    }, smt)
 
 	end
