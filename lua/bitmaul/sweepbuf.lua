@@ -145,7 +145,26 @@ local SweepBuf  = {
 	      ret[#ret+1]=word
 	  end
 	  return ret
+  end,
+
+  hexdump = function(tbl )
+
+	  local offset=1
+	  local bytes_per_line=16
+	  while offset < #tbl.buff  do
+	  	io.write(string.format("%08X ", offset-1))
+		local bytes = string.sub(tbl.buff,offset,offset+bytes_per_line)
+	    for b in bytes:gmatch('.') do
+		    io.write(('%02X '):format(b:byte()))
+		end
+		io.write(('   '):rep(bytes_per_line - bytes:len() + 1))
+		io.write(bytes:gsub('[^%g]', '.'), '\n')
+		offset = offset + bytes_per_line
+	  end
+
   end
+
+
 
 }
 
