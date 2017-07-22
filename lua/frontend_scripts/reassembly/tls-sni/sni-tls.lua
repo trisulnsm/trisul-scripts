@@ -46,6 +46,10 @@ local TLSDissector_SNI =
 				  payload:skip(1)
 				  local snihostname  =  payload:next_str_to_len(payload:next_u16())
 
+				  if #snihostname >=64 then
+				  	snihostname = string.sub(snihostname,1,64)
+				  end
+
 				  -- hits 
 				  pdur.engine:update_counter("{38497403-23FB-4206-65C2-0AD5C419DD53}",
 				  						snihostname, 1, 1)
