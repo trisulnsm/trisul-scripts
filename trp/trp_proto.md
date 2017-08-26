@@ -29,9 +29,12 @@
  * [DomainRequest](#TRP.DomainRequest)
  * [DomainResponse](#TRP.DomainResponse)
  * [DomainResponse.Node](#TRP.DomainResponse.Node)
+ * [EdgeGraphT](#TRP.EdgeGraphT)
  * [ErrorResponse](#TRP.ErrorResponse)
  * [FileRequest](#TRP.FileRequest)
  * [FileResponse](#TRP.FileResponse)
+ * [GraphRequest](#TRP.GraphRequest)
+ * [GraphResponse](#TRP.GraphResponse)
  * [GrepRequest](#TRP.GrepRequest)
  * [GrepResponse](#TRP.GrepResponse)
  * [HelloRequest](#TRP.HelloRequest)
@@ -84,6 +87,7 @@
  * [TopperTrendRequest](#TRP.TopperTrendRequest)
  * [TopperTrendResponse](#TRP.TopperTrendResponse)
  * [UpdateKeyRequest](#TRP.UpdateKeyRequest)
+ * [VertexGroupT](#TRP.VertexGroupT)
  * [AuthLevel](#TRP.AuthLevel)
  * [CompressionType](#TRP.CompressionType)
  * [DomainNodeType](#TRP.DomainNodeType)
@@ -270,12 +274,15 @@ ContextStart  : run
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | context_name | [string](#string) | required | if not  set all context get in |
-| mode | [string](#string) | optional |  |
+| mode | [string](#string) | optional | same as trisul cmdline run mode |
 | background | [bool](#bool) | optional |  |
 | pcap_path | [string](#string) | optional |  |
 | run_tool | [string](#string) | optional | snort, suricata supported.. |
 | tool_ids_config | [string](#string) | optional |  |
 | tool_av_config | [string](#string) | optional |  |
+| cmd_in | [string](#string) | optional | maps to trisul -in |
+| cmd_out | [string](#string) | optional | maps to trisul -out |
+| cmd_args | [string](#string) | optional | maps to trisul -args |
 
 
 <a name="TRP.ContextStopRequest"/>
@@ -458,6 +465,17 @@ messages to routerX backend
 | heartbeat_time | [Timestamp](#TRP.Timestamp) | optional |  |
 
 
+<a name="TRP.EdgeGraphT"/>
+### EdgeGraphT
+EdgeGraphT : a graph
+/     subjectnode -&gt; vertices(of a particular type)
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| time_interval | [TimeInterval](#TRP.TimeInterval) | required | covers this window |
+| vertex_groups | [VertexGroupT](#TRP.VertexGroupT) | repeated | vertices grouped by type |
+
+
 <a name="TRP.ErrorResponse"/>
 ### ErrorResponse
 ErrorResponse
@@ -498,6 +516,29 @@ FileResponse
 | content | [bytes](#bytes) | optional | file chunk content |
 | request_params | [string](#string) | optional |  |
 | context_name | [string](#string) | optional |  |
+
+
+<a name="TRP.GraphRequest"/>
+### GraphRequest
+GraphRequest
+/		given a subject node, retrive a  graph for a given time window
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| time_interval | [TimeInterval](#TRP.TimeInterval) | required | time window |
+| subject_group | [string](#string) | required | guid of subject, eg counter or alert guid |
+| subject_key | [KeyT](#TRP.KeyT) | required | key (can specify key.key, key.label, etc too |
+
+
+<a name="TRP.GraphResponse"/>
+### GraphResponse
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| subject_group | [string](#string) | required | from request |
+| subject_key | [KeyT](#TRP.KeyT) | required | from request |
+| graphs | [EdgeGraphT](#TRP.EdgeGraphT) | repeated | graphs - an EdgeGraphT message |
 
 
 <a name="TRP.GrepRequest"/>
@@ -710,6 +751,8 @@ Top level message is TRP::Message
 | async_response | [AsyncResponse](#TRP.AsyncResponse) | optional |  |
 | file_request | [FileRequest](#TRP.FileRequest) | optional |  |
 | file_response | [FileResponse](#TRP.FileResponse) | optional |  |
+| graph_request | [GraphRequest](#TRP.GraphRequest) | optional |  |
+| graph_response | [GraphResponse](#TRP.GraphResponse) | optional |  |
 | destination_node | [string](#string) | optional |  |
 | probe_id | [string](#string) | optional |  |
 | run_async | [bool](#bool) | optional | if run_async = true, then you will immediately get a AsynResponse with a token you can poll |
@@ -1306,6 +1349,17 @@ UpdatekeysRequest
 | keys | [KeyT](#TRP.KeyT) | repeated | key  : if you set both key and label, the DB label will be updated |
 
 
+<a name="TRP.VertexGroupT"/>
+### VertexGroupT
+VertexGroupT : a group of vertices 
+/
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| vertex_group | [string](#string) | required | GUID of vertices in this message |
+| vertex_keys | [KeyT](#TRP.KeyT) | repeated | list of vertices |
+
+
 
 <a name="TRP.AuthLevel"/>
 ### AuthLevel
@@ -1422,6 +1476,8 @@ Compression: Used by PCAP or other content requests
 | FILE_RESPONSE | 123 |  |
 | SUBSYSTEM_INIT | 124 |  |
 | SUBSYSTEM_EXIT | 125 |  |
+| GRAPH_REQUEST | 130 |  |
+| GRAPH_RESPONSE | 131 |  |
 
 <a name="TRP.MeterInfo.MeterType"/>
 ### MeterInfo.MeterType
@@ -1440,6 +1496,7 @@ from TrisulAPI
 | VT_AUTO | 7 | automatic (eg, min/max/avg/stddev/) |
 | VT_RUNNING_COUNTER | 8 | running counter, no delta calc |
 | VT_AVERAGE | 9 | average of samples, total/sampl uses 32bt|32bit |
+| VT_DELTA_RATE_COUNTER | 10 | link snmp running counter |
 
 <a name="TRP.PcapFormat"/>
 ### PcapFormat
