@@ -1,0 +1,5290 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <title>Protocol Documentation</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Ubuntu:400,700,400italic"/>
+    <style>
+      body {
+        width: 60em;
+        margin: 1em auto;
+        color: #222;
+        font-family: "Ubuntu", sans-serif;
+        padding-bottom: 4em;
+      }
+
+      h1 {
+        font-weight: normal;
+        border-bottom: 1px solid #aaa;
+        padding-bottom: 0.5ex;
+      }
+
+      h2 {
+        border-bottom: 1px solid #aaa;
+        padding-bottom: 0.5ex;
+        margin: 1.5em 0;
+      }
+
+      h3 {
+        font-weight: normal;
+        border-bottom: 1px solid #aaa;
+        padding-bottom: 0.5ex;
+      }
+
+      a {
+        text-decoration: none;
+        color: #567e25;
+      }
+
+      table {
+        width: 100%;
+        font-size: 80%;
+        border-collapse: collapse;
+      }
+
+      thead {
+        font-weight: 700;
+        background-color: #dcdcdc;
+      }
+
+      tbody tr:nth-child(even) {
+        background-color: #fbfbfb;
+      }
+
+      td {
+        border: 1px solid #ccc;
+        padding: 0.5ex 2ex;
+      }
+
+      td p {
+        text-indent: 1em;
+        margin: 0;
+      }
+
+      td p:nth-child(1) {
+        text-indent: 0; /* No indent on first p in td */
+      }
+
+      /* Table of fields */
+      .field-table td:nth-child(1) { /* Field */
+        width: 10em;
+      }
+      .field-table td:nth-child(2) { /* Type */
+        width: 10em;
+      }
+      .field-table td:nth-child(3) { /* Label */
+        width: 6em;
+      }
+      .field-table td:nth-child(4) { /* Description */
+        width: auto;
+      }
+
+      /* Table of extensions */
+      .extension-table td:nth-child(1) { /* Extension */
+        width: 10em;
+      }
+      .extension-table td:nth-child(2) { /* Type */
+        width: 10em;
+      }
+      .extension-table td:nth-child(3) { /* Base */
+        width: 10em;
+      }
+      .extension-table td:nth-child(4) { /* Number */
+        width: 5em;
+      }
+      .extension-table td:nth-child(5) { /* Description */
+        width: auto;
+      }
+
+      /* Table of enum values. */
+      .enum-table td:nth-child(1) { /* Name */
+        width: 10em;
+      }
+      .enum-table td:nth-child(2) { /* Number */
+        width: 10em;
+      }
+      .enum-table td:nth-child(3) { /* Description */
+        width: auto;
+      }
+
+      /* Table of scalar value types. */
+      .scalar-value-types-table tr {
+        height: 3em;
+      }
+
+      /* Table of contents. */
+      #toc-container ul {
+        list-style-type: none;
+        padding-left: 1em;
+        line-height: 180%;
+        margin: 0;
+      }
+      #toc > li > a {
+        font-weight: bold;
+      }
+
+      /* File heading div */
+      .file-heading {
+        width: 100%;
+        display: table;
+        border-bottom: 1px solid #aaa;
+        margin: 4em 0 1.5em 0;
+      }
+      .file-heading h2 {
+        border: none;
+        display: table-cell;
+      }
+      .file-heading a {
+        text-align: right;
+        display: table-cell;
+      }
+
+      /* The 'M', 'E' and 'X' badges in the ToC */
+      .badge {
+        width: 1.6em;
+        height: 1.6em;
+        display: inline-block;
+
+        line-height: 1.6em;
+        text-align: center;
+        font-weight: bold;
+        font-size: 60%;
+
+        color: #89ba48;
+        background-color: #dff0c8;
+
+        margin: 0.5ex 1em 0.5ex -1em;
+        border: 1px solid #fbfbfb;
+        border-radius: 1ex;
+      }
+    </style>
+
+    <!-- User custom CSS -->
+    <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+  </head>
+
+  <body>
+
+    <h1 id="title">Protocol Documentation</h1>
+
+    <h2>Table of Contents</h2>
+
+    <div id="toc-container">
+      <ul id="toc">
+        <li>
+          <a href="#trp.proto">trp.proto</a>
+          <ul>
+            <li>
+              <a href="#TRP.AlertT">
+                <span class="badge">M</span>
+                AlertT
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.AsyncRequest">
+                <span class="badge">M</span>
+                AsyncRequest
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.AsyncResponse">
+                <span class="badge">M</span>
+                AsyncResponse
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.ContextConfigRequest">
+                <span class="badge">M</span>
+                ContextConfigRequest
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.ContextConfigResponse">
+                <span class="badge">M</span>
+                ContextConfigResponse
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.ContextConfigResponse.Layer">
+                <span class="badge">M</span>
+                ContextConfigResponse.Layer
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.ContextCreateRequest">
+                <span class="badge">M</span>
+                ContextCreateRequest
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.ContextDeleteRequest">
+                <span class="badge">M</span>
+                ContextDeleteRequest
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.ContextInfoRequest">
+                <span class="badge">M</span>
+                ContextInfoRequest
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.ContextInfoResponse">
+                <span class="badge">M</span>
+                ContextInfoResponse
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.ContextInfoResponse.Item">
+                <span class="badge">M</span>
+                ContextInfoResponse.Item
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.ContextStartRequest">
+                <span class="badge">M</span>
+                ContextStartRequest
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.ContextStopRequest">
+                <span class="badge">M</span>
+                ContextStopRequest
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.CounterGroupInfoRequest">
+                <span class="badge">M</span>
+                CounterGroupInfoRequest
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.CounterGroupInfoResponse">
+                <span class="badge">M</span>
+                CounterGroupInfoResponse
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.CounterGroupT">
+                <span class="badge">M</span>
+                CounterGroupT
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.CounterGroupTopperRequest">
+                <span class="badge">M</span>
+                CounterGroupTopperRequest
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.CounterGroupTopperResponse">
+                <span class="badge">M</span>
+                CounterGroupTopperResponse
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.CounterItemRequest">
+                <span class="badge">M</span>
+                CounterItemRequest
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.CounterItemResponse">
+                <span class="badge">M</span>
+                CounterItemResponse
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.DeleteAlertsRequest">
+                <span class="badge">M</span>
+                DeleteAlertsRequest
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.DocumentT">
+                <span class="badge">M</span>
+                DocumentT
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.DocumentT.Flow">
+                <span class="badge">M</span>
+                DocumentT.Flow
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.DomainRequest">
+                <span class="badge">M</span>
+                DomainRequest
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.DomainResponse">
+                <span class="badge">M</span>
+                DomainResponse
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.DomainResponse.Node">
+                <span class="badge">M</span>
+                DomainResponse.Node
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.EdgeGraphT">
+                <span class="badge">M</span>
+                EdgeGraphT
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.ErrorResponse">
+                <span class="badge">M</span>
+                ErrorResponse
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.FileRequest">
+                <span class="badge">M</span>
+                FileRequest
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.FileResponse">
+                <span class="badge">M</span>
+                FileResponse
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.GraphRequest">
+                <span class="badge">M</span>
+                GraphRequest
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.GraphResponse">
+                <span class="badge">M</span>
+                GraphResponse
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.GrepRequest">
+                <span class="badge">M</span>
+                GrepRequest
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.GrepResponse">
+                <span class="badge">M</span>
+                GrepResponse
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.HelloRequest">
+                <span class="badge">M</span>
+                HelloRequest
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.HelloResponse">
+                <span class="badge">M</span>
+                HelloResponse
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.KeySpaceRequest">
+                <span class="badge">M</span>
+                KeySpaceRequest
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.KeySpaceRequest.KeySpace">
+                <span class="badge">M</span>
+                KeySpaceRequest.KeySpace
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.KeySpaceResponse">
+                <span class="badge">M</span>
+                KeySpaceResponse
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.KeyStats">
+                <span class="badge">M</span>
+                KeyStats
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.KeyT">
+                <span class="badge">M</span>
+                KeyT
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.LogRequest">
+                <span class="badge">M</span>
+                LogRequest
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.LogResponse">
+                <span class="badge">M</span>
+                LogResponse
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.Message">
+                <span class="badge">M</span>
+                Message
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.MeterInfo">
+                <span class="badge">M</span>
+                MeterInfo
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.MeterValues">
+                <span class="badge">M</span>
+                MeterValues
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.MetricsSummaryRequest">
+                <span class="badge">M</span>
+                MetricsSummaryRequest
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.MetricsSummaryResponse">
+                <span class="badge">M</span>
+                MetricsSummaryResponse
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.NameValue">
+                <span class="badge">M</span>
+                NameValue
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.NodeConfigRequest">
+                <span class="badge">M</span>
+                NodeConfigRequest
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.NodeConfigRequest.IntelFeed">
+                <span class="badge">M</span>
+                NodeConfigRequest.IntelFeed
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.NodeConfigResponse">
+                <span class="badge">M</span>
+                NodeConfigResponse
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.NodeConfigResponse.Node">
+                <span class="badge">M</span>
+                NodeConfigResponse.Node
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.OKResponse">
+                <span class="badge">M</span>
+                OKResponse
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.PcapRequest">
+                <span class="badge">M</span>
+                PcapRequest
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.PcapResponse">
+                <span class="badge">M</span>
+                PcapResponse
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.PcapSlicesRequest">
+                <span class="badge">M</span>
+                PcapSlicesRequest
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.ProbeStatsRequest">
+                <span class="badge">M</span>
+                ProbeStatsRequest
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.ProbeStatsResponse">
+                <span class="badge">M</span>
+                ProbeStatsResponse
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.QueryAlertsRequest">
+                <span class="badge">M</span>
+                QueryAlertsRequest
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.QueryAlertsResponse">
+                <span class="badge">M</span>
+                QueryAlertsResponse
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.QueryFTSRequest">
+                <span class="badge">M</span>
+                QueryFTSRequest
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.QueryFTSResponse">
+                <span class="badge">M</span>
+                QueryFTSResponse
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.QueryResourcesRequest">
+                <span class="badge">M</span>
+                QueryResourcesRequest
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.QueryResourcesResponse">
+                <span class="badge">M</span>
+                QueryResourcesResponse
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.QuerySessionsRequest">
+                <span class="badge">M</span>
+                QuerySessionsRequest
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.QuerySessionsResponse">
+                <span class="badge">M</span>
+                QuerySessionsResponse
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.ResourceT">
+                <span class="badge">M</span>
+                ResourceT
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.SearchKeysRequest">
+                <span class="badge">M</span>
+                SearchKeysRequest
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.SearchKeysResponse">
+                <span class="badge">M</span>
+                SearchKeysResponse
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.SessionT">
+                <span class="badge">M</span>
+                SessionT
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.SessionTrackerRequest">
+                <span class="badge">M</span>
+                SessionTrackerRequest
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.SessionTrackerResponse">
+                <span class="badge">M</span>
+                SessionTrackerResponse
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.StatsArray">
+                <span class="badge">M</span>
+                StatsArray
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.StatsTuple">
+                <span class="badge">M</span>
+                StatsTuple
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.SubscribeCtl">
+                <span class="badge">M</span>
+                SubscribeCtl
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.TimeInterval">
+                <span class="badge">M</span>
+                TimeInterval
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.TimeSlicesRequest">
+                <span class="badge">M</span>
+                TimeSlicesRequest
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.TimeSlicesResponse">
+                <span class="badge">M</span>
+                TimeSlicesResponse
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.TimeSlicesResponse.SliceT">
+                <span class="badge">M</span>
+                TimeSlicesResponse.SliceT
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.Timestamp">
+                <span class="badge">M</span>
+                Timestamp
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.TopperTrendRequest">
+                <span class="badge">M</span>
+                TopperTrendRequest
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.TopperTrendResponse">
+                <span class="badge">M</span>
+                TopperTrendResponse
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.UpdateKeyRequest">
+                <span class="badge">M</span>
+                UpdateKeyRequest
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.VertexGroupT">
+                <span class="badge">M</span>
+                VertexGroupT
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.AuthLevel">
+                <span class="badge">E</span>
+                AuthLevel
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.CompressionType">
+                <span class="badge">E</span>
+                CompressionType
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.DomainNodeType">
+                <span class="badge">E</span>
+                DomainNodeType
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.DomainOperation">
+                <span class="badge">E</span>
+                DomainOperation
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.Message.Command">
+                <span class="badge">E</span>
+                Message.Command
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.MeterInfo.MeterType">
+                <span class="badge">E</span>
+                MeterInfo.MeterType
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.PcapFormat">
+                <span class="badge">E</span>
+                PcapFormat
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.SubscribeCtl.CtlType">
+                <span class="badge">E</span>
+                SubscribeCtl.CtlType
+              </a>
+            </li>
+            <li>
+              <a href="#TRP.SubscribeCtl.StabberType">
+                <span class="badge">E</span>
+                SubscribeCtl.StabberType
+              </a>
+            </li>
+          </ul>
+        </li>
+        <li><a href="#scalar-value-types">Scalar Value Types</a></li>
+      </ul>
+    </div>
+
+    <div class="file-heading">
+      <h2 id="trp.proto">trp.proto</h2><a href="#title">Top</a>
+    </div>
+    <p>trp.proto - Trisul Remote Protocol .proto file
+TRP : Trisul Remote Protocol is a remote query API that allows
+clients to connect and retrieve data from Trisul Hub</p>
+    <h3 id="TRP.AlertT">AlertT</h3>
+    <p>AlertT : an alert in Trisul 
+/  all alert types Threshold Crossing, Flow Tracker, Badfellas, custom alerts use 
+/  the same object below</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>sensor_id</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p>source of alert, usually not used</p></td>
+        </tr>
+        <tr>
+          <td>time</td>
+          <td><a href="#TRP.Timestamp">Timestamp</a></td>
+          <td>required</td>
+          <td><p>timestamp</p></td>
+        </tr>
+        <tr>
+          <td>alert_id</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p>DB alert ID eg 99:8:98838</p></td>
+        </tr>
+        <tr>
+          <td>source_ip</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p>source ip</p></td>
+        </tr>
+        <tr>
+          <td>source_port</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>destination_ip</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>destination_port</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>sigid</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p>unique key representing alert type</p></td>
+        </tr>
+        <tr>
+          <td>classification</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p>classification (from IDS terminology)</p></td>
+        </tr>
+        <tr>
+          <td>priority</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p>priority 1,2,3</p></td>
+        </tr>
+        <tr>
+          <td>dispatch_time</td>
+          <td><a href="#TRP.Timestamp">Timestamp</a></td>
+          <td>optional</td>
+          <td><p>sent time</p></td>
+        </tr>
+        <tr>
+          <td>dispatch_message1</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>a free format string created by generator of alert</p></td>
+        </tr>
+        <tr>
+          <td>dispatch_message2</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>second format</p></td>
+        </tr>
+        <tr>
+          <td>occurrances</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p>number of occurranes, used by QueryAlerts for aggregation Default: 1</p></td>
+        </tr>
+        <tr>
+          <td>group_by_key</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>aggregation key</p></td>
+        </tr>
+        <tr>
+          <td>probe_id</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>probe generating this alert</p></td>
+        </tr>
+        <tr>
+          <td>alert_status</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>FIRE,CLEAR,BLOCK etc</p></td>
+        </tr>
+        <tr>
+          <td>acknowledge_flag</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p>ACK or NOT</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.AsyncRequest">AsyncRequest</h3>
+    <p>AsyncRequest - Asynchrononous query framework 
+/      response taken from original , the token</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>token</td>
+          <td><a href="#int64">int64</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>request_message</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.AsyncResponse">AsyncResponse</h3>
+    <p>AsyncResponse   - a token represnting a future response
+/  you will get an AsyncResponse  for TRP Request  if you set the run_async=true at the message level</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>token</td>
+          <td><a href="#int64">int64</a></td>
+          <td>required</td>
+          <td><p>use this token in AsyncRequest polling until you get the original Response you expected</p></td>
+        </tr>
+        <tr>
+          <td>response_message</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>response</td>
+          <td><a href="#TRP.Message">Message</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.ContextConfigRequest">ContextConfigRequest</h3>
+    <p>ContextConfigRequest - start stop status 
+/  OK or ERROR response 
+/  Status = OK if running with PID etc in message text</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>context_name</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>profile</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>params</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>push_config_blob</td>
+          <td><a href="#bytes">bytes</a></td>
+          <td>optional</td>
+          <td><p>push this ..</p></td>
+        </tr>
+        <tr>
+          <td>query_config</td>
+          <td><a href="#TRP.NameValue">NameValue</a></td>
+          <td>repeated</td>
+          <td><p>query, leave the .value field blank</p></td>
+        </tr>
+        <tr>
+          <td>set_config_values</td>
+          <td><a href="#TRP.NameValue">NameValue</a></td>
+          <td>repeated</td>
+          <td><p>push this ..  (name=value;name=value ..)</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.ContextConfigResponse">ContextConfigResponse</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>context_name</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>profile</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>params</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>what kind of config you want</p></td>
+        </tr>
+        <tr>
+          <td>pull_config_blob</td>
+          <td><a href="#bytes">bytes</a></td>
+          <td>optional</td>
+          <td><p>config</p></td>
+        </tr>
+        <tr>
+          <td>config_blob</td>
+          <td><a href="#bytes">bytes</a></td>
+          <td>optional</td>
+          <td><p>compress tar.gz ..</p></td>
+        </tr>
+        <tr>
+          <td>endpoints_flush</td>
+          <td><a href="#string">string</a></td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>endpoints_query</td>
+          <td><a href="#string">string</a></td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>endpoints_pub</td>
+          <td><a href="#string">string</a></td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>config_values</td>
+          <td><a href="#TRP.NameValue">NameValue</a></td>
+          <td>repeated</td>
+          <td><p>query, leave the .value field blank</p></td>
+        </tr>
+        <tr>
+          <td>layers</td>
+          <td><a href="#TRP.ContextConfigResponse.Layer">ContextConfigResponse.Layer</a></td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.ContextConfigResponse.Layer">ContextConfigResponse.Layer</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>layer</td>
+          <td><a href="#int64">int64</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>probe_id</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>probe_description</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.ContextCreateRequest">ContextCreateRequest</h3>
+    <p>ContextRequest  - Context methods 
+/  response Ok or Error, follow up with ContextInfo to print details 
+/</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>context_name</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>clone_from</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.ContextDeleteRequest">ContextDeleteRequest</h3>
+    <p>ContextDelete  : initialize 
+/      reset data only ..</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>context_name</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p>if not  set all context get in</p></td>
+        </tr>
+        <tr>
+          <td>reset_data</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p>reset data dont delete everything</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.ContextInfoRequest">ContextInfoRequest</h3>
+    <p>ContextInfo : one or all contexts
+/  use is_init to prime with config</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>context_name</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>if not  set all context get in</p></td>
+        </tr>
+        <tr>
+          <td>get_size_on_disk</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p>get size on disk (expensive) Default: false</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.ContextInfoResponse">ContextInfoResponse</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>items</td>
+          <td><a href="#TRP.ContextInfoResponse.Item">ContextInfoResponse.Item</a></td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.ContextInfoResponse.Item">ContextInfoResponse.Item</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>context_name</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>is_initialized</td>
+          <td><a href="#bool">bool</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>is_running</td>
+          <td><a href="#bool">bool</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>size_on_disk</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>time_interval</td>
+          <td><a href="#TRP.TimeInterval">TimeInterval</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>is_clean</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>extrainfo</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>run_history</td>
+          <td><a href="#TRP.TimeInterval">TimeInterval</a></td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>profile</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>runmode</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>node_version</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.ContextStartRequest">ContextStartRequest</h3>
+    <p>ContextStart  : run 
+/      run data only ..</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>context_name</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p>if not  set all context get in</p></td>
+        </tr>
+        <tr>
+          <td>mode</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>same as trisul cmdline run mode</p></td>
+        </tr>
+        <tr>
+          <td>background</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>pcap_path</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>run_tool</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>snort, suricata supported..</p></td>
+        </tr>
+        <tr>
+          <td>tool_ids_config</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>tool_av_config</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>cmd_in</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>maps to trisul -in</p></td>
+        </tr>
+        <tr>
+          <td>cmd_out</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>maps to trisul -out</p></td>
+        </tr>
+        <tr>
+          <td>cmd_args</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>maps to trisul -args</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.ContextStopRequest">ContextStopRequest</h3>
+    <p>ContextSttop  : kill  the context processes</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>context_name</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p>if not  set all context get in</p></td>
+        </tr>
+        <tr>
+          <td>run_tool</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>snort, suricata , trp, flushd supported..</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.CounterGroupInfoRequest">CounterGroupInfoRequest</h3>
+    <p>CounterGroupInfoRequest - retrieve information about enabled counter groups</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>counter_group</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>get_meter_info</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p> Default: false</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.CounterGroupInfoResponse">CounterGroupInfoResponse</h3>
+    <p>CounterGroupInfoResponse</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>group_details</td>
+          <td><a href="#TRP.CounterGroupT">CounterGroupT</a></td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.CounterGroupT">CounterGroupT</h3>
+    <p>CounterGroupT : Represents a counter group 
+/</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>guid</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p>guid identifying the CG</p></td>
+        </tr>
+        <tr>
+          <td>name</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p>CG name</p></td>
+        </tr>
+        <tr>
+          <td>bucket_size</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p>bucketsize for all meters in this group</p></td>
+        </tr>
+        <tr>
+          <td>time_interval</td>
+          <td><a href="#TRP.TimeInterval">TimeInterval</a></td>
+          <td>optional</td>
+          <td><p>total time interval available in DB</p></td>
+        </tr>
+        <tr>
+          <td>topper_bucket_size</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p>topper bucketsize (streaming analytics window)</p></td>
+        </tr>
+        <tr>
+          <td>meters</td>
+          <td><a href="#TRP.MeterInfo">MeterInfo</a></td>
+          <td>repeated</td>
+          <td><p>array of meter information (m0, m1, .. mn)</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.CounterGroupTopperRequest">CounterGroupTopperRequest</h3>
+    <p>CounterGroupTopperRequest  - retrieve toppers for a counter group (top-K)</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>counter_group</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p>guid of CG</p></td>
+        </tr>
+        <tr>
+          <td>meter</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p>meter; eg to get Top Hosts By Connections use cg=Hosts meter = 6(connections) Default: 0</p></td>
+        </tr>
+        <tr>
+          <td>maxitems</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p>number of top items to retreive Default: 100</p></td>
+        </tr>
+        <tr>
+          <td>time_interval</td>
+          <td><a href="#TRP.TimeInterval">TimeInterval</a></td>
+          <td>optional</td>
+          <td><p>time interval</p></td>
+        </tr>
+        <tr>
+          <td>time_instant</td>
+          <td><a href="#TRP.Timestamp">Timestamp</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>flags</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>resolve_keys</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p>retrieve labels as set in the response for each key Default: true</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.CounterGroupTopperResponse">CounterGroupTopperResponse</h3>
+    <p>CounterGroupTopperResponse</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>counter_group</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p>request cgid</p></td>
+        </tr>
+        <tr>
+          <td>meter</td>
+          <td><a href="#int64">int64</a></td>
+          <td>required</td>
+          <td><p>from request</p></td>
+        </tr>
+        <tr>
+          <td>sysgrouptotal</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p>the metric value for &quot;Others..&quot;  after Top-K</p></td>
+        </tr>
+        <tr>
+          <td>keys</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>repeated</td>
+          <td><p>topper keys, KeyT.metric contains the top-k value</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.CounterItemRequest">CounterItemRequest</h3>
+    <p>CounterItemRequest : Time series history statistics for an item</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>counter_group</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p>guid of counter group</p></td>
+        </tr>
+        <tr>
+          <td>meter</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p>optional meter, default will retrieve all (same cost)</p></td>
+        </tr>
+        <tr>
+          <td>key</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>required</td>
+          <td><p>key (can specify key.key, key.label, etc too</p></td>
+        </tr>
+        <tr>
+          <td>time_interval</td>
+          <td><a href="#TRP.TimeInterval">TimeInterval</a></td>
+          <td>required</td>
+          <td><p>Time interval for query</p></td>
+        </tr>
+        <tr>
+          <td>volumes_only</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p>if '1' ; then only retrieves totals for each meter Default: 0</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.CounterItemResponse">CounterItemResponse</h3>
+    <p>CounterItemResponse  -</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>counter_group</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p>guid of CG</p></td>
+        </tr>
+        <tr>
+          <td>key</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>required</td>
+          <td><p>key : filled up with readable,label automatically</p></td>
+        </tr>
+        <tr>
+          <td>totals</td>
+          <td><a href="#TRP.StatsArray">StatsArray</a></td>
+          <td>optional</td>
+          <td><p>if volumes_only = 1 in request, this contains totals for each metric</p></td>
+        </tr>
+        <tr>
+          <td>stats</td>
+          <td><a href="#TRP.StatsArray">StatsArray</a></td>
+          <td>repeated</td>
+          <td><p>time series stats - can use to draw charts etc</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.DeleteAlertsRequest">DeleteAlertsRequest</h3>
+    <p>DeleteAlerts
+/  - very limited exception to Trisul rule of not having delete options</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>alert_group</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>time_interval</td>
+          <td><a href="#TRP.TimeInterval">TimeInterval</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>source_ip</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>source_port</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>destination_ip</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>destination_port</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>sigid</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>classification</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>priority</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>any_ip</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>any_port</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>message_regex</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>delete using regex</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.DocumentT">DocumentT</h3>
+    <p>DocumentT : a full text document 
+/     full HTTP headers, printable TLS certs, etc</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>dockey</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p>unique id</p></td>
+        </tr>
+        <tr>
+          <td>fts_attributes</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>attibutes used for facets</p></td>
+        </tr>
+        <tr>
+          <td>fullcontent</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>full document text</p></td>
+        </tr>
+        <tr>
+          <td>flows</td>
+          <td><a href="#TRP.DocumentT.Flow">DocumentT.Flow</a></td>
+          <td>repeated</td>
+          <td><p>list of flows where this doc was seen</p></td>
+        </tr>
+        <tr>
+          <td>probe_id</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.DocumentT.Flow">DocumentT.Flow</h3>
+    <p>this document was seen at these time and on this flow</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>time</td>
+          <td><a href="#TRP.Timestamp">Timestamp</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>key</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.DomainRequest">DomainRequest</h3>
+    <p>messages to routerX backend</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>cmd</td>
+          <td><a href="#TRP.DomainOperation">DomainOperation</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>station_id</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>params</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>nodetype</td>
+          <td><a href="#TRP.DomainNodeType">DomainNodeType</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.DomainResponse">DomainResponse</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>cmd</td>
+          <td><a href="#TRP.DomainOperation">DomainOperation</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>nodes</td>
+          <td><a href="#TRP.DomainResponse.Node">DomainResponse.Node</a></td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>req_params</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>params</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>need_reconnect</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p> Default: false</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.DomainResponse.Node">DomainResponse.Node</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>id</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>nodetype</td>
+          <td><a href="#TRP.DomainNodeType">DomainNodeType</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>station_id</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>extra_info</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>register_time</td>
+          <td><a href="#TRP.Timestamp">Timestamp</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>heartbeat_time</td>
+          <td><a href="#TRP.Timestamp">Timestamp</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.EdgeGraphT">EdgeGraphT</h3>
+    <p>EdgeGraphT : a graph
+/     subjectnode -&gt; vertices(of a particular type)</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>time_interval</td>
+          <td><a href="#TRP.TimeInterval">TimeInterval</a></td>
+          <td>required</td>
+          <td><p>covers this window</p></td>
+        </tr>
+        <tr>
+          <td>vertex_groups</td>
+          <td><a href="#TRP.VertexGroupT">VertexGroupT</a></td>
+          <td>repeated</td>
+          <td><p>vertices grouped by type</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.ErrorResponse">ErrorResponse</h3>
+    <p>ErrorResponse
+/ All XYZRequest() messages can either generate a XYZResponse() or an ErrorResponse()
+/ you need to handle the error case</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>original_command</td>
+          <td><a href="#int64">int64</a></td>
+          <td>required</td>
+          <td><p>Command ID of request</p></td>
+        </tr>
+        <tr>
+          <td>error_code</td>
+          <td><a href="#int64">int64</a></td>
+          <td>required</td>
+          <td><p>numeric error code</p></td>
+        </tr>
+        <tr>
+          <td>error_message</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p>error string</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.FileRequest">FileRequest</h3>
+    <p>FileRequest   - used to download files from Trisul domain nodes like probes</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>uri</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p>uri of resource you want to download , example PcapResponse.save_file</p></td>
+        </tr>
+        <tr>
+          <td>position</td>
+          <td><a href="#int64">int64</a></td>
+          <td>required</td>
+          <td><p>seek position in that file</p></td>
+        </tr>
+        <tr>
+          <td>params</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>local meaning sentback n response</p></td>
+        </tr>
+        <tr>
+          <td>context_name</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>context name</p></td>
+        </tr>
+        <tr>
+          <td>delete_on_eof</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p> Default: false</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.FileResponse">FileResponse</h3>
+    <p>FileResponse
+/      one chunk at at time, Trisul has slightly inefficient File Transfer
+/      for very large files, since most files are data feeds  &lt; 100MB fine for now</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>uri</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p>requested URI</p></td>
+        </tr>
+        <tr>
+          <td>eof</td>
+          <td><a href="#bool">bool</a></td>
+          <td>required</td>
+          <td><p>end of all chunks</p></td>
+        </tr>
+        <tr>
+          <td>position</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p>current  position</p></td>
+        </tr>
+        <tr>
+          <td>content</td>
+          <td><a href="#bytes">bytes</a></td>
+          <td>optional</td>
+          <td><p>file chunk content</p></td>
+        </tr>
+        <tr>
+          <td>request_params</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>context_name</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.GraphRequest">GraphRequest</h3>
+    <p>GraphRequest
+/		given a subject node, retrive a  graph for a given time window</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>time_interval</td>
+          <td><a href="#TRP.TimeInterval">TimeInterval</a></td>
+          <td>required</td>
+          <td><p>time window</p></td>
+        </tr>
+        <tr>
+          <td>subject_group</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p>guid of subject, eg counter or alert guid</p></td>
+        </tr>
+        <tr>
+          <td>subject_key</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>required</td>
+          <td><p>key (can specify key.key, key.label, etc too</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.GraphResponse">GraphResponse</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>subject_group</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p>from request</p></td>
+        </tr>
+        <tr>
+          <td>subject_key</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>required</td>
+          <td><p>from request</p></td>
+        </tr>
+        <tr>
+          <td>graphs</td>
+          <td><a href="#TRP.EdgeGraphT">EdgeGraphT</a></td>
+          <td>repeated</td>
+          <td><p>graphs - an EdgeGraphT message</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.GrepRequest">GrepRequest</h3>
+    <p>GrepRequest - reconstruct and search for patterns in saved packets</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>context_name</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>time_interval</td>
+          <td><a href="#TRP.TimeInterval">TimeInterval</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>maxitems</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p> Default: 100</p></td>
+        </tr>
+        <tr>
+          <td>flowcutoff_bytes</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>pattern_hex</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>hex patttern</p></td>
+        </tr>
+        <tr>
+          <td>pattern_text</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>plain text</p></td>
+        </tr>
+        <tr>
+          <td>pattern_file</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>a file - must be available at probe</p></td>
+        </tr>
+        <tr>
+          <td>md5list</td>
+          <td><a href="#string">string</a></td>
+          <td>repeated</td>
+          <td><p>a list of MD5 matching the content</p></td>
+        </tr>
+        <tr>
+          <td>resolve_keys</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p> Default: true</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.GrepResponse">GrepResponse</h3>
+    <p>GrepResponse</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>context_name</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>sessions</td>
+          <td><a href="#TRP.SessionT">SessionT</a></td>
+          <td>repeated</td>
+          <td><p>sessionT with keys containing the content</p></td>
+        </tr>
+        <tr>
+          <td>hints</td>
+          <td><a href="#string">string</a></td>
+          <td>repeated</td>
+          <td><p>some surrounding context for the match</p></td>
+        </tr>
+        <tr>
+          <td>probe_id</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.HelloRequest">HelloRequest</h3>
+    <p>Hello Request : use to check connectivity</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>station_id</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p>an id of the query client trying to connect</p></td>
+        </tr>
+        <tr>
+          <td>message</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>a message (will be echoed back in response)</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.HelloResponse">HelloResponse</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>station_id</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p>station id of the query server</p></td>
+        </tr>
+        <tr>
+          <td>station_id_request</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>station id found in the request</p></td>
+        </tr>
+        <tr>
+          <td>message</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>message found in the request</p></td>
+        </tr>
+        <tr>
+          <td>local_timestamp</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p>local timestamp at server, used to detect drifts</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.KeySpaceRequest">KeySpaceRequest</h3>
+    <p>KeySpaceRequest - search hits in Key Space 
+/ for example you can search the key space 10.0.0.0 to 11.0.0.0 to get all IP 
+/ seen in that range</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>counter_group</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>time_interval</td>
+          <td><a href="#TRP.TimeInterval">TimeInterval</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>maxitems</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p> Default: 100</p></td>
+        </tr>
+        <tr>
+          <td>spaces</td>
+          <td><a href="#TRP.KeySpaceRequest.KeySpace">KeySpaceRequest.KeySpace</a></td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>resolve_keys</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p> Default: true</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.KeySpaceRequest.KeySpace">KeySpaceRequest.KeySpace</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>from_key</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>required</td>
+          <td><p>from key representing start of keyspace</p></td>
+        </tr>
+        <tr>
+          <td>to_key</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>required</td>
+          <td><p>end of key space</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.KeySpaceResponse">KeySpaceResponse</h3>
+    <p>KeySpaceResponse</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>counter_group</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>hits</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>repeated</td>
+          <td><p>array of keys in the requested space</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.KeyStats">KeyStats</h3>
+    <p>KeyStats - A full time series item (countergroup, key, timeseries) 
+/</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>counter_group</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p>guid of counter group</p></td>
+        </tr>
+        <tr>
+          <td>key</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>required</td>
+          <td><p>key representing an item</p></td>
+        </tr>
+        <tr>
+          <td>meters</td>
+          <td><a href="#TRP.MeterValues">MeterValues</a></td>
+          <td>repeated</td>
+          <td><p>array of timeseries (timeseries-meter0, ts-meter1, ...ts-meter-n)</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.KeyT">KeyT</h3>
+    <p>KeyT : Represents a Key 
+/ Top level objects are named ObjT 
+/   eg KeyT - Key Type, SessionT - Session Type etc.</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>key</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>key in trisul key format eg, C0.A8.01.02 for 192.168.1.2</p></td>
+        </tr>
+        <tr>
+          <td>readable</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>human friendly name</p></td>
+        </tr>
+        <tr>
+          <td>label</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>a user label eg, a hostname or manually assigned name</p></td>
+        </tr>
+        <tr>
+          <td>description</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>description</p></td>
+        </tr>
+        <tr>
+          <td>metric</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p>optional : a single metric value - relevant to the query used</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.LogRequest">LogRequest</h3>
+    <p>LogRequest  - get log file  from a domain node</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>context_name</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>log_type</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>regex_filter</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>maxlines</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p> Default: 1000</p></td>
+        </tr>
+        <tr>
+          <td>continue_logfilename</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>continue_seekpos</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>latest_run_only</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p> Default: false</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.LogResponse">LogResponse</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>context_name</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>logfilename</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>seekpos</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>log_lines</td>
+          <td><a href="#string">string</a></td>
+          <td>repeated</td>
+          <td><p>compressed gz</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.Message">Message</h3>
+    <p>Top level message is TRP::Message
+/ wraps the actual request or response 
+/ 
+/ You must set trp.command = &lt;cmd&gt; for EACH request in addition to 
+/ constructing the actual TRP request message 
+/</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>trp_command</td>
+          <td><a href="#TRP.Message.Command">Message.Command</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>hello_request</td>
+          <td><a href="#TRP.HelloRequest">HelloRequest</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>hello_response</td>
+          <td><a href="#TRP.HelloResponse">HelloResponse</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>ok_response</td>
+          <td><a href="#TRP.OKResponse">OKResponse</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>error_response</td>
+          <td><a href="#TRP.ErrorResponse">ErrorResponse</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>counter_group_topper_request</td>
+          <td><a href="#TRP.CounterGroupTopperRequest">CounterGroupTopperRequest</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>counter_group_topper_response</td>
+          <td><a href="#TRP.CounterGroupTopperResponse">CounterGroupTopperResponse</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>counter_item_request</td>
+          <td><a href="#TRP.CounterItemRequest">CounterItemRequest</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>counter_item_response</td>
+          <td><a href="#TRP.CounterItemResponse">CounterItemResponse</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>pcap_request</td>
+          <td><a href="#TRP.PcapRequest">PcapRequest</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>pcap_response</td>
+          <td><a href="#TRP.PcapResponse">PcapResponse</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>search_keys_request</td>
+          <td><a href="#TRP.SearchKeysRequest">SearchKeysRequest</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>search_keys_response</td>
+          <td><a href="#TRP.SearchKeysResponse">SearchKeysResponse</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>counter_group_info_request</td>
+          <td><a href="#TRP.CounterGroupInfoRequest">CounterGroupInfoRequest</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>counter_group_info_response</td>
+          <td><a href="#TRP.CounterGroupInfoResponse">CounterGroupInfoResponse</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>update_key_request</td>
+          <td><a href="#TRP.UpdateKeyRequest">UpdateKeyRequest</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>query_sessions_request</td>
+          <td><a href="#TRP.QuerySessionsRequest">QuerySessionsRequest</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>query_sessions_response</td>
+          <td><a href="#TRP.QuerySessionsResponse">QuerySessionsResponse</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>session_tracker_request</td>
+          <td><a href="#TRP.SessionTrackerRequest">SessionTrackerRequest</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>session_tracker_response</td>
+          <td><a href="#TRP.SessionTrackerResponse">SessionTrackerResponse</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>probe_stats_request</td>
+          <td><a href="#TRP.ProbeStatsRequest">ProbeStatsRequest</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>probe_stats_response</td>
+          <td><a href="#TRP.ProbeStatsResponse">ProbeStatsResponse</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>query_alerts_request</td>
+          <td><a href="#TRP.QueryAlertsRequest">QueryAlertsRequest</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>query_alerts_response</td>
+          <td><a href="#TRP.QueryAlertsResponse">QueryAlertsResponse</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>query_resources_request</td>
+          <td><a href="#TRP.QueryResourcesRequest">QueryResourcesRequest</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>query_resources_response</td>
+          <td><a href="#TRP.QueryResourcesResponse">QueryResourcesResponse</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>grep_request</td>
+          <td><a href="#TRP.GrepRequest">GrepRequest</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>grep_response</td>
+          <td><a href="#TRP.GrepResponse">GrepResponse</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>topper_trend_request</td>
+          <td><a href="#TRP.TopperTrendRequest">TopperTrendRequest</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>topper_trend_response</td>
+          <td><a href="#TRP.TopperTrendResponse">TopperTrendResponse</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>subscribe_ctl</td>
+          <td><a href="#TRP.SubscribeCtl">SubscribeCtl</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>query_fts_request</td>
+          <td><a href="#TRP.QueryFTSRequest">QueryFTSRequest</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>query_fts_response</td>
+          <td><a href="#TRP.QueryFTSResponse">QueryFTSResponse</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>time_slices_request</td>
+          <td><a href="#TRP.TimeSlicesRequest">TimeSlicesRequest</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>time_slices_response</td>
+          <td><a href="#TRP.TimeSlicesResponse">TimeSlicesResponse</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>delete_alerts_request</td>
+          <td><a href="#TRP.DeleteAlertsRequest">DeleteAlertsRequest</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>metrics_summary_request</td>
+          <td><a href="#TRP.MetricsSummaryRequest">MetricsSummaryRequest</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>metrics_summary_response</td>
+          <td><a href="#TRP.MetricsSummaryResponse">MetricsSummaryResponse</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>key_space_request</td>
+          <td><a href="#TRP.KeySpaceRequest">KeySpaceRequest</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>key_space_response</td>
+          <td><a href="#TRP.KeySpaceResponse">KeySpaceResponse</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>pcap_slices_request</td>
+          <td><a href="#TRP.PcapSlicesRequest">PcapSlicesRequest</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>log_request</td>
+          <td><a href="#TRP.LogRequest">LogRequest</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>log_response</td>
+          <td><a href="#TRP.LogResponse">LogResponse</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>context_create_request</td>
+          <td><a href="#TRP.ContextCreateRequest">ContextCreateRequest</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>context_delete_request</td>
+          <td><a href="#TRP.ContextDeleteRequest">ContextDeleteRequest</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>context_start_request</td>
+          <td><a href="#TRP.ContextStartRequest">ContextStartRequest</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>context_stop_request</td>
+          <td><a href="#TRP.ContextStopRequest">ContextStopRequest</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>context_config_request</td>
+          <td><a href="#TRP.ContextConfigRequest">ContextConfigRequest</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>context_config_response</td>
+          <td><a href="#TRP.ContextConfigResponse">ContextConfigResponse</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>context_info_request</td>
+          <td><a href="#TRP.ContextInfoRequest">ContextInfoRequest</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>context_info_response</td>
+          <td><a href="#TRP.ContextInfoResponse">ContextInfoResponse</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>domain_request</td>
+          <td><a href="#TRP.DomainRequest">DomainRequest</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>domain_response</td>
+          <td><a href="#TRP.DomainResponse">DomainResponse</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>node_config_request</td>
+          <td><a href="#TRP.NodeConfigRequest">NodeConfigRequest</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>node_config_response</td>
+          <td><a href="#TRP.NodeConfigResponse">NodeConfigResponse</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>async_request</td>
+          <td><a href="#TRP.AsyncRequest">AsyncRequest</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>async_response</td>
+          <td><a href="#TRP.AsyncResponse">AsyncResponse</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>file_request</td>
+          <td><a href="#TRP.FileRequest">FileRequest</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>file_response</td>
+          <td><a href="#TRP.FileResponse">FileResponse</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>graph_request</td>
+          <td><a href="#TRP.GraphRequest">GraphRequest</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>graph_response</td>
+          <td><a href="#TRP.GraphResponse">GraphResponse</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>destination_node</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>probe_id</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>run_async</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p>if run_async = true, then you will immediately get a AsynResponse with a token you can poll</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.MeterInfo">MeterInfo</h3>
+    <p>MeterType : information about a particular meter
+/</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>id</td>
+          <td><a href="#int32">int32</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>type</td>
+          <td><a href="#TRP.MeterInfo.MeterType">MeterInfo.MeterType</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>topcount</td>
+          <td><a href="#int32">int32</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>name</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>description</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>units</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.MeterValues">MeterValues</h3>
+    <p>MeterValues : a timeseries  (meter_id, stat1, stat2, ... statn) 
+/     this is rarely used because StatsArray is available .</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>meter</td>
+          <td><a href="#int32">int32</a></td>
+          <td>required</td>
+          <td><p>metric id , eg Hosts:TotalConnections</p></td>
+        </tr>
+        <tr>
+          <td>values</td>
+          <td><a href="#TRP.StatsTuple">StatsTuple</a></td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>total</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p>total of all metric values</p></td>
+        </tr>
+        <tr>
+          <td>seconds</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p>total number of seconds in time series</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.MetricsSummaryRequest">MetricsSummaryRequest</h3>
+    <p>MetricsSummaryRequest - used to retrieve DB stats</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>time_interval</td>
+          <td><a href="#TRP.TimeInterval">TimeInterval</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>metric_name</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>totals_only</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p> Default: true</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.MetricsSummaryResponse">MetricsSummaryResponse</h3>
+    <p>MetricsSummaryResponse</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>metric_name</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>vals</td>
+          <td><a href="#TRP.StatsTuple">StatsTuple</a></td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.NameValue">NameValue</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>name</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>value</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.NodeConfigRequest">NodeConfigRequest</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>message</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>add_feed</td>
+          <td><a href="#TRP.NodeConfigRequest.IntelFeed">NodeConfigRequest.IntelFeed</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>process_new_feed</td>
+          <td><a href="#TRP.NodeConfigRequest.IntelFeed">NodeConfigRequest.IntelFeed</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>get_all_nodes</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p> Default: true</p></td>
+        </tr>
+        <tr>
+          <td>query_config</td>
+          <td><a href="#TRP.NameValue">NameValue</a></td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.NodeConfigRequest.IntelFeed">NodeConfigRequest.IntelFeed</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>guid</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p>identifying feed group (eg Geo, Badfellas)</p></td>
+        </tr>
+        <tr>
+          <td>name</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>name</p></td>
+        </tr>
+        <tr>
+          <td>download_rules</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>xml file with feed update instructions</p></td>
+        </tr>
+        <tr>
+          <td>uri</td>
+          <td><a href="#string">string</a></td>
+          <td>repeated</td>
+          <td><p>individual files in config//.. for FileRequest download</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.NodeConfigResponse">NodeConfigResponse</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>domains</td>
+          <td><a href="#TRP.NodeConfigResponse.Node">NodeConfigResponse.Node</a></td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>hubs</td>
+          <td><a href="#TRP.NodeConfigResponse.Node">NodeConfigResponse.Node</a></td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>probes</td>
+          <td><a href="#TRP.NodeConfigResponse.Node">NodeConfigResponse.Node</a></td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>feeds</td>
+          <td><a href="#string">string</a></td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>config_values</td>
+          <td><a href="#TRP.NameValue">NameValue</a></td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.NodeConfigResponse.Node">NodeConfigResponse.Node</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>id</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>nodetype</td>
+          <td><a href="#TRP.DomainNodeType">DomainNodeType</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>description</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>public_key</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.OKResponse">OKResponse</h3>
+    <p>OKResponse
+/ many messages return an OKResponse indicating success of operation</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>original_command</td>
+          <td><a href="#int64">int64</a></td>
+          <td>required</td>
+          <td><p>command id of request</p></td>
+        </tr>
+        <tr>
+          <td>message</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>success message</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.PcapRequest">PcapRequest</h3>
+    <p>PcapRequest - retrieve a PCAP
+/ Sent directly to each probe rather than to the DB query HUB   
+/
+/ the flow is PCAP Request for a file -&gt; put a file on the probe &gt; return a token
+/    &gt; use that token in FileRequest to download the file from the probe 
+/
+/ see app notes and examples
+/
+/  NOTE - only one of the various filters are supported
+/  sending &gt; 1 will result in error 
+/  
+/ Modes
+/  1.  nothing set =&gt; PCAP file in contents
+/  2.  save_file_prefix set =&gt;  file download token
+/  3.  merge_pcap_files =&gt; file download token 
+/ 
+/</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>context_name</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>max_bytes</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p> Default: 100000000</p></td>
+        </tr>
+        <tr>
+          <td>compress_type</td>
+          <td><a href="#TRP.CompressionType">CompressionType</a></td>
+          <td>optional</td>
+          <td><p> Default: UNCOMPRESSED</p></td>
+        </tr>
+        <tr>
+          <td>time_interval</td>
+          <td><a href="#TRP.TimeInterval">TimeInterval</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>save_file_prefix</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>filter_expression</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>PCAP filter expression in Trisul Filter format</p></td>
+        </tr>
+        <tr>
+          <td>merge_pcap_files</td>
+          <td><a href="#string">string</a></td>
+          <td>repeated</td>
+          <td><p>list of PCAP files on probe that you need to merge</p></td>
+        </tr>
+        <tr>
+          <td>delete_after_merge</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p> Default: true</p></td>
+        </tr>
+        <tr>
+          <td>format</td>
+          <td><a href="#TRP.PcapFormat">PcapFormat</a></td>
+          <td>optional</td>
+          <td><p> Default: LIBPCAP</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.PcapResponse">PcapResponse</h3>
+    <p>Pcap Response - for small files (&lt;1MB) contents directly contain the PCAP 
+/   for larger files, save_file contains a download token for use by FileRequest</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>context_name</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>format</td>
+          <td><a href="#TRP.PcapFormat">PcapFormat</a></td>
+          <td>optional</td>
+          <td><p> Default: LIBPCAP</p></td>
+        </tr>
+        <tr>
+          <td>compress_type</td>
+          <td><a href="#TRP.CompressionType">CompressionType</a></td>
+          <td>optional</td>
+          <td><p> Default: UNCOMPRESSED</p></td>
+        </tr>
+        <tr>
+          <td>time_interval</td>
+          <td><a href="#TRP.TimeInterval">TimeInterval</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>num_bytes</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>sha1</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>contents</td>
+          <td><a href="#bytes">bytes</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>save_file</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.PcapSlicesRequest">PcapSlicesRequest</h3>
+    <p>.. response = TimeSlicesResponse
+/ get the PCAP METASLICE based info</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>context_name</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>get_total_window</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p> Default: false</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.ProbeStatsRequest">ProbeStatsRequest</h3>
+    <p>ProbeStatsRequest - DOMAIN 
+/ retrieve statistics about probe cpu, mem, etc</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>context_name</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>param</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.ProbeStatsResponse">ProbeStatsResponse</h3>
+    <p>ProbeStatsResponse</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>context_name</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>instance_name</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>connections</td>
+          <td><a href="#int64">int64</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>uptime_seconds</td>
+          <td><a href="#int64">int64</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>cpu_usage_percent_trisul</td>
+          <td><a href="#double">double</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>cpu_usage_percent_total</td>
+          <td><a href="#double">double</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>mem_usage_trisul</td>
+          <td><a href="#double">double</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>mem_usage_total</td>
+          <td><a href="#double">double</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>mem_total</td>
+          <td><a href="#double">double</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>drop_percent_cap</td>
+          <td><a href="#double">double</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>drop_percent_trisul</td>
+          <td><a href="#double">double</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>proc_bytes</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>proc_packets</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>offline_pcap_file</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>is_running</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.QueryAlertsRequest">QueryAlertsRequest</h3>
+    <p>QueryAlertsRequest - query alerts in system, can group_by (aggregate) any one field 
+/ multiple query fields are treated as AND</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>alert_group</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>time_interval</td>
+          <td><a href="#TRP.TimeInterval">TimeInterval</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>maxitems</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p> Default: 100</p></td>
+        </tr>
+        <tr>
+          <td>source_ip</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>source_port</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>destination_ip</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>destination_port</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>sigid</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>classification</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>priority</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>aux_message1</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>matches dispatchmessage1 in AlertT</p></td>
+        </tr>
+        <tr>
+          <td>aux_message2</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>matches dispatchmessage2 in AlertT</p></td>
+        </tr>
+        <tr>
+          <td>group_by_fieldname</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>can group by any field - group by 'sigid' will group results by sigid</p></td>
+        </tr>
+        <tr>
+          <td>idlist</td>
+          <td><a href="#string">string</a></td>
+          <td>repeated</td>
+          <td><p>list of alert ids</p></td>
+        </tr>
+        <tr>
+          <td>resolve_keys</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p> Default: true</p></td>
+        </tr>
+        <tr>
+          <td>any_ip</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p>search by any_ip (source_dest)</p></td>
+        </tr>
+        <tr>
+          <td>any_port</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p>search by any_port (source_dest)</p></td>
+        </tr>
+        <tr>
+          <td>ip_pair</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>repeated</td>
+          <td><p>array of 2 ips</p></td>
+        </tr>
+        <tr>
+          <td>message_regex</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>searech via regex of the dispatch message</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.QueryAlertsResponse">QueryAlertsResponse</h3>
+    <p>QueryAlertsResponse - response 
+/ if you used group_by_fieldname then AlertT.occurrances would contain the count</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>alert_group</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>alerts</td>
+          <td><a href="#TRP.AlertT">AlertT</a></td>
+          <td>repeated</td>
+          <td><p>array of matching alerts</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.QueryFTSRequest">QueryFTSRequest</h3>
+    <p>FTS
+/  query to return docs, docids, and flows based on keyword search
+/</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>time_interval</td>
+          <td><a href="#TRP.TimeInterval">TimeInterval</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>fts_group</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>keywords</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>maxitems</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p> Default: 100</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.QueryFTSResponse">QueryFTSResponse</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>fts_group</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>documents</td>
+          <td><a href="#TRP.DocumentT">DocumentT</a></td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.QueryResourcesRequest">QueryResourcesRequest</h3>
+    <p>QueryResourcesRequest - resource queries</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>resource_group</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>time_interval</td>
+          <td><a href="#TRP.TimeInterval">TimeInterval</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>maxitems</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p> Default: 100</p></td>
+        </tr>
+        <tr>
+          <td>source_ip</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>source_port</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>destination_ip</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>destination_port</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>uri_pattern</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>userlabel_pattern</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>regex_uri</td>
+          <td><a href="#string">string</a></td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>idlist</td>
+          <td><a href="#string">string</a></td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>resolve_keys</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p> Default: true</p></td>
+        </tr>
+        <tr>
+          <td>any_port</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>any_ip</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>ip_pair</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.QueryResourcesResponse">QueryResourcesResponse</h3>
+    <p>QueryResourceResponse</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>resource_group</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>resources</td>
+          <td><a href="#TRP.ResourceT">ResourceT</a></td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.QuerySessionsRequest">QuerySessionsRequest</h3>
+    <p>QuerySessions - Query flows 
+/   fields filled are treated as AND criteria 
+/   See SessionT for description of common query fields</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>session_group</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p> Default: &quot;{99A78737-4B41-4387-8F31-8077DB917336}&quot;</p></td>
+        </tr>
+        <tr>
+          <td>time_interval</td>
+          <td><a href="#TRP.TimeInterval">TimeInterval</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>key</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>source_ip</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>source_port</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>dest_ip</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>dest_port</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>any_ip</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p>source or dest match</p></td>
+        </tr>
+        <tr>
+          <td>any_port</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p>source or dest match</p></td>
+        </tr>
+        <tr>
+          <td>ip_pair</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>repeated</td>
+          <td><p>array of 2 ips</p></td>
+        </tr>
+        <tr>
+          <td>protocol</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>flowtag</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>string flow tagger text</p></td>
+        </tr>
+        <tr>
+          <td>nf_routerid</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>nf_ifindex_in</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>nf_ifindex_out</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>subnet_24</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>ip /24 subnet  matching</p></td>
+        </tr>
+        <tr>
+          <td>subnet_16</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>ip /16 subnet</p></td>
+        </tr>
+        <tr>
+          <td>maxitems</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p>maximum number of matching flows to retrieve Default: 100</p></td>
+        </tr>
+        <tr>
+          <td>volume_filter</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p>only retrieve flows &gt; this many bytes (a+z) Default: 0</p></td>
+        </tr>
+        <tr>
+          <td>resolve_keys</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p> Default: true</p></td>
+        </tr>
+        <tr>
+          <td>outputpath</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>write results to a file (CSV) on trisul-hub (for very large dumps)</p></td>
+        </tr>
+        <tr>
+          <td>idlist</td>
+          <td><a href="#string">string</a></td>
+          <td>repeated</td>
+          <td><p>array of flow ids , usually from SessionTracker response</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.QuerySessionsResponse">QuerySessionsResponse</h3>
+    <p>QuerySessionsResponse 
+/  a list of matching flows</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>session_group</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>sessions</td>
+          <td><a href="#TRP.SessionT">SessionT</a></td>
+          <td>repeated</td>
+          <td><p>matching flows SessionT objects</p></td>
+        </tr>
+        <tr>
+          <td>outputpath</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>if 'outputpath' set in request, the sessions are here (in CSV format)</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.ResourceT">ResourceT</h3>
+    <p>ResourceT : represents a &quot;resource&quot; object 
+/ examples DNS records, HTTP URLs, TLS Certificates, extracted file hashes, etc</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>time</td>
+          <td><a href="#TRP.Timestamp">Timestamp</a></td>
+          <td>required</td>
+          <td><p>time resource was seen</p></td>
+        </tr>
+        <tr>
+          <td>resource_id</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p>DB id format = 988:0:8388383</p></td>
+        </tr>
+        <tr>
+          <td>source_ip</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>source_port</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>destination_ip</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>destination_port</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>uri</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>raw resource - uniform resource id ,dns names, http url, etc</p></td>
+        </tr>
+        <tr>
+          <td>userlabel</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>additional data</p></td>
+        </tr>
+        <tr>
+          <td>probe_id</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>which probe detected this</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.SearchKeysRequest">SearchKeysRequest</h3>
+    <p>SearchkeysRequest - search for keys</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>counter_group</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>maxitems</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p> Default: 100</p></td>
+        </tr>
+        <tr>
+          <td>pattern</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>label</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>keys</td>
+          <td><a href="#string">string</a></td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>offset</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p> Default: 0</p></td>
+        </tr>
+        <tr>
+          <td>get_totals</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p> Default: false</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.SearchKeysResponse">SearchKeysResponse</h3>
+    <p>SearchKeysResponse</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>counter_group</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>keys</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>total_count</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.SessionT">SessionT</h3>
+    <p>SessionT : an IP flow 
+/</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>session_key</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>Trisul format eg 06A:C0.A8.01.02:p-0B94_D1.D8.F9.3A:p-0016</p></td>
+        </tr>
+        <tr>
+          <td>session_id</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p>SID once stored in DB 883:3:883488</p></td>
+        </tr>
+        <tr>
+          <td>user_label</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>any label assigned by user</p></td>
+        </tr>
+        <tr>
+          <td>time_interval</td>
+          <td><a href="#TRP.TimeInterval">TimeInterval</a></td>
+          <td>required</td>
+          <td><p>start and end time of flow</p></td>
+        </tr>
+        <tr>
+          <td>state</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p>flow state (see docs)</p></td>
+        </tr>
+        <tr>
+          <td>az_bytes</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p>bytes in A&gt;Z direction, see KeyA&gt;KeyZ</p></td>
+        </tr>
+        <tr>
+          <td>za_bytes</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p>bytes in  Z&gt;A direction</p></td>
+        </tr>
+        <tr>
+          <td>az_packets</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p>pkts in A&gt;Z direction</p></td>
+        </tr>
+        <tr>
+          <td>za_packets</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p>pkts in Z&gt;A direction</p></td>
+        </tr>
+        <tr>
+          <td>key1A</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>required</td>
+          <td><p>basically IP A End</p></td>
+        </tr>
+        <tr>
+          <td>key2A</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>required</td>
+          <td><p>Port Z End (can be a string like ICMP00, GRE00, for non TCP/UDP)</p></td>
+        </tr>
+        <tr>
+          <td>key1Z</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>required</td>
+          <td><p>IP Z end</p></td>
+        </tr>
+        <tr>
+          <td>key2Z</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>required</td>
+          <td><p>Port Z End</p></td>
+        </tr>
+        <tr>
+          <td>protocol</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>required</td>
+          <td><p>IP Protocol</p></td>
+        </tr>
+        <tr>
+          <td>nf_routerid</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p>Netflow only : Router ID</p></td>
+        </tr>
+        <tr>
+          <td>nf_ifindex_in</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p>Netflow only : Interface Index</p></td>
+        </tr>
+        <tr>
+          <td>nf_ifindex_out</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>optional</td>
+          <td><p>Netflow only : Interface Index</p></td>
+        </tr>
+        <tr>
+          <td>tags</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>tags assigned using flow taggers</p></td>
+        </tr>
+        <tr>
+          <td>az_payload</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p>AZ payload - actual content transferred</p></td>
+        </tr>
+        <tr>
+          <td>za_payload</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p>ZA payload</p></td>
+        </tr>
+        <tr>
+          <td>setup_rtt</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p>Round Trip Time for setup : Must have TCPReassmbly enabled on Probe</p></td>
+        </tr>
+        <tr>
+          <td>retransmissions</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p>Retransmissiosn total</p></td>
+        </tr>
+        <tr>
+          <td>tracker_statval</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p>Metric for flow trackers</p></td>
+        </tr>
+        <tr>
+          <td>probe_id</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p>Probe ID generating this flow</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.SessionTrackerRequest">SessionTrackerRequest</h3>
+    <p>SessionTrackerRequest  - query session trackers 
+/     session trackers are top-k streaming algorithm for network flows 
+/     They are Top Sessions fulfilling a particular preset criterion</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>session_group</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p> Default: &quot;{99A78737-4B41-4387-8F31-8077DB917336}&quot;</p></td>
+        </tr>
+        <tr>
+          <td>tracker_id</td>
+          <td><a href="#int64">int64</a></td>
+          <td>required</td>
+          <td><p>session tracker id Default: 1</p></td>
+        </tr>
+        <tr>
+          <td>maxitems</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p> Default: 100</p></td>
+        </tr>
+        <tr>
+          <td>time_interval</td>
+          <td><a href="#TRP.TimeInterval">TimeInterval</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>resolve_keys</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p> Default: true</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.SessionTrackerResponse">SessionTrackerResponse</h3>
+    <p>SessionTrackerResponse - results of tracker
+/  returns a list of SessionT  for the matching sessions. 
+/  Note: the returned list of SessionT only contains keys (in key format) and the 
+/  tracker_statval reprsenting the tracker metric. You need to send further QuerySession
+/  request with the session_key to retrive the fullflow</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>session_group</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>sessions</td>
+          <td><a href="#TRP.SessionT">SessionT</a></td>
+          <td>repeated</td>
+          <td><p>contains session_key and tracker_statval</p></td>
+        </tr>
+        <tr>
+          <td>tracker_id</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.StatsArray">StatsArray</h3>
+    <p>StatsArray : multiple timeseries values (t, v1, v2, v3...vn) 
+/    notice we use ts_tv_sec. Most Trisul data have 1 sec resolution.</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>ts_tv_sec</td>
+          <td><a href="#int64">int64</a></td>
+          <td>required</td>
+          <td><p>tv.tv_sec</p></td>
+        </tr>
+        <tr>
+          <td>values</td>
+          <td><a href="#int64">int64</a></td>
+          <td>repeated</td>
+          <td><p>array of values</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.StatsTuple">StatsTuple</h3>
+    <p>StatsTuple : a single timeseries vaue (t,v)</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>ts</td>
+          <td><a href="#TRP.Timestamp">Timestamp</a></td>
+          <td>required</td>
+          <td><p>ts</p></td>
+        </tr>
+        <tr>
+          <td>val</td>
+          <td><a href="#int64">int64</a></td>
+          <td>required</td>
+          <td><p>value metric</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.SubscribeCtl">SubscribeCtl</h3>
+    <p>Subscribe - add a subcription to the Real Time channel</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>context_name</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>ctl</td>
+          <td><a href="#TRP.SubscribeCtl.CtlType">SubscribeCtl.CtlType</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>type</td>
+          <td><a href="#TRP.SubscribeCtl.StabberType">SubscribeCtl.StabberType</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>guid</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>key</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>meterid</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.TimeInterval">TimeInterval</h3>
+    <p>TimeInterval from and to</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>from</td>
+          <td><a href="#TRP.Timestamp">Timestamp</a></td>
+          <td>required</td>
+          <td><p>start time</p></td>
+        </tr>
+        <tr>
+          <td>to</td>
+          <td><a href="#TRP.Timestamp">Timestamp</a></td>
+          <td>required</td>
+          <td><p>end  time</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.TimeSlicesRequest">TimeSlicesRequest</h3>
+    <p>Timeslices - retrieves the backend timeslice details 
+/
+/ get the METERS METASLICE info 
+/ .. response = TimeSlicesResponse</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>get_disk_usage</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p> Default: false</p></td>
+        </tr>
+        <tr>
+          <td>get_all_engines</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p> Default: false</p></td>
+        </tr>
+        <tr>
+          <td>get_total_window</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p> Default: false</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.TimeSlicesResponse">TimeSlicesResponse</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>slices</td>
+          <td><a href="#TRP.TimeSlicesResponse.SliceT">TimeSlicesResponse.SliceT</a></td>
+          <td>repeated</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>total_window</td>
+          <td><a href="#TRP.TimeInterval">TimeInterval</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>context_name</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.TimeSlicesResponse.SliceT">TimeSlicesResponse.SliceT</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>time_interval</td>
+          <td><a href="#TRP.TimeInterval">TimeInterval</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>name</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>status</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>disk_size</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>path</td>
+          <td><a href="#string">string</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>available</td>
+          <td><a href="#bool">bool</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.Timestamp">Timestamp</h3>
+    <p></p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>tv_sec</td>
+          <td><a href="#int64">int64</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>tv_usec</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p> Default: 0</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.TopperTrendRequest">TopperTrendRequest</h3>
+    <p>TopperTrendRequest - raw top-K at each topper snapshot interval
+/ can use this to see &quot;Top apps over 1 Week&quot;</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>counter_group</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>meter</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p> Default: 0</p></td>
+        </tr>
+        <tr>
+          <td>maxitems</td>
+          <td><a href="#int64">int64</a></td>
+          <td>optional</td>
+          <td><p> Default: 100</p></td>
+        </tr>
+        <tr>
+          <td>time_interval</td>
+          <td><a href="#TRP.TimeInterval">TimeInterval</a></td>
+          <td>optional</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.TopperTrendResponse">TopperTrendResponse</h3>
+    <p>TopperTrendResponse</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>counter_group</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>meter</td>
+          <td><a href="#int64">int64</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>keytrends</td>
+          <td><a href="#TRP.KeyStats">KeyStats</a></td>
+          <td>repeated</td>
+          <td><p>timeseries - ts, (array of key stats) for each snapshot interval</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.UpdateKeyRequest">UpdateKeyRequest</h3>
+    <p>UpdatekeysRequest
+/ Response = OKResponse or ErrorResponse</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>counter_group</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>keys</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>repeated</td>
+          <td><p>key  : if you set both key and label, the DB label will be updated</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.VertexGroupT">VertexGroupT</h3>
+    <p>VertexGroupT : a group of vertices 
+/</p>
+    <table class="field-table">
+      <thead>
+        <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>vertex_group</td>
+          <td><a href="#string">string</a></td>
+          <td>required</td>
+          <td><p>GUID of vertices in this message</p></td>
+        </tr>
+        <tr>
+          <td>vertex_keys</td>
+          <td><a href="#TRP.KeyT">KeyT</a></td>
+          <td>repeated</td>
+          <td><p>list of vertices</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.AuthLevel">AuthLevel</h3>
+    <p>Enums
+/  Auth Level</p>
+    <table class="enum-table">
+      <thead>
+        <tr><td>Name</td><td>Number</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>ADMIN</td>
+          <td>1</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>BASIC_USER</td>
+          <td>2</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>FORENSIC_USER</td>
+          <td>3</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>BLOCKED_USER</td>
+          <td>4</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.CompressionType">CompressionType</h3>
+    <p>Compression: Used by PCAP or other content requests</p>
+    <table class="enum-table">
+      <thead>
+        <tr><td>Name</td><td>Number</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>UNCOMPRESSED</td>
+          <td>1</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>GZIP</td>
+          <td>2</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.DomainNodeType">DomainNodeType</h3>
+    <p></p>
+    <table class="enum-table">
+      <thead>
+        <tr><td>Name</td><td>Number</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>HUB</td>
+          <td>0</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>PROBE</td>
+          <td>1</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>CONFIG</td>
+          <td>2</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>ROUTER</td>
+          <td>3</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>WEB</td>
+          <td>4</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>MONITOR</td>
+          <td>5</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.DomainOperation">DomainOperation</h3>
+    <p></p>
+    <table class="enum-table">
+      <thead>
+        <tr><td>Name</td><td>Number</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>GETNODES</td>
+          <td>1</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>HEARTBEAT</td>
+          <td>2</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>REGISTER</td>
+          <td>3</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.Message.Command">Message.Command</h3>
+    <p></p>
+    <table class="enum-table">
+      <thead>
+        <tr><td>Name</td><td>Number</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>HELLO_REQUEST</td>
+          <td>1</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>HELLO_RESPONSE</td>
+          <td>2</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>OK_RESPONSE</td>
+          <td>3</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>ERROR_RESPONSE</td>
+          <td>5</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>COUNTER_GROUP_TOPPER_REQUEST</td>
+          <td>6</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>COUNTER_GROUP_TOPPER_RESPONSE</td>
+          <td>7</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>COUNTER_ITEM_REQUEST</td>
+          <td>8</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>COUNTER_ITEM_RESPONSE</td>
+          <td>9</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>PCAP_REQUEST</td>
+          <td>14</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>PCAP_RESPONSE</td>
+          <td>15</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>SEARCH_KEYS_REQUEST</td>
+          <td>18</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>SEARCH_KEYS_RESPONSE</td>
+          <td>19</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>COUNTER_GROUP_INFO_REQUEST</td>
+          <td>20</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>COUNTER_GROUP_INFO_RESPONSE</td>
+          <td>21</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>SESSION_TRACKER_REQUEST</td>
+          <td>22</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>SESSION_TRACKER_RESPONSE</td>
+          <td>23</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>UPDATE_KEY_REQUEST</td>
+          <td>32</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>UPDATE_KEY_RESPONSE</td>
+          <td>33</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>QUERY_SESSIONS_REQUEST</td>
+          <td>34</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>QUERY_SESSIONS_RESPONSE</td>
+          <td>35</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>PROBE_STATS_REQUEST</td>
+          <td>38</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>PROBE_STATS_RESPONSE</td>
+          <td>39</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>QUERY_ALERTS_REQUEST</td>
+          <td>44</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>QUERY_ALERTS_RESPONSE</td>
+          <td>45</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>QUERY_RESOURCES_REQUEST</td>
+          <td>48</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>QUERY_RESOURCES_RESPONSE</td>
+          <td>49</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>GREP_REQUEST</td>
+          <td>60</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>GREP_RESPONSE</td>
+          <td>61</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>KEYSPACE_REQUEST</td>
+          <td>70</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>KEYSPACE_RESPONSE</td>
+          <td>71</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>TOPPER_TREND_REQUEST</td>
+          <td>72</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>TOPPER_TREND_RESPONSE</td>
+          <td>73</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>STAB_PUBSUB_CTL</td>
+          <td>80</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>QUERY_FTS_REQUEST</td>
+          <td>90</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>QUERY_FTS_RESPONSE</td>
+          <td>91</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>TIMESLICES_REQUEST</td>
+          <td>92</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>TIMESLICES_RESPONSE</td>
+          <td>93</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>DELETE_ALERTS_REQUEST</td>
+          <td>94</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>METRICS_SUMMARY_REQUEST</td>
+          <td>95</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>METRICS_SUMMARY_RESPONSE</td>
+          <td>96</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>PCAP_SLICES_REQUEST</td>
+          <td>97</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>SERVICE_REQUEST</td>
+          <td>101</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>SERVICE_RESPONSE</td>
+          <td>102</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>CONFIG_REQUEST</td>
+          <td>103</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>CONFIG_RESPONSE</td>
+          <td>104</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>LOG_REQUEST</td>
+          <td>105</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>LOG_RESPONSE</td>
+          <td>106</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>CONTEXT_CREATE_REQUEST</td>
+          <td>108</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>CONTEXT_DELETE_REQUEST</td>
+          <td>109</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>CONTEXT_START_REQUEST</td>
+          <td>110</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>CONTEXT_STOP_REQUEST</td>
+          <td>111</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>CONTEXT_INFO_REQUEST</td>
+          <td>112</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>CONTEXT_INFO_RESPONSE</td>
+          <td>113</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>CONTEXT_CONFIG_REQUEST</td>
+          <td>114</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>CONTEXT_CONFIG_RESPONSE</td>
+          <td>115</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>DOMAIN_REQUEST</td>
+          <td>116</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>DOMAIN_RESPONSE</td>
+          <td>117</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>NODE_CONFIG_REQUEST</td>
+          <td>118</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>NODE_CONFIG_RESPONSE</td>
+          <td>119</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>ASYNC_REQUEST</td>
+          <td>120</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>ASYNC_RESPONSE</td>
+          <td>121</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>FILE_REQUEST</td>
+          <td>122</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>FILE_RESPONSE</td>
+          <td>123</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>SUBSYSTEM_INIT</td>
+          <td>124</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>SUBSYSTEM_EXIT</td>
+          <td>125</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>GRAPH_REQUEST</td>
+          <td>130</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>GRAPH_RESPONSE</td>
+          <td>131</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.MeterInfo.MeterType">MeterInfo.MeterType</h3>
+    <p>types of meters 
+from TrisulAPI</p>
+    <table class="enum-table">
+      <thead>
+        <tr><td>Name</td><td>Number</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>VT_INVALID</td>
+          <td>0</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>VT_RATE_COUNTER_WITH_SLIDING_WINDOW</td>
+          <td>1</td>
+          <td><p>this for top-N type counters</p></td>
+        </tr>
+        <tr>
+          <td>VT_COUNTER</td>
+          <td>2</td>
+          <td><p>basic counter, stores val in the raw</p></td>
+        </tr>
+        <tr>
+          <td>VT_COUNTER_WITH_SLIDING_WINDOW</td>
+          <td>3</td>
+          <td><p>use this for top-N type counters</p></td>
+        </tr>
+        <tr>
+          <td>VT_RATE_COUNTER</td>
+          <td>4</td>
+          <td><p>rate counter stores val/sec</p></td>
+        </tr>
+        <tr>
+          <td>VT_GAUGE</td>
+          <td>5</td>
+          <td><p>basic gauge</p></td>
+        </tr>
+        <tr>
+          <td>VT_GAUGE_MIN_MAX_AVG</td>
+          <td>6</td>
+          <td><p>gauge with 3 additional min/avg/max cols (auto)</p></td>
+        </tr>
+        <tr>
+          <td>VT_AUTO</td>
+          <td>7</td>
+          <td><p>automatic (eg, min/max/avg/stddev/)</p></td>
+        </tr>
+        <tr>
+          <td>VT_RUNNING_COUNTER</td>
+          <td>8</td>
+          <td><p>running counter, no delta calc</p></td>
+        </tr>
+        <tr>
+          <td>VT_AVERAGE</td>
+          <td>9</td>
+          <td><p>average of samples, total/sampl uses 32bt|32bit</p></td>
+        </tr>
+        <tr>
+          <td>VT_DELTA_RATE_COUNTER</td>
+          <td>10</td>
+          <td><p>link snmp running counter</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.PcapFormat">PcapFormat</h3>
+    <p>Pcap: format</p>
+    <table class="enum-table">
+      <thead>
+        <tr><td>Name</td><td>Number</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>LIBPCAP</td>
+          <td>1</td>
+          <td><p>normal libpcap format *.pcap</p></td>
+        </tr>
+        <tr>
+          <td>UNSNIFF</td>
+          <td>2</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>LIBPCAPNOFILEHEADER</td>
+          <td>3</td>
+          <td><p>libpcap but without the pcap file header</p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.SubscribeCtl.CtlType">SubscribeCtl.CtlType</h3>
+    <p></p>
+    <table class="enum-table">
+      <thead>
+        <tr><td>Name</td><td>Number</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>CT_SUBSCRIBE</td>
+          <td>0</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>CT_UNSUBSCRIBE</td>
+          <td>1</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 id="TRP.SubscribeCtl.StabberType">SubscribeCtl.StabberType</h3>
+    <p></p>
+    <table class="enum-table">
+      <thead>
+        <tr><td>Name</td><td>Number</td><td>Description</td></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>ST_COUNTER_ITEM</td>
+          <td>0</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>ST_ALERT</td>
+          <td>1</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>ST_FLOW</td>
+          <td>2</td>
+          <td><p></p></td>
+        </tr>
+        <tr>
+          <td>ST_TOPPER</td>
+          <td>3</td>
+          <td><p></p></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2 id="scalar-value-types">Scalar Value Types</h2>
+    <table class="scalar-value-types-table">
+      <thead>
+        <tr><td>.proto Type</td><td>Notes</td><td>C++ Type</td><td>Java Type</td><td>Python Type</td></tr>
+      </thead>
+      <tbody>
+        <tr id="double">
+          <td>double</td>
+          <td></td>
+          <td>double</td>
+          <td>double</td>
+          <td>float</td>
+        </tr>
+        <tr id="float">
+          <td>float</td>
+          <td></td>
+          <td>float</td>
+          <td>float</td>
+          <td>float</td>
+        </tr>
+        <tr id="int32">
+          <td>int32</td>
+          <td>Uses variable-length encoding. Inefficient for encoding negative numbers – if your field is likely to have negative values, use sint32 instead.</td>
+          <td>int32</td>
+          <td>int</td>
+          <td>int</td>
+        </tr>
+        <tr id="int64">
+          <td>int64</td>
+          <td>Uses variable-length encoding. Inefficient for encoding negative numbers – if your field is likely to have negative values, use sint64 instead.</td>
+          <td>int64</td>
+          <td>long</td>
+          <td>int/long</td>
+        </tr>
+        <tr id="uint32">
+          <td>uint32</td>
+          <td>Uses variable-length encoding.</td>
+          <td>uint32</td>
+          <td>int</td>
+          <td>int/long</td>
+        </tr>
+        <tr id="uint64">
+          <td>uint64</td>
+          <td>Uses variable-length encoding.</td>
+          <td>uint64</td>
+          <td>long</td>
+          <td>int/long</td>
+        </tr>
+        <tr id="sint32">
+          <td>sint32</td>
+          <td>Uses variable-length encoding. Signed int value. These more efficiently encode negative numbers than regular int32s.</td>
+          <td>int32</td>
+          <td>int</td>
+          <td>int</td>
+        </tr>
+        <tr id="sint64">
+          <td>sint64</td>
+          <td>Uses variable-length encoding. Signed int value. These more efficiently encode negative numbers than regular int64s.</td>
+          <td>int64</td>
+          <td>long</td>
+          <td>int/long</td>
+        </tr>
+        <tr id="fixed32">
+          <td>fixed32</td>
+          <td>Always four bytes. More efficient than uint32 if values are often greater than 2^28.</td>
+          <td>uint32</td>
+          <td>int</td>
+          <td>int</td>
+        </tr>
+        <tr id="fixed64">
+          <td>fixed64</td>
+          <td>Always eight bytes. More efficient than uint64 if values are often greater than 2^56.</td>
+          <td>uint64</td>
+          <td>long</td>
+          <td>int/long</td>
+        </tr>
+        <tr id="sfixed32">
+          <td>sfixed32</td>
+          <td>Always four bytes.</td>
+          <td>int32</td>
+          <td>int</td>
+          <td>int</td>
+        </tr>
+        <tr id="sfixed64">
+          <td>sfixed64</td>
+          <td>Always eight bytes.</td>
+          <td>int64</td>
+          <td>long</td>
+          <td>int/long</td>
+        </tr>
+        <tr id="bool">
+          <td>bool</td>
+          <td></td>
+          <td>bool</td>
+          <td>boolean</td>
+          <td>boolean</td>
+        </tr>
+        <tr id="string">
+          <td>string</td>
+          <td>A string must always contain UTF-8 encoded or 7-bit ASCII text.</td>
+          <td>string</td>
+          <td>String</td>
+          <td>str/unicode</td>
+        </tr>
+        <tr id="bytes">
+          <td>bytes</td>
+          <td>May contain any arbitrary sequence of bytes.</td>
+          <td>string</td>
+          <td>ByteString</td>
+          <td>str</td>
+        </tr>
+      </tbody>
+    </table>
+
+  </body>
+</html>
