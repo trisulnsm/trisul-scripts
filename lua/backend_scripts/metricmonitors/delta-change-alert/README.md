@@ -1,7 +1,7 @@
 Technique to detect and alert on DELTA change on any metric
 ===========================================================
 
-# script mac-traffic-tracker.lua
+## script mac-traffic-tracker.lua
 
 Give a list of MACs to monitor and the following
 
@@ -12,17 +12,21 @@ Give a list of MACs to monitor and the following
   },
 ````
 
-1. *delta* : What % delta UP or down do you want to alert on 
-2. *alert_str* : Useful string to include with the alert, use an asset name or handler
-3. *last_val,last_tm* : leave it at 0
-
+1. `delta` : What % delta UP or down do you want to alert on 
+2. `alert_str` : Useful string to include with the alert, use an asset name or handler
+3. `last_val,last_tm` : leave it at 0
 
 
 Inserting this script into Trisul Backend LUA will generate an alert whenever the usage (1-min)
-goes beyond delta*value_in_previous_inteval.
+goes beyond `delta*value_in_previous_interval`.We have it in production for monitoring steady multicast feed for Financial Market applications. Works great.
 
-We have it in production for monitoring steady multicast feed for Financial Market applications.
-Works great.
+## Usage
+
+Download this script into the local lua directory on the probe. To see where that directory is located.
+
+`trisulctl_probe list lua default@probe0` 
+
+You dont need to restart trisul. Backend scripts are injected into live system.  Removing the lua file uninstalls the script automatically.
 
 
 
