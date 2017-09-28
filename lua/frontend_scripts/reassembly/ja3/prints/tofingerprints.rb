@@ -13,6 +13,7 @@ File.foreach(ARGV.shift) do |line|
   ja3 = JSON.parse(line)
   ja3_str=ja3['ja3_str'].split(",")
 
+  out["id"]="0"
   out["desc"]=ja3['desc']
   out["record_tls_version"]="0x0301"
   out["tls_version"]="0x#{ja3_str[0].to_i.to_s(16).upcase.rjust(4,'0')}"
