@@ -10,7 +10,10 @@
 -- Setup LUAJIT2.1 FFI into libcrypto.so for MD5 
 local ffi=require('ffi')
 local C = ffi.load('libcrypto.so.1.0.0')
---local dbg=require'debugger'
+local SWP = require'sweepbuf' 
+local JSON = require'JSON' 
+
+-- local dbg=require'debugger'
 
 ffi.cdef[[
     typedef struct MD5state_st
@@ -34,77 +37,6 @@ function md5sum( input)
     C.MD5_Final(hashresults,ctx)
     return T.util.bin2hex(ffi.string(hashresults,16)) 
 end 
-
--- helpers to parse binary records 
-local xtractors = {
-
-  u8 = function(tbl)
-    return string.byte(tbl.buff,tbl.seekpos)
-  end,
-
-  next_u8 = function(tbl)
-    local r = tbl:u8()
-    tbl:inc(1)
-    return r
-  end,
-
-  next_u8_arr = function(tbl,nitems)
-    local ret = {}
-    while nitems > 0 do
-      ret[#ret+1] = tbl:next_u8()
-      nitems = nitems - 1
-    end
-    return ret;
-  end,
-
-  next_u16 = function(tbl)
-    return tbl:next_u8()*256 + tbl:next_u8()
-  end,
-
-  next_u16_arr = function(tbl,nitems)
-    local ret = {}
-    while nitems > 0 do
-      ret[#ret+1] = tbl:next_u16()
-      nitems = nitems - 1
-    end
-    return ret;
-  end,
-
-  next_u24 = function(tbl)
-    return tbl:next_u8()*4096 + tbl:next_u8()*256 + tbl:next_u8()
-  end,
-
-  next_u32 = function(tbl)
-    return tbl:next_u16()*65536 + tbl:next_u16() 
-  end,
-
-  inc = function(tbl, n)
-    tbl.seekpos = tbl.seekpos + n 
-  end,
-
-  skip = function(tbl, n)
-    tbl.seekpos = tbl.seekpos + n 
-    return true
-  end,
-
-  reset = function(tbl)
-    tbl.seekpos=1
-    fence=#tbl.buff
-  end,
-
-  has_more = function(tbl)
-    return tbl.seekpos < tbl.fence
-  end,
-
-  set_fence = function(tbl,delta_ahead)
-    fence = tbl.seekpos + delta_ahead
-  end ,
-
-  reset_fence = function(tbl)
-    fence=#tbl.buff
-  end,
-
-}
 
 -- you dont want to be messing with these
 -- hi there Chromium !!  https://tools.ietf.org/html/draft-davidben-tls-grease-00
@@ -137,15 +69,50 @@ TrisulPlugin = {
     description = "a client_hello hash ",
   },
 
-  -- a new JA3 resource 
+
+  -- read the JSON 
   -- 
-  resourcegroup  = {
+  onload = function()
+
+  	local prints_file = T.env.get_config("App>DataDirectory").."/tls-fingerprints.json" 
+
+	local f, err = io.open(prints_file)
+	if not f then
+		print("Unable to open TLS Fingerprints JSON file"..err)
+		return false
+	end
+
+	print("Prints file="..prints_file);
+	T.print_tbl = { } 
+
+	local cnt=0
+	for oneline in f:lines() do
+		local jj = JSON:decode(oneline)
+		if jj then 
+			T.print_tbl[jj["ja3_hash"]]=jj["desc"]
+			cnt=cnt+1
+		end
+	end
+
+	print("Loaded "..cnt.." TLS fingerprints")
+
+	f:close()
+  end,
+
+  -- a new JA3 counter group  - just note hits  
+  -- 
+  countergroup   = {
 
     control = {
-      guid = "{E8D3E68F-B320-49F3-C83D-66751C3B485F}",
-      name = "JA3 TLS",
+      guid = "{E8D5E68F-B320-49F3-C83D-66751C3B485F}",
+      name = "JA3 PRINT",
       description = "JA3 TLS Client Hello Hash",
+	  bucketsize = 60,
     },
+
+	meters = {
+		{  0, T.K.vartype.COUNTER, 20, "Hits", "hits",    "hits" },
+	},  
 
   },
  
@@ -157,14 +124,11 @@ TrisulPlugin = {
     -- 
     onattribute = function(engine, timestamp, flowkey, attr_name, attr_value) 
 
+
     if attr_name ~= "TLS:RECORD" then return;  end 
 
-    local payload = {
-      buff = attr_value,
-      seekpos = 1,
-      fence=#attr_value,
-    }
-    setmetatable( payload, { __index = xtractors } )
+	local payload = SWP.new(attr_value)
+
 
     -- handshake only + client_hello only
     if payload:next_u8() == 22 and payload:skip(4) and payload:next_u8() == 1 then
@@ -184,15 +148,23 @@ TrisulPlugin = {
       }
 
       payload:next_u8()                   -- over handshake_type
-      payload:next_u24()                  -- over handshake_length 
-      ja3f.SSLVersion = payload:next_u16()
+
+	  -- validate , sometimes encrypted handshake can misfire 
+      local hslen=payload:next_u24()                  
+	  if hslen ~= #attr_value - 9 then return end;
+
+      ja3f.SSLVersion = payload:next_u16() 
       payload:skip(32)                    -- over client_random
       payload:skip(payload:next_u8())     -- over SessionID if present 
 
       ja3f.Cipher = payload:next_u16_arr( payload:next_u16()/2) 
 
       payload:skip(payload:next_u8())     -- over compression 
-      payload:set_fence(payload:next_u16())
+
+	  -- extensions, we pick out SNI as well if 
+      payload:push_fence(payload:next_u16())
+
+	  local snihostname  = nil 
 
       while payload:has_more() do
         local ext_type = payload:next_u16()
@@ -201,12 +173,23 @@ TrisulPlugin = {
            ja3f.EllipticCurve  = payload:next_u16_arr( payload:next_u16()/2)
         elseif ext_type == 11 then
            ja3f.EllipticCurvePointFormat = payload:next_u8_arr( payload:next_u8())
+	    elseif ext_type ==  0 then 
+		   payload:push_fence(payload:next_u16())
+		   while payload:has_more() do
+			  payload:skip(1)
+		      snihostname  =  payload:next_str_to_len(payload:next_u16())
+		   end
+		   payload:pop_fence()
         else 
           payload:skip(ext_len)
         end
 
-        ja3f.SSLExtension[#ja3f.SSLExtension+1]=ext_type 
+		-- skip the padding extension 
+		if ext_type ~= 21 then 
+			ja3f.SSLExtension[#ja3f.SSLExtension+1]=ext_type 
+		end 
       end
+
 
       -- kick out GREASE values  from all tables (see RFC) 
       -- since they can appear at random positions (generating a different hash)
@@ -225,11 +208,36 @@ TrisulPlugin = {
                table.concat(ja3f.EllipticCurvePointFormat,"-")
       local ja3_hash = md5sum(ja3_str)
 
-      print("string = ".. ja3_str.. " hash="..md5sum(ja3_str))
-      engine:add_resource('{E8D3E68F-B320-49F3-C83D-66751C3B485F}', -- the JA3 resource guid
-        flowkey:id(),
-        ja3_hash,
-        ja3_str)
+
+	  local client_desc = T.print_tbl[ja3_hash]
+
+	  if client_desc then 
+		  print("FOUND = " .. client_desc)
+	  else 
+		  print("UNKNOWN hash ".. ja3_hash.. " string="..ja3_str)
+	  end
+
+
+	  -- counters and edges 
+      engine:update_counter('{E8D5E68F-B320-49F3-C83D-66751C3B485F}', ja3_hash, 0, 1)
+
+      if client_desc then
+		  engine:update_key_info('{E8D5E68F-B320-49F3-C83D-66751C3B485F}', ja3_hash, client_desc)
+		  engine:add_edge('{E8D5E68F-B320-49F3-C83D-66751C3B485F}', ja3_hash, 
+							'{4CD742B1-C1CA-4708-BE78-0FCA2EB01A86}', client_desc)
+	  end
+
+	  engine:add_edge('{E8D5E68F-B320-49F3-C83D-66751C3B485F}', ja3_hash, 
+						'{4CD742B1-C1CA-4708-BE78-0FCA2EB01A86}', snihostname)
+
+	  engine:add_edge('{4CD742B1-C1CA-4708-BE78-0FCA2EB01A86}', snihostname,
+						'{E8D5E68F-B320-49F3-C83D-66751C3B485F}', ja3_hash )
+
+	  engine:add_flow_edges(flowkey:id(), '{4CD742B1-C1CA-4708-BE78-0FCA2EB01A86}', snihostname)
+	  engine:add_flow_edges(flowkey:id(), '{4CD742B1-C1CA-4708-BE78-0FCA2EB01A86}', ja3_hash)
+	  if client_desc then
+		  engine:add_flow_edges(flowkey:id(), '{4CD742B1-C1CA-4708-BE78-0FCA2EB01A86}', client_desc)
+	  end
 
     end
     
