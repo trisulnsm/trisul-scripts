@@ -78,11 +78,11 @@ TrisulPlugin = {
 
 	local f, err = io.open(prints_file)
 	if not f then
-		print("Unable to open TLS Fingerprints JSON file"..err)
+		T.logerror("Unable to open TLS Fingerprints JSON file"..err)
 		return false
 	end
 
-	print("Prints file="..prints_file);
+	T.log("Prints file="..prints_file);
 	T.print_tbl = { } 
 
 	local cnt=0
@@ -94,7 +94,7 @@ TrisulPlugin = {
 		end
 	end
 
-	print("Loaded "..cnt.." TLS fingerprints")
+	T.log("Loaded "..cnt.." TLS fingerprints")
 
 	f:close()
   end,
@@ -123,6 +123,12 @@ TrisulPlugin = {
     -- we want to see TLS:RECORD 
     -- 
     onattribute = function(engine, timestamp, flowkey, attr_name, attr_value) 
+
+
+	if attr_name == "User-Agent" then
+	    engine:add_flow_edges(flowkey:id(), '{B91A8AD4-C6B6-4FBC-E862-FF94BC204A35}', attr_value:sub(10))
+		return
+	end 
 
 
     if attr_name ~= "TLS:RECORD" then return;  end 
@@ -209,35 +215,31 @@ TrisulPlugin = {
       local ja3_hash = md5sum(ja3_str)
 
 
-	  local client_desc = T.print_tbl[ja3_hash]
 
-	  if client_desc then 
-		  print("FOUND = " .. client_desc)
-	  else 
-		  print("UNKNOWN hash ".. ja3_hash.. " string="..ja3_str)
-	  end
 
+	  print(" flow=".. flowkey:to_s().." hash ".. ja3_hash.. " string="..ja3_str)
 
 	  -- counters and edges 
       engine:update_counter('{E8D5E68F-B320-49F3-C83D-66751C3B485F}', ja3_hash, 0, 1)
 
-      if client_desc then
+	  -- see if this is a known hash 
+	  local client_desc = T.print_tbl[ja3_hash]
+	  if client_desc then
 		  engine:update_key_info('{E8D5E68F-B320-49F3-C83D-66751C3B485F}', ja3_hash, client_desc)
 		  engine:add_edge('{E8D5E68F-B320-49F3-C83D-66751C3B485F}', ja3_hash, 
-							'{4CD742B1-C1CA-4708-BE78-0FCA2EB01A86}', client_desc)
+				  '{B91A8AD4-C6B6-4FBC-E862-FF94BC204A35}', client_desc)
 	  end
 
+	  -- Bi-Directional Edge 
 	  engine:add_edge('{E8D5E68F-B320-49F3-C83D-66751C3B485F}', ja3_hash, 
-						'{4CD742B1-C1CA-4708-BE78-0FCA2EB01A86}', snihostname)
+                      '{B91A8AD4-C6B6-4FBC-E862-FF94BC204A35}', snihostname)
 
-	  engine:add_edge('{4CD742B1-C1CA-4708-BE78-0FCA2EB01A86}', snihostname,
-						'{E8D5E68F-B320-49F3-C83D-66751C3B485F}', ja3_hash )
+	  engine:add_edge('{B91A8AD4-C6B6-4FBC-E862-FF94BC204A35}', snihostname, 
+					  '{E8D5E68F-B320-49F3-C83D-66751C3B485F}', ja3_hash )
 
-	  engine:add_flow_edges(flowkey:id(), '{4CD742B1-C1CA-4708-BE78-0FCA2EB01A86}', snihostname)
-	  engine:add_flow_edges(flowkey:id(), '{4CD742B1-C1CA-4708-BE78-0FCA2EB01A86}', ja3_hash)
-	  if client_desc then
-		  engine:add_flow_edges(flowkey:id(), '{4CD742B1-C1CA-4708-BE78-0FCA2EB01A86}', client_desc)
-	  end
+	  -- Flow edges 
+	  engine:add_flow_edges(flowkey:id(), '{B91A8AD4-C6B6-4FBC-E862-FF94BC204A35}', snihostname)
+	  engine:add_flow_edges(flowkey:id(), '{E8D5E68F-B320-49F3-C83D-66751C3B485F}', ja3_hash)
 
     end
     
