@@ -1,7 +1,9 @@
 IOC based on Client Hello fingerprinting 
 ======================
 
-An experimental Trisul plugin for collecting client hello fingerprints. 
+An experimental Trisul plugin for collecting client hello fingerprints.  
+
+bq. Requires the sweepbuf.lua buffer parsing library https://github.com/trisulnsm/trisul-scripts/blob/master/lua/bitmaul/sweepbuf.lua
 
 This method is an implementation of https://github.com/salesforce/ja3  
 
@@ -23,7 +25,7 @@ It does 2 things.
 
 1. A *reassembly_handler*  -- parses Client Hello and pulls out the fields required for the ja3 hash.  The chunk of LuaJIT code at the beginning is a neat way to safely parse packets in LUA.   [API Docs](https://www.trisul.org/docs/lua/reassembly.html)
 
-2. A *resource_group*  -- creates a new type of resource to which we add discovered hashes.  [API Docs](https://www.trisul.org/docs/lua/resource_group.html) 
+2. A *new counter group* -- meters hashes and uses the new TRISUL EDGE stream graph analytics to add SNI and Flow Based Vertices
 
 
 Code
