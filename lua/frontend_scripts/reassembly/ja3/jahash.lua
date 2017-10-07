@@ -227,7 +227,7 @@ TrisulPlugin = {
 	  if client_desc then
 		  engine:update_key_info('{E8D5E68F-B320-49F3-C83D-66751C3B485F}', ja3_hash, client_desc)
 		  engine:add_edge('{E8D5E68F-B320-49F3-C83D-66751C3B485F}', ja3_hash, 
-				  '{B91A8AD4-C6B6-4FBC-E862-FF94BC204A35}', client_desc)
+         				  '{B91A8AD4-C6B6-4FBC-E862-FF94BC204A35}', client_desc)
 	  end
 
 	  -- Bi-Directional Edge 
