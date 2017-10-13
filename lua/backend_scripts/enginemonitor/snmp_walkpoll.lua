@@ -7,8 +7,7 @@
 
 local lsqlite3 = require 'lsqlite3'
 local dbg = require'debugger'
-local WEBTRISUL_DATABASE="/home/vivek/bldart/z01/webtrisul/db/webtrisul.db"
--- local WEBTRISUL_DATABASE="/usr/local/share/webtrisul/db/webtrisul.db"
+local WEBTRISUL_DATABASE="/usr/local/share/webtrisul/db/webtrisul.db"
 
 -- return { key, value } 
 function do_bulk_walk( agent, community, oid  )
