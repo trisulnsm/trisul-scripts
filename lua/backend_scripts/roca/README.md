@@ -1,9 +1,9 @@
 Trisul ROCA scanner
 ===================
 
-Trisul Script to scan RSA Public Keys found in SSL Certs seen in network traffic for the  ROCA CVE-2017-15361 vulnerability.
-The actual detection algorithm is a LUA port of https://github.com/crocs-muni/roca/tree/master/csharp/RocaTest
+Trisul script to scan SSL Certs seen in network traffic for the  ROCA [CVE-2017-15361](http://www.securityfocus.com/bid/101484/info) vulnerability.
 
+> The algorithm here is a LuaJIT port of https://github.com/crocs-muni/roca/tree/master/csharp/RocaTest
 
 There are two LUA files in this directory.
 
@@ -14,28 +14,24 @@ There are two LUA files in this directory.
 roca.lua - scan network traffic
 --------------------------------
 
-To install this script simply copy the `roca.lua` file into the Trisul Probe `local-lua` directory. Typically this is what you need to do
+To install this script simply copy the `roca.lua` file into the Trisul Probe `local-lua` directory. 
 
 ````
 cp roca.lua /usr/local/var/lib/trisul-probe/domain0/probe0/context0/config/local-lua
 ````
 
-
-The good news is that since this script is a Backend script this is automatically picked up by a LIVE Trisul system within 1 minute.
-
-
-For more details about deploying this on multiple probes, refer to [Installing and Uninstalling](https://www.trisul.org/docs/lua/basics.html#installing_and_uninstalling)
+Since this script is a [Backend stream](https://www.trisul.org/docs/lua/basics.html#frontend_and_backend_scripts) script this is automatically picked up by a LIVE Trisul system within 1 minute. 
 
 
-### How it works
+### How roca.lua works
 
 The algorithm in the script is a direct port of the algorithm found in https://github.com/crocs-muni/roca/tree/master/csharp/RocaTest 
 What we do here is 
 
-1. Use the [`fts_monitor`])https://www.trisul.org/docs/lua/fts_monitor.html) script type that watches the SSL Certs stream in Trisul
-2. The documents in this stream are nothing but SSL Certs in canonical OpenSSL text format
+1. Use the [`fts_monitor`](https://www.trisul.org/docs/lua/fts_monitor.html) type that plugs into the SSL Certs stream in Trisul
+2. The documents in this stream are SSL Certs in canonical OpenSSL X.509 '-text' format
 3. Using regex we pick out all the `Modulus` parts 
-4. Then using the magical LuaJIT FFI we pull in the BIGNUM support from libcrypto
+4. Then using the magical LuaJIT FFI we pull in the BIGNUM support from libcrypto to implement the algorithms
 5. When a cert is detected to be vulnerable we fire an alert. This shows up in the Trisul UI - can be emailed etc etc
 
 
@@ -73,3 +69,9 @@ Feedback requested
 =========
 
 We ran this on our network and traces and could not find any vulnerable certs.  It is probably because we arent using any of the impacted devices.  If anyone would like to deploy on a network you can download Trisul and install this LUA for free to test live traffic. Let us know if you find anything. 
+
+
+Further reading
+===============
+
+For details about deploying this on multiple probes, refer to [Installing and Uninstalling](https://www.trisul.org/docs/lua/basics.html#installing_and_uninstalling)
