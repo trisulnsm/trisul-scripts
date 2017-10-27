@@ -3,8 +3,6 @@ Trisul ROCA scanner
 
 Trisul script to scan SSL Certs seen in network traffic for the  ROCA [CVE-2017-15361](http://www.securityfocus.com/bid/101484/info) vulnerability.
 
-> The algorithm here is a LuaJIT port of https://github.com/crocs-muni/roca/tree/master/csharp/RocaTest
-
 There are two LUA files in this directory.
 
 1. `roca.lua`  - A Trisul LUA script to watch certs in live or recorded network traffic 
