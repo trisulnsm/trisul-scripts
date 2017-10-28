@@ -1,8 +1,7 @@
 LUA IP range  lookup
 ===================
 
-iprangemap.lua is a simple fast lookup library to check an IP address against a database of 
-IP ranges to check if there is match. 
+[iprangemap.lua](https://github.com/trisulnsm/trisul-scripts/blob/master/lua/backend_scripts/firehol/iprangemap.lua)  is a simple fast lookup library to check an IP address against a database of IP ranges.
 
 We at Trisul Network Analytics are using this for checking an IP against blacklists. 
 
@@ -15,6 +14,9 @@ The following example
 2. one IP 
 3. checks match
 4. prints match 
+
+
+Try with LuaJIT
 
 ````lua 
 local RMAP=require'iprangemap'
