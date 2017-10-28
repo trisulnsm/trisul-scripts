@@ -10,7 +10,11 @@ We at Trisul Network Analytics are using this for checking an IP against blackli
 Usage
 -----
 
-The following snippet creates a new map, adds 3 subnets, then checks and prints any matching ranges
+The following example
+1. adds 3 IP subnets
+2. one IP 
+3. checks match
+4. prints match 
 
 ````lua 
 local RMAP=require'iprangemap'
@@ -18,6 +22,7 @@ local RMAP=require'iprangemap'
 local rm = RMAP.new()
 rm:add("103.229.217.0/24")
 rm:add("74.207.22..122")	-- bad form , will be rejected 
+rm:add("180.179.120.65")
 rm:add("29.212.22..0/255")
 rm:add("23.251.224.0/19")
 
