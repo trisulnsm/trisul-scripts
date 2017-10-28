@@ -1,12 +1,7 @@
 FireHOL.lua  - Trisul Plugin to alert on FireHOL matches
 =================================
 
-
 This LUA script tracks all newly seen IPs against the excellent FireHOL Cyber Crime Feeds at http://iplists.firehol.org/
-
-
-Essentially this script reads in the IP ranges in the intel file. Click on 'download local copy' and loads it into a 
-LUA range map. Then tracks the "New Key" stream.
 
 
 Using
