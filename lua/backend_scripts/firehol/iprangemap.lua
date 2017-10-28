@@ -40,6 +40,7 @@ local IPRangeLookup   = {
   -- 
   add = function( tbl, ip_range)
     local _,_, b1,b2,b3,b4,cidr = ip_range:find("(%d+)%.(%d+)%.(%d+)%.(%d+)/*(%d*)")
+	if b1 == nil then return; end  
     local num_start = b1*math.pow(2,24) + b2*math.pow(2,16) + b3*math.pow(2,8) + b4*math.pow(2,0) 
     local num_end = num_start
     if #cidr > 0  then 
@@ -76,7 +77,8 @@ local IPRangeLookup   = {
   -- lookup "82.188.23.12"
   -- 
   lookup = function(tbl, ip_dotted)
-    local _,_, b1,b2,b3,b4= ip_dotted:find("(%d+)%.(%d+)%.(%d+)%.(%d+)")
+    local pmatch,_, b1,b2,b3,b4= ip_dotted:find("(%d+)%.(%d+)%.(%d+)%.(%d+)")
+	if not pmatch then return nil ; end  
     local ipnum = b1*math.pow(2,24) + b2*math.pow(2,16) + b3*math.pow(2,8) + b4*math.pow(2,0) 
     local rcheck = Range.new(ipnum,ipnum)
     return tbl.bin_search(tbl.lkp_table, rcheck)
@@ -84,16 +86,21 @@ local IPRangeLookup   = {
 
   -- lookup in trisul format C0.A8.23.FE 
   lookup_trisul = function(tbl, ip_trisul_key)
-    local _,_, b1,b2,b3,b4= ip_dotted:find("(%x+)%.(%x+)%.(%x+)%.(%x+)")
+    local pmatch,_, b1,b2,b3,b4= ip_dotted:find("(%x+)%.(%x+)%.(%x+)%.(%x+)")
+	if not pmatch then return nil ; end  
     local ipnum = tonumber(b1,16)*math.pow(2,24) + tonumber(b2,16)*math.pow(2,16) + tonumber(b3,16)*math.pow(2,8) + tonumber(b4,16)*math.pow(2,0) 
     local rcheck = Range.new(ipnum,ipnum)
     return tbl.bin_search(tbl.lkp_table, rcheck)
   end,
 
+  check=function(tbl, ip_dotted)
+  	return tbl.lookup(tbl,ip_dotted) ~= nil 
+  end,
+
   -- loads a file containing 1 range per line 
   load = function(tbl, filename  )
     local f,err = io.open(filename)
-    if f == nil then return false, err
+    if f == nil then return false, err end 
 
     for l in f:lines() do 
       local  validline=true 
