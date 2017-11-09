@@ -30,7 +30,7 @@ TrisulPlugin = {
   T.fhole = FH.new()
     local firehol_intel_file  = T.env.get_config("App>DataDirectory") + "/" + FIREHOL_FILENAME
     local status,errormsg = T.fhole:load(firehol_intel_file)
-    if status == false
+    if status == false then 
       T.logerror("Error loading filehol list msg="..errormsg)
       return false
     end

@@ -13,3 +13,11 @@ ruby toja3.rb fingerprints.json > ja3_fingerprints.json
 
 
 Status: currently testing accuracy on a  live Trisul system.  
+
+
+get_ja3.rb
+===========
+
+Ruby Trisul Remote Protocol (TRP) script to automatically correlate unkown ja3 prints from apache webserver logs.
+
+
