@@ -3,7 +3,7 @@ IOC based on Client Hello fingerprinting
 
 An experimental Trisul plugin for collecting client hello fingerprints.  
 
-bq. Requires the sweepbuf.lua buffer parsing library https://github.com/trisulnsm/trisul-scripts/blob/master/lua/bitmaul/sweepbuf.lua
+>>  Requires the sweepbuf.lua buffer parsing library https://github.com/trisulnsm/trisul-scripts/blob/master/lua/bitmaul/sweepbuf.lua
 
 This method is an implementation of https://github.com/salesforce/ja3  
 
