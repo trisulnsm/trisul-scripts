@@ -11,6 +11,8 @@ local JSON=require'JSON'
 local WEBTRISUL_DATABASE="/usr/local/share/webtrisul/db/webtrisul.db"
 --local WEBTRISUL_DATABASE= "/home/devbox/bldart/z21/webtrisul/db/webtrisul.db"
 
+local dbg=require'debugger'
+
 -- return { key, value } 
 function do_bulk_walk( agent, version, community, oid  )
   command = "snmpbulkwalk"
@@ -129,20 +131,25 @@ TrisulPlugin = {
     local status,db=pcall(lsqlite3.open,dbfile);
     local stmt=db:prepare("SELECT name, value FROM WEBTRISUL_OPTIONS WHERE  webtrisul_option_type_id = 2 and id >= 10000");
 
+
     local targets = {} 
 
-    while pcall(stmt.step)  do
+    local ok, stepret = pcall(stmt.step, stmt) 
+    while stepret  do
       local v = stmt:get_values()
       local  snmp = JSON:decode(v[2])
       targets[ #targets + 1] = { agent_ip = snmp["IP Address"], agent_community = snmp["Community"], agent_version = snmp["Version"] } 
       T.log(T.K.loglevel.INFO, "Loaded ip="..snmp["IP Address"].." version"..snmp["Version"].." comm=".. snmp["Community"])
+      print("Loaded ip="..snmp["IP Address"].." version"..snmp["Version"].." comm=".. snmp["Community"])
+      ok, stepret = pcall(stmt.step, stmt) 
     end
     stmt:finalize()
 
 
     -- community string     
     local stmt2=db:prepare("SELECT value FROM WEBTRISUL_OPTIONS where name='default_snmpv2_community';");
-    if pcall(stmt2.step) then 
+    ok, stepret = pcall(stmt2.step, stmt2) 
+    if stepret then 
       T.default_community = stmt2:get_value(0)
     else 
       T.default_community = 'public'
