@@ -11,8 +11,6 @@ local JSON=require'JSON'
 local WEBTRISUL_DATABASE="/usr/local/share/webtrisul/db/webtrisul.db"
 --local WEBTRISUL_DATABASE= "/home/devbox/bldart/z21/webtrisul/db/webtrisul.db"
 
-local dbg=require'debugger'
-
 -- return { key, value } 
 function do_bulk_walk( agent, version, community, oid  )
   command = "snmpbulkwalk"
