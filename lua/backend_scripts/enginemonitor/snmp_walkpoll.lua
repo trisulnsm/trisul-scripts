@@ -127,10 +127,20 @@ TrisulPlugin = {
     T.log(T.K.loglevel.INFO, "Loading SNMP targets for polling from DB "..dbfile)
 
     local status,db=pcall(lsqlite3.open,dbfile);
-    local stmt=db:prepare("SELECT name, value FROM WEBTRISUL_OPTIONS WHERE  webtrisul_option_type_id = 2 and id >= 10000");
+    if not status then
+      T.logerror("Error open lsqlite3 err="..db)
+      return 
+    end 
 
 
+    local status, stmt=pcall(db.prepare, db,  "SELECT name, value FROM WEBTRISUL_OPTIONS WHERE  webtrisul_option_type_id = 2 and id >= 10000");
+    if not status then
+      db:close() 
+      T.logerror("Error prepare lsqlite3 err="..stmt)
+      return 
+    end 
     local targets = {} 
+
 
     local ok, stepret = pcall(stmt.step, stmt) 
     while stepret  do
@@ -145,8 +155,14 @@ TrisulPlugin = {
 
 
     -- community string     
-    local stmt2=db:prepare("SELECT value FROM WEBTRISUL_OPTIONS where name='default_snmpv2_community';");
-    ok, stepret = pcall(stmt2.step, stmt2) 
+    local status,stmt2=pcall(db.prepare, db, "SELECT value FROM WEBTRISUL_OPTIONS where name='default_snmpv2_community';");
+    if not status then
+      db:close() 
+      T.logerror("Error prepare err="..stmt2)
+      return 
+    end 
+
+    ok, stepret = pcall(stmt.step, stmt) 
     if stepret then 
       T.default_community = stmt2:get_value(0)
     else 
