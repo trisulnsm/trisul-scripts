@@ -4,6 +4,8 @@ toja3.rb
 Quick script to generate a ja3_hash from this awesome fingerprint DB from https://github.com/LeeBrotherston/tls-fingerprinting/blob/master/fingerprints/fingerprints.json
 
 
+**NEW : Jan 8 2018 ** Converted and added about 160 prints from John Althouse 
+
 Run
 ---
 

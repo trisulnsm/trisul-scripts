@@ -16,8 +16,8 @@ function do_bulk_walk( agent, version, community, oid  )
   command = "snmpbulkwalk"
   if version == "1" then command="snmpwalk" end
   local tstart = os.time()
-  local h = io.popen(command.." -r 1 -O q  -v"..version.." -c '"..community.."' "..agent.."  "..oid)
-  print(command.." -r 1 -O q  -v"..version.." -c '"..community.."' "..agent.."  "..oid)
+  local h = io.popen(command.." -r 1 -O q -t 3  -v"..version.." -c '"..community.."' "..agent.."  "..oid)
+  print(command.." -r 1 -O q -t 3  -v"..version.." -c '"..community.."' "..agent.."  "..oid)
 
   local ret = { } 
   for oneline in h:lines()
@@ -67,14 +67,12 @@ TrisulPlugin = {
     -- only do this from Engine 0. Run thru each port and send separat SNMP get 
     onbeginflush = function(engine, tv)
 
-      if engine:instanceid() ~= "0" then return end 
-
       for _,agent in ipairs(T.poll_targets) do 
 
         -- update IN 
         local oid = ".1.3.6.1.2.1.31.1.1.1.6"
         if agent.agent_version == "1"  then oid = "1.3.6.1.2.1.2.2.1.10" end
-        print("BULK in "..agent.agent_ip)
+        print("Engine-"..engine:id().." BulkWalk start for "..agent.agent_ip)
         local bw_in =  do_bulk_walk( agent.agent_ip, agent.agent_version,  agent.agent_community, oid)
         local has_varbinds = false
         for k,v in pairs( bw_in) do 
@@ -112,8 +110,10 @@ TrisulPlugin = {
 
     -- every interval reload the map -
     onendflush = function(engine,tv)
-      if engine:instanceid() ~= "0" then return end 
-      T.poll_targets = TrisulPlugin.load_poll_targets(WEBTRISUL_DATABASE)
+      local new_targets =  TrisulPlugin.load_poll_targets(engine:instanceid(), WEBTRISUL_DATABASE)
+      if new_targets ~= nil then
+        T.poll_targets = TrisulPlugin.load_poll_targets(engine:instanceid(),WEBTRISUL_DATABASE)
+      end
     end,
 
   },
@@ -122,14 +122,14 @@ TrisulPlugin = {
   -- load polling targets from sqlite3 database 
   -- in this case webtrisul db 
   -- return { agent => [ifindex] } mappings 
-  load_poll_targets = function(dbfile)
+  load_poll_targets = function(engine_id, dbfile)
 
     T.log(T.K.loglevel.INFO, "Loading SNMP targets for polling from DB "..dbfile)
 
     local status,db=pcall(lsqlite3.open,dbfile);
     if not status then
       T.logerror("Error open lsqlite3 err="..db)
-      return 
+      return nil
     end 
 
 
@@ -137,7 +137,7 @@ TrisulPlugin = {
     if not status then
       db:close() 
       T.logerror("Error prepare lsqlite3 err="..stmt)
-      return 
+      return nil
     end 
     local targets = {} 
 
@@ -146,9 +146,14 @@ TrisulPlugin = {
     while stepret  do
       local v = stmt:get_values()
       local  snmp = JSON:decode(v[2])
-      targets[ #targets + 1] = { agent_ip = snmp["IP Address"], agent_community = snmp["Community"], agent_version = snmp["Version"] } 
-      T.log(T.K.loglevel.INFO, "Loaded ip="..snmp["IP Address"].." version"..snmp["Version"].." comm=".. snmp["Community"])
-      print("Loaded ip="..snmp["IP Address"].." version"..snmp["Version"].." comm=".. snmp["Community"])
+	  if T.util.hash( snmp["IP Address"],1) == tonumber(engine_id) then 
+		  targets[ #targets + 1] = { agent_ip = snmp["IP Address"], agent_community = snmp["Community"], agent_version = snmp["Version"] } 
+		  T.log(T.K.loglevel.INFO, "Loaded ip="..snmp["IP Address"].." version"..snmp["Version"].." comm=".. snmp["Community"])
+		  print("Loaded ip="..snmp["IP Address"].." version"..snmp["Version"].." comm=".. snmp["Community"])
+	  else
+		  T.log(T.K.loglevel.INFO, "SKIPPED ip="..snmp["IP Address"].." version"..snmp["Version"].." comm=".. snmp["Community"])
+		  print("SKIPPED ip="..snmp["IP Address"].." version"..snmp["Version"].." comm=".. snmp["Community"])
+	  end 
       ok, stepret = pcall(stmt.step, stmt) 
     end
     stmt:finalize()
@@ -159,7 +164,7 @@ TrisulPlugin = {
     if not status then
       db:close() 
       T.logerror("Error prepare err="..stmt2)
-      return 
+      return nil
     end 
 
     ok, stepret = pcall(stmt.step, stmt) 

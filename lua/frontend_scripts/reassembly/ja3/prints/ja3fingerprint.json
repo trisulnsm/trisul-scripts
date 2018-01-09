@@ -457,3 +457,160 @@
 {"desc":"Firefox/56.0 Windows 10","ja3_hash":"be1a7de97ea176604a3c70622189d78d","ja3_str":"771,49195-49199-49196-49200-158-162-159-163-49187-49191-49161-49171-49188-49192-49162-49172-103-107-51-57-64-106-50-56-156-157-60-61-47-53-49159-49169-5-255,0-11-10-35-13-15,14-13-25-11-12-24-9-10-22-23-8-6-7-20-21-4-5-18-19-1-2-3-15-16-17,0-1-2"}
 {"desc":"Firefox/40.1 Windows 7","ja3_hash":"05af1f5ca1b87cc9cc9b25185115607d","ja3_str":"769,49172-49171-57-51-53-47-49162-49161-56-50-10-19-5-4,0-10-11-23-65281,23-24,0"}
 {"desc":"Firefox/55 Windows 10","ja3_hash":"1885aa9927f99ed538ed895d9335995c","ja3_str":"771,49195-49199-158-49162-49161-49171-49172-49159-49169-51-50-57-156-47-53-10-5-4-255,0-11-10-35-13-15,14-13-25-11-12-24-9-10-22-23-8-6-7-20-21-4-5-18-19-1-2-3-15-16-17,0-1-2"}
+
+
+# -- from https://raw.githubusercontent.com/salesforce/ja3/master/lists/osx-nix-ja3.csv -- 
+# Copyright (c) 2017 salesforce.com inc.
+# All rights reserved.
+# Licensed under the BSD 3-Clause license. 
+# For full license text see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause",
+{"desc":"61d50e7771aee7f2f4b89a7200b4d45e","ja3_hash":"AcroCEF","ja3_string":""}
+{"desc":"49a6cf42956937669a01438f26e7c609","ja3_hash":"AIM","ja3_string":""}
+{"desc":"561145462cfc7de1d6a97e93d3264786","ja3_hash":"Airmail 3","ja3_string":""}
+{"desc":"f6fd83a21f9f3c5f9ff7b5c63bbc179d","ja3_hash":"Alation Compose","ja3_string":""}
+{"desc":"6003b52942a2e1e1ea72d802d153ec08","ja3_hash":"Amazon Music","ja3_string":""}
+{"desc":"eb149984fc9c44d85ed7f12c90d818be","ja3_hash":"Amazon Music,Dreamweaver,Spotify","ja3_string":""}
+{"desc":"8e3f1bf87bc652a20de63bfd4952b16a","ja3_hash":"AnypointStudio","ja3_string":""}
+{"desc":"5507277945374659a5b4572e1b6d9b9f","ja3_hash":"apple.geod","ja3_string":""}
+{"desc":"f753495f2eab5155c61b760c838018f8","ja3_hash":"apple.geod","ja3_string":""}
+{"desc":"ba40fea2b2638908a3b3b482ac78d729","ja3_hash":"apple.geod,parsecd,apple.photomoments","ja3_string":""}
+{"desc":"474e73aea21d1e0910f25c3e6c178535","ja3_hash":"apple.WebKit.Networking","ja3_string":""}
+{"desc":"eeeb5e7485f5e10cbc39db4cfb69b264","ja3_hash":"apple.WebKit.Networking","ja3_string":""}
+{"desc":"d4693422c5ce1565377aca25940ad80c","ja3_hash":"apple.WebKit.Networking,CalendarAgent,Go for Gmail","ja3_string":""}
+{"desc":"63de2b6188d5694e79b678f585b13264","ja3_hash":"apple.WebKit.Networking,Chatter,FieldServiceApp,socialstudio","ja3_string":""}
+{"desc":"3e4e87dda5a3162306609b7e330441d2","ja3_hash":"apple.WebKit.Networking,itunesstored","ja3_string":""}
+{"desc":"7b343af1092863fdd822d6f10645abfb","ja3_hash":"apple.WebKit.Networking,itunesstored","ja3_string":""}
+{"desc":"a312f9162a08eeedf7feb7a13cd7e9bb","ja3_hash":"apple.WebKit.Networking,Spotify,WhatsApp,Skype,iTunes","ja3_string":""}
+{"desc":"c5c11e6105c56fd29cc72c3ac7a2b78b","ja3_hash":"AT&T Connect","ja3_string":""}
+{"desc":"fa030dbcb2e3c7141d3c2803780ee8db","ja3_hash":"Battle.net,Dropbox","ja3_string":""}
+{"desc":"0ef9ca1c10d3f186f5786e1ef3461a46","ja3_hash":"bitgo,ShapeShift","ja3_string":""}
+{"desc":"cdec81515ccc75a5aa41eb3db22226e6","ja3_hash":"BlueJeans,CEPHtmlEngine","ja3_string":""}
+{"desc":"83e04bc58d402f9633983cbf22724b02","ja3_hash":"Charles,Google Play Music Desktop Player,Postman,Slack,and other desktop programs","ja3_string":""}
+{"desc":"424008725394c634a4616b8b1f2828a5","ja3_hash":"Charles,java,eclipse","ja3_string":""}
+{"desc":"be9f1360cf52dc1f61ae025252f192a3","ja3_hash":"Chromium","ja3_string":""}
+{"desc":"def8761e4bcaaf91d99801a22ac6f6d4","ja3_hash":"Chromium","ja3_string":""}
+{"desc":"fc5cb0985a5f5e295163cc8ffff8a6e1","ja3_hash":"Chromium","ja3_string":""}
+{"desc":"e7d46c98b078477c4324031e0d3b22f5","ja3_hash":"Cisco AnyConnect Secure Mobility Client","ja3_string":""}
+{"desc":"ed36017db541879619c399c95e22067d","ja3_hash":"Cisco AnyConnect Secure Mobility Client","ja3_string":""}
+{"desc":"5ee1a653fb824db7182714897fd3b5df","ja3_hash":"Citrix Viewer","ja3_string":""}
+{"desc":"a9d17f74e55dd53fcf7c234f8a240919","ja3_hash":"Covenant Eyes","ja3_string":""}
+{"desc":"c882d9444412c00e71b643f3f54145ff","ja3_hash":"Creative Cloud","ja3_string":""}
+{"desc":"bc0608d33dc64506b42f7f5f87958f37","ja3_hash":"cscan","ja3_string":""}
+{"desc":"4fcd1770545298cc119865aeba81daba","ja3_hash":"Deezer","ja3_string":""}
+{"desc":"4c40bf8baa7c301c5dba8a20bc4119e2","ja3_hash":"Dynalist,Postman,Google Chrome,Franz,GOG Galaxy","ja3_string":""}
+{"desc":"0411bbb5ff27ad46e1874a7a8beedacb","ja3_hash":"eclipse","ja3_string":""}
+{"desc":"4990c9da08f44a01ecd7ddc3837caf25","ja3_hash":"eclipse","ja3_string":""}
+{"desc":"fa106fe5beec443af7e211ef8902e7e0","ja3_hash":"eclipse","ja3_string":""}
+{"desc":"d74778f454e2b047e030b291b94dd698","ja3_hash":"eclipse,java","ja3_string":""}
+{"desc":"187dfde7edc8ceddccd3deeccc21daeb","ja3_hash":"eclipse,java,studio,STS","ja3_string":""}
+{"desc":"8c5a50f1e833ed581e9cfc690814719a","ja3_hash":"eclipse,JavaApplicationStub,idea","ja3_string":""}
+{"desc":"1fbe5382f9d8430fe921df747c46d95f","ja3_hash":"FieldServiceApp,socialstudio","ja3_string":""}
+{"desc":"0a81538cf247c104edb677bdb8902ed5","ja3_hash":"firefox","ja3_string":""}
+{"desc":"0b6592fd91d4843c823b75e49b43838d","ja3_hash":"firefox","ja3_string":""}
+{"desc":"1c15aca4a38bad90f9c40678f6aface9","ja3_hash":"firefox","ja3_string":""}
+{"desc":"5163bc7c08f57077bc652ec370459c2f","ja3_hash":"firefox","ja3_string":""}
+{"desc":"a88f1426c4603f2a8cd8bb41e875cb75","ja3_hash":"firefox","ja3_string":""}
+{"desc":"b03910cc6de801d2fcfa0c3b9f397df4","ja3_hash":"firefox","ja3_string":""}
+{"desc":"bfcc1a3891601edb4f137ab7ab25b840","ja3_hash":"firefox","ja3_string":""}
+{"desc":"f15797a734d0b4f171a86fd35c9a5e43","ja3_hash":"firefox","ja3_string":""}
+{"desc":"8498fe4268764dbf926a38283e9d3d8f","ja3_hash":"Franz,Google Chrome,Kiwi,Spotify,nwjs,Slack","ja3_string":""}
+{"desc":"900c1fa84b4ea86537e1d148ee16eae8","ja3_hash":"Fuze","ja3_string":""}
+{"desc":"107144b88827da5da9ed42d8776ccdc5","ja3_hash":"geod","ja3_string":""}
+{"desc":"c46941d4de99445aef6b497679474cf4","ja3_hash":"geod","ja3_string":""}
+{"desc":"002205d0f96c37c5e660b9f041363c11","ja3_hash":"Google Chrome","ja3_string":""}
+{"desc":"073eede15b2a5a0302d823ecbd5ad15b","ja3_hash":"Google Chrome","ja3_string":""}
+{"desc":"0b61c673ee71fe9ee725bd687c455809","ja3_hash":"Google Chrome","ja3_string":""}
+{"desc":"6cd1b944f5885e2cfbe98a840b75eeb8","ja3_hash":"Google Chrome","ja3_string":""}
+{"desc":"b4f4e6164f938870486578536fc1ffce","ja3_hash":"Google Chrome","ja3_string":""}
+{"desc":"b8f81673c0e1d29908346f3bab892b9b","ja3_hash":"Google Chrome","ja3_string":""}
+{"desc":"baaac9b6bf25ad098115c71c59d29e51","ja3_hash":"Google Chrome","ja3_string":""}
+{"desc":"da949afd9bd6df820730f8f171584a71","ja3_hash":"Google Chrome","ja3_string":""}
+{"desc":"f58966d34ff9488a83797b55c804724d","ja3_hash":"Google Chrome","ja3_string":""}
+{"desc":"fd6314b03413399e4f23d1524d206692","ja3_hash":"Google Chrome","ja3_string":""}
+{"desc":"0e46737668fe75092919ee047a0b5945","ja3_hash":"Google Chrome Helper","ja3_string":""}
+{"desc":"39fa85654105398ee7ef6a3a1c81d685","ja3_hash":"Google Chrome Helper","ja3_string":""}
+{"desc":"4ba7b7022f5f5e1e500bb19199d8b1a4","ja3_hash":"Google Chrome Helper","ja3_string":""}
+{"desc":"5498cef2cca704eb01cf2041cc1089c1","ja3_hash":"Google Chrome,Slack","ja3_string":""}
+{"desc":"d27fb8deca6e3b9739db3fda2b229fe3","ja3_hash":"Google Drive File Stream","ja3_string":""}
+{"desc":"ae340571b4fd0755c4a0821b18d8fa93","ja3_hash":"Google Earth","ja3_string":""}
+{"desc":"f059212ce3de94b1e8253a7522cb1b44","ja3_hash":"Google Photos Backup","ja3_string":""}
+{"desc":"fd10cc8cce9493a966c57249e074755f","ja3_hash":"gramblr","ja3_string":""}
+{"desc":"3e860202fc555b939e83e7a7ab518c38","ja3_hash":"hola_svc","ja3_string":""}
+{"desc":"54328bd36c14bd82ddaa0c04b25ed9ad","ja3_hash":"hola_svc","ja3_string":""}
+{"desc":"56ac3a0bef0824c49e4b569941937088","ja3_hash":"hola_svc","ja3_string":""}
+{"desc":"5c1c89f930122bccc7a97d52f73bea2c","ja3_hash":"hola_svc","ja3_string":""}
+{"desc":"77310efe11f1943306ee317cf02150b7","ja3_hash":"hola_svc","ja3_string":""}
+{"desc":"8bd59c4b7f3193db80fd64318429bcec","ja3_hash":"hola_svc","ja3_string":""}
+{"desc":"d1f9f9b224387d2597f02095fcec96d7","ja3_hash":"hola_svc","ja3_string":""}
+{"desc":"ff1040ba1e3d235855ef0d7cd9237fdc","ja3_hash":"hola_svc","ja3_string":""}
+{"desc":"5af143afdbf58ec11ab3b3d53dd4e5e3","ja3_hash":"IDSyncDaemon","ja3_string":""}
+{"desc":"d06acbe8ac31e753f40600a9d6717cba","ja3_hash":"Inbox OSX","ja3_string":""}
+{"desc":"093081b45872912be9a1f2a8163fe041","ja3_hash":"java","ja3_string":""}
+{"desc":"2080bf56cb87e64303e27fcd781e7efd","ja3_hash":"java","ja3_string":""}
+{"desc":"225a24b45f0f1adbc2e245d4624c6e08","ja3_hash":"java","ja3_string":""}
+{"desc":"3afe1fb5976d0999abe833b14b7d6485","ja3_hash":"java","ja3_string":""}
+{"desc":"3b844830bfbb12eb5d2f8dc281d349a9","ja3_hash":"java","ja3_string":""}
+{"desc":"51a7ad14509fd614c7bb3a50c4982b8c","ja3_hash":"java","ja3_string":""}
+{"desc":"550628650380ff418de25d3d890e836e","ja3_hash":"java","ja3_string":""}
+{"desc":"5b270b309ad8c6478586a15dece20a88","ja3_hash":"java","ja3_string":""}
+{"desc":"5d7abe53ae15b4272a34f10431e06bf3","ja3_hash":"java","ja3_string":""}
+{"desc":"7c7a68b96d2aab15d678497a12119f4f","ja3_hash":"java","ja3_string":""}
+{"desc":"88afa0dea1608e28f50acbad32d7f195","ja3_hash":"java","ja3_string":""}
+{"desc":"8ce6933b8c12ce931ca238e9420cc5dd","ja3_hash":"java","ja3_string":""}
+{"desc":"a61299f9b501adcf680b9275d79d4ac6","ja3_hash":"java","ja3_string":""}
+{"desc":"a9fead344bf3ac09f62df3cd9b22c268","ja3_hash":"java","ja3_string":""}
+{"desc":"4056657a50a8a4e5cfac40ba48becfa2","ja3_hash":"java,eclipse","ja3_string":""}
+{"desc":"f22bdd57e3a52de86cda40da2d84e83b","ja3_hash":"java,eclipse,Cyberduck","ja3_string":""}
+{"desc":"028563cffc7a3a2e32090aee0294d636","ja3_hash":"java,eclipse,STS","ja3_string":""}
+{"desc":"5f9b53f0d39dc9d940a3b5568fe5f0bb","ja3_hash":"java,JavaApplicationStub","ja3_string":""}
+{"desc":"2db6873021f2a95daa7de0d93a1d1bf2","ja3_hash":"java,studio,eclipse","ja3_string":""}
+{"desc":"c376061f96329e1020865a1dc726927d","ja3_hash":"JavaApplicationStub","ja3_string":""}
+{"desc":"e516ad69a423f8e0407307aa7bfd6344","ja3_hash":"Kindle,stack,nextcloud","ja3_string":""}
+{"desc":"3959d0a1344896e9fb5c0564ca0a2956","ja3_hash":"LeagueClientUx","ja3_string":""}
+{"desc":"0fe51fa93812c2ebb50a655222a57bf2","ja3_hash":"LINE Messaging","ja3_string":""}
+{"desc":"2e094913d88f0ad8dc69447cb7d2ce65","ja3_hash":"LINE Messaging","ja3_string":""}
+{"desc":"193349d34561d1d5d1a270172eb2d97e","ja3_hash":"LogMeIn Client","ja3_string":""}
+{"desc":"d732ca39155f38942f90e9fc2b0f97f7","ja3_hash":"Maxthon","ja3_string":""}
+{"desc":"c9dbeed362a32f9a50a26f4d9b32bbd8","ja3_hash":"Messenger,Jumpshare","ja3_string":""}
+{"desc":"6acb250ada693067812c3335705dae79","ja3_hash":"mono-sgen,Syncplicity,Axure RP 8,Amazon Drive","ja3_string":""}
+{"desc":"3ee4aaac7147ff2b80ada31686db660c","ja3_hash":"node-webkit,Kindle","ja3_string":""}
+{"desc":"641df9d6dbe7fdb74f70c8ad93def8cc","ja3_hash":"node.js","ja3_string":""}
+{"desc":"9811c1bb9f0f6835d5c13a831cca4173","ja3_hash":"node.js","ja3_string":""}
+{"desc":"106ecbd3d14b4dc6e413494263720afe","ja3_hash":"node.js,Postman,WhatsApp","ja3_string":""}
+{"desc":"49de9b1c7e60bd3b8e1d4f7a49ba362e","ja3_hash":"nwjs,Chromium","ja3_string":""}
+{"desc":"38cbe70b308f42da7c9980c0e1c89656","ja3_hash":"p4v,owncloud","ja3_string":""}
+{"desc":"62448833d8230241227c03b7d441e31b","ja3_hash":"parsecd,apple.geod,apple.photomoments,photoanalysisd,FreedomProxy","ja3_string":""}
+{"desc":"e846898acc767ebeb2b4388e58a968d4","ja3_hash":"postbox-bin","ja3_string":""}
+{"desc":"a7823092705a5e91ce2b7f561b6e5b98","ja3_hash":"Qsync Client","ja3_string":""}
+{"desc":"c048d9f26a79e11ca7276499ef24daf3","ja3_hash":"RescueTime,Plantronics Hub","ja3_string":""}
+{"desc":"d219efd07cbb8fbe547e6a5335843f0f","ja3_hash":"ruby","ja3_string":""}
+{"desc":"c36fb08942cf19508c08d96af22d4ffc","ja3_hash":"Safari","ja3_string":""}
+{"desc":"844166382cc98d98595e6778c470f5d5","ja3_hash":"Salesforce Files","ja3_string":""}
+{"desc":"49a341a21f4fd4ac63b027ff2b1a331f","ja3_hash":"Skype","ja3_string":""}
+{"desc":"a5aa6e939e4770e3b8ac38ce414fd0d5","ja3_hash":"Slack","ja3_string":""}
+{"desc":"116ffc8889873efad60457cd55eaf543","ja3_hash":"Spark","ja3_string":""}
+{"desc":"8db4b0f8e9dd8f2fff38ee7c5a1e4496","ja3_hash":"SpotlightNetHelper,Safari","ja3_string":""}
+{"desc":"39cf5b7a13a764494de562add874f016","ja3_hash":"Steam OSX","ja3_string":""}
+{"desc":"2d3854d1cbcdceece83eabd85bdcc056","ja3_hash":"Tableau","ja3_string":""}
+{"desc":"a585c632a2b49be1256881fb0c16c864","ja3_hash":"Tableau","ja3_string":""}
+{"desc":"cd7c06b9459c9cfd4af2dba5696ea930","ja3_hash":"Tableau","ja3_string":""}
+{"desc":"df65746370dcabc9b4f370c6e14a8156","ja3_hash":"True Key","ja3_string":""}
+{"desc":"84071ea96fc8a60c55fc8a405e214c0f","ja3_hash":"Used by many desktop apps,Quip,Spotify,GitHub Desktop","ja3_string":""}
+{"desc":"40fd0a5e81ebdcf0ec82a4710a12dec1","ja3_hash":"Used by many programs on OSX,apple.WebKit.Networking","ja3_string":""}
+{"desc":"618ee2509ef52bf0b8216e1564eea909","ja3_hash":"Used by many programs on OSX,apple.WebKit.Networking","ja3_string":""}
+{"desc":"799135475da362592a4be9199d258726","ja3_hash":"Used by many programs on OSX,apple.WebKit.Networking","ja3_string":""}
+{"desc":"7b530a25af9016a9d12de5abc54d9e74","ja3_hash":"Used by many programs on OSX,apple.WebKit.Networking","ja3_string":""}
+{"desc":"7e72698146290dd68239f788a452e7d8","ja3_hash":"Used by many programs on OSX,apple.WebKit.Networking","ja3_string":""}
+{"desc":"a9aecaa66ad9c6cfe1c361da31768506","ja3_hash":"Used by many programs on OSX,apple.WebKit.Networking","ja3_string":""}
+{"desc":"c05de18b01a054f2f6900ffe96b3da7a","ja3_hash":"Used by many programs on OSX,apple.WebKit.Networking","ja3_string":""}
+{"desc":"c07cb55f88702033a8f52c046d23e0b2","ja3_hash":"Used by many programs on OSX,apple.WebKit.Networking","ja3_string":""}
+{"desc":"e4d448cdfe06dc1243c1eb026c74ac9a","ja3_hash":"Used by many programs on OSX,apple.WebKit.Networking","ja3_string":""}
+{"desc":"f1c5cf087b959cec31bd6285407f689a","ja3_hash":"Used by many programs on OSX,apple.WebKit.Networking","ja3_string":""}
+{"desc":"488b6b601cb141b062d4da7f524b4b22","ja3_hash":"Used by many programs,Python,PHP,Git,dotnet,Adobe","ja3_string":""}
+{"desc":"f28d34ce9e732f644de2350027d74c3f","ja3_hash":"Used by many programs,Quip,Aura,Spotify,Chatty","ja3_string":""}
+{"desc":"190dfb280fe3b541acc6a2e5f00690e6","ja3_hash":"Used by many programs,Quip,Spotify,Dropbox,GitHub Desktop,etc","ja3_string":""}
+{"desc":"20dd18bdd3209ea718989030a6f93364","ja3_hash":"Used by many programs,Slack,Postman,Spotify,Google Chrome","ja3_string":""}
+{"desc":"e0224fc1c33658f2d3d963bfb0a76a85","ja3_hash":"Viber","ja3_string":""}
+{"desc":"01319090aea981dde6fc8d6ae71ead54","ja3_hash":"vpnkit","ja3_string":""}
+{"desc":"84607748f3887541dd60fe974a042c71","ja3_hash":"wineserver","ja3_string":""}
+{"desc":"c2b4710c6888a5d47befe865c8e6fb19","ja3_hash":"ZwiftApp","ja3_string":""}
