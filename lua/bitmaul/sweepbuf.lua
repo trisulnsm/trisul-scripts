@@ -6,8 +6,30 @@
 -- local dbg=require'debugger'
 local SweepBuf  = {
 
+  u8le = function(tbl)
+    return string.byte(tbl.buff,tbl.seekpos)
+  end,
+
   u8 = function(tbl)
     return string.byte(tbl.buff,tbl.seekpos)
+  end,
+
+  u16le = function(tbl)
+    return string.byte(tbl.buff,tbl.seekpos) +
+           string.byte(tbl.buff,tbl.seekpos+1)*256;
+  end,
+
+  u24le = function(tbl)
+    return string.byte(tbl.buff,tbl.seekpos) +
+           string.byte(tbl.buff,tbl.seekpos+1)*256 + 
+           string.byte(tbl.buff,tbl.seekpos+2)*4096
+  end,
+
+  u32le = function(tbl)
+    return string.byte(tbl.buff,tbl.seekpos) +
+           string.byte(tbl.buff,tbl.seekpos+1)*256 +
+           string.byte(tbl.buff,tbl.seekpos+2)*4096 + 
+           string.byte(tbl.buff,tbl.seekpos+3)*65536
   end,
 
   u16 = function(tbl)
@@ -35,6 +57,12 @@ local SweepBuf  = {
 	return reclen
   end,
 
+  next_u8_le = function(tbl)
+    local r = tbl:u8()
+    tbl:inc(1)
+    return r
+  end,
+
   next_u8 = function(tbl)
     local r = tbl:u8()
     tbl:inc(1)
@@ -53,6 +81,11 @@ local SweepBuf  = {
   next_u16 = function(tbl)
     return tbl:next_u8()*256 + tbl:next_u8()
   end,
+
+  next_u16_le = function(tbl)
+    return tbl:next_u8() + tbl:next_u8()*256
+  end,
+
 
   next_str_to_pattern = function(tbl, patt)
   	local f =string.find(tbl.buff,patt,tbl.seekpos,true) 
@@ -88,8 +121,16 @@ local SweepBuf  = {
     return tbl:next_u8()*4096 + tbl:next_u8()*256 + tbl:next_u8()
   end,
 
+  next_u24_le = function(tbl)
+    return tbl:next_u8()+ tbl:next_u8()*256 + tbl:next_u8()*4096
+  end,
+
   next_u32 = function(tbl)
     return tbl:next_u16()*65536 + tbl:next_u16() 
+  end,
+
+  next_u32_le = function(tbl)
+    return tbl:next_u8()+ tbl:next_u8()*256 + tbl:next_u8()*4096 + tbl:next_u8()*65536
   end,
 
   next_u32_arr = function(tbl,nitems)
