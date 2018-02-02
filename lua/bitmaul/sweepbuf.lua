@@ -1,8 +1,9 @@
 -- sweepbuf.lua
--- 	a one-pass scan buffer 
--- 	for packet dissection 
+--  a one-pass scan buffer 
+--  for packet dissection 
 --
--- 	TODO: unoptimized 
+--  TODO: unoptimized but need profiling LuaJIT traces 
+--
 -- local dbg=require'debugger'
 local SweepBuf  = {
 
@@ -51,10 +52,10 @@ local SweepBuf  = {
   end,
 
   peek_u16 = function(tbl, offset)
-	tbl:inc(offset)
-	local reclen  = tbl:u16()
-	tbl:inc(-offset)
-	return reclen
+    tbl:inc(offset)
+    local reclen  = tbl:u16()
+    tbl:inc(-offset)
+    return reclen
   end,
 
   next_u8_le = function(tbl)
@@ -88,24 +89,24 @@ local SweepBuf  = {
 
 
   next_str_to_pattern = function(tbl, patt)
-  	local f =string.find(tbl.buff,patt,tbl.seekpos,true) 
-  	if f then
-  		local r = string.sub(tbl.buff,tbl.seekpos,f+#patt)
-  		tbl.seekpos = f+#patt
-  		return r
-  	else
-  		return nil 
-  	end
+    local f =string.find(tbl.buff,patt,tbl.seekpos,true) 
+    if f then
+        local r = string.sub(tbl.buff,tbl.seekpos,f+#patt)
+        tbl.seekpos = f+#patt
+        return r
+    else
+        return nil 
+    end
   end,
 
   next_str_to_len = function(tbl, slen)
-  	if tbl:bytes_left() >= slen then 
-  		local r = string.sub(tbl.buff,tbl.seekpos,tbl.seekpos+slen-1)
-  		tbl:inc(slen)
-  		return r
-  	else
-	   	return nil
-	 end 
+    if tbl:bytes_left() >= slen then 
+      local r = string.sub(tbl.buff,tbl.seekpos,tbl.seekpos+slen-1)
+      tbl:inc(slen)
+      return r
+    else
+      return nil
+    end 
   end,
 
   next_u16_arr = function(tbl,nitems)
@@ -153,11 +154,11 @@ local SweepBuf  = {
 
   reset = function(tbl)
     tbl.seekpos=1
-	tbl.fence={#tbl.buff}
+    tbl.fence={#tbl.buff}
   end,
 
   top_fence = function(tbl)
-  	return tbl.fence[#tbl.fence]
+    return tbl.fence[#tbl.fence]
   end,
 
   has_more = function(tbl)
@@ -181,73 +182,70 @@ local SweepBuf  = {
   end,
 
   split = function(tbl, str, delim)
-      local ret = {}
-	  for word in str:gmatch("([^,]+)") do
-	      ret[#ret+1]=word
-	  end
-	  return ret
+    local ret = {}
+    for word in str:gmatch("([^,]+)") do
+      ret[#ret+1]=word
+    end
+    return ret
   end,
 
   hexdump = function(tbl )
-
-	  local offset=1
-	  local bytes_per_line=16
-	  while offset < #tbl.buff  do
-	  	io.write(string.format("%08X ", offset-1))
-		local bytes = string.sub(tbl.buff,offset,offset+bytes_per_line)
-	    for b in bytes:gmatch('.') do
-		    io.write(('%02X '):format(b:byte()))
-		end
-		io.write(('   '):rep(bytes_per_line - bytes:len() + 1))
-		io.write(bytes:gsub('[^%g]', '.'), '\n')
-		offset = offset + bytes_per_line
-	  end
-
+    local offset=1
+    local bytes_per_line=16
+    while offset < #tbl.buff  do
+      io.write(string.format("%08X ", offset-1))
+      local bytes = string.sub(tbl.buff,offset,offset+bytes_per_line)
+      for b in bytes:gmatch('.') do
+        io.write(('%02X '):format(b:byte()))
+      end
+      io.write(('   '):rep(bytes_per_line - bytes:len() + 1))
+      io.write(bytes:gsub('[^%g]', '.'), '\n')
+      offset = offset + bytes_per_line
+    end
   end
-
-
 
 }
 
 
 -- metatbl - use a common mt (LuaJIT opt)
 local smt = {
-	__index = SweepBuf,
+    __index = SweepBuf,
 
-	__le    = function(s1, s2) 
-				return s1.left >= s2.left and s1.right <= s2.right
-			  end,
+    __le    = function(s1, s2) 
+                return s1.left >= s2.left and s1.right <= s2.right
+              end,
 
-	__add   = function(s1, s2) 
-				local ol = s1.right-s2.left
-				local newbuff = string.sub(s1.buff,s1.seekpos).. string.sub(s2.buff,ol+1)
-				return setmetatable({
-					left=s1.left,
-					right=s2.right,
-					seekpos=1,
-					buff = newbuff,
-					fence={#newbuff}
-				},getmetatable(s1));
-			  end,
+    __add   = function(s1, s2) 
+                local ol = s1.right-s2.left
+                local newbuff = string.sub(s1.buff,s1.seekpos).. string.sub(s2.buff,ol+1)
+                return setmetatable({
+                  left=s1.left,
+                  right=s2.right,
+                  seekpos=1,
+                  buff = newbuff,
+                  fence={#newbuff}
+                },getmetatable(s1));
+              end,
 
-	__tostring = function(s)
-					 return string.format( "SB: Len=%d Seek=%d Avail=%d L=%d R=%d F=%d", #s.buff, s.seekpos, s:bytes_left(), s.left, s.right, s:top_fence() )
-				 end
+    __tostring = function(s)
+                   return string.format( "SB: Len=%d Seek=%d Avail=%d L=%d R=%d F=%d", #s.buff, s.seekpos, s:bytes_left(), s.left, s.right, s:top_fence() )
+                 end
 }
 
 local sweepbuf = { 
 
    new = function( rawbuffer , pos) 
-   	   pos = pos or 1 
-	   return setmetatable(  {
-		   buff=rawbuffer,
-		   left=pos,
-		   right=pos+#rawbuffer,
-		   seekpos=1,
-		   fence={#rawbuffer} 
-	    }, smt)
+       pos = pos or 1 
+       return setmetatable(  {
+          buff=rawbuffer,
+          left=pos,
+          right=pos+#rawbuffer,
+          seekpos=1,
+          fence={#rawbuffer} 
+        },smt)
 
-	end
+    end
 } 
 
 return sweepbuf 
+
