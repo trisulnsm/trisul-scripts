@@ -1,7 +1,7 @@
 BITMAUL - The Mauler of packetz 
 ======
 
-![BITMAUL ICON ](https://octodex.github.com/images/yaktocat.png)
+![BITMAUL ICON ](https://github.com/trisulnsm/trisul-scripts/raw/master/lua/bitmaul/maulaxe.png)
 
 BITMAUL is a LUA helper library that makes it easy to 
 
