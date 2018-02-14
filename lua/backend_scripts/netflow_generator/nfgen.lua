@@ -48,8 +48,8 @@ TrisulPlugin = {
     local addr=ffi.new("struct sockaddr_in");
     ffi.fill(addr,ffi.sizeof(addr));
     addr.sin_family = K.AF_INET;
-    addr.sin_addr = ffi.C.inet_addr("192.168.2.19"); 
-    addr.sin_port = ffi.C.htons(2055);
+    addr.sin_addr = ffi.C.inet_addr(NETFLOW_COLLECTOR_HOST)
+    addr.sin_port = ffi.C.htons(NETFLOW_COLLECTOR_PORT)
     T.dest_addr = addr
 
     -- basic resets
