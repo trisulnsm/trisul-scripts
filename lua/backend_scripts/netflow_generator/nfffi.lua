@@ -1,3 +1,6 @@
+-- nfffi : LuaJIT FFI  definitions 
+--         we use these to send out Netflow packets 
+
 local _ffi=require'ffi'
 
 -- this cdef is the tough part 
@@ -78,7 +81,6 @@ typedef struct nf5_packet {
 } nf5_packet;
 
 ]] 
-
 
 return _ffi
 
