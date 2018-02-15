@@ -13,7 +13,7 @@ local bit = require'bit'
 --
 --  Config Params
 --
-local NETFLOW_COLLECTOR_HOST = "192.168.2.11"
+local NETFLOW_COLLECTOR_HOST = "192.168.2.80"
 local NETFLOW_COLLECTOR_PORT = 2055
 --
 -- 
@@ -57,6 +57,9 @@ TrisulPlugin = {
     T.flow_flush_time = nil 
     T.sequence_no = 1 
 
+    -- in progress 
+    T.inprogress = { } 
+
   end,
 
 
@@ -78,6 +81,12 @@ TrisulPlugin = {
     -- WHEN CALLED: before a flow is flushed to the Hub node  
     -- build a packet , then send when UDP datagram is full - about 25 records per packet 
     onflush = function(engine, flow) 
+
+
+      -- skip in progress flows 
+      if bit.band(flow:state(),0x0900)  == 0  then 
+        return 
+      end 
 
       -- packet being filled up 
       if T.nf5_Packet == nil then
