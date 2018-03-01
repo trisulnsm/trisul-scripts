@@ -3,8 +3,7 @@ ja3fingerprint.json
 
 A database of JA3 Fingerprints in JSON format. 
 
-The original sources of these prints can be found as comments.  If you have stumble across any reliable  JA3 Print not seen in the list, please submit a pull request. 
-
+The original sources of these prints can be found as comments.  If you come across prints not seen in the list, please submit a pull request. 
 
 For more about JA3 :  https://github.com/salesforce/ja3  
 
