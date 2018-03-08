@@ -18,6 +18,7 @@ TrisulPlugin = {
     control = {
       guid = "{ED5CA168-1E17-44E0-7ABD-65E5C2DFAD21}", 
       name = "HTTP User-Agent",
+	  description = "HTTP U-A resource"
     },
   },
 }
