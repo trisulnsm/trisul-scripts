@@ -6,6 +6,8 @@ local contents = input_file:read("*a")
 
 print( contents )
 
+local test_str = "Mozilla/4.0 (compatible; GoogleToolbar 4.0.1601.4978-big; Windows XP 5.1; MSIE 6.0.2900.2180)"
+
 
 local doc = YAML.parse(contents) 
 print(inspect(doc) )
