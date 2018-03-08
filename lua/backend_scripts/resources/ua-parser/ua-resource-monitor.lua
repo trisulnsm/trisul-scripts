@@ -27,17 +27,18 @@ TrisulPlugin = {
 
 	T.ua_table={} 
 	for k,v in pairs(doc['user_agent_parsers'])  do 
-		T.ua_table[#T.ua_table+1] = {regex_compiled=T.re2(v['regex']), 
+		local case_s = (v['regex_flag']~='i')
+		T.ua_table[#T.ua_table+1] = {regex_compiled=T.re2(v['regex'],{case_sensitive=case_s}), 
 									 regex_str=v['regex'], 
 									 family_replacement=v['family_replacement'], 
 									 hits=0 }
 	end
 	print("LOADED  "..#T.ua_table.." User Agent regexps")
 
-
 	T.dev_table = { } 
 	for k,v in pairs(doc['device_parsers'])  do 
-		T.dev_table[#T.dev_table+1] = {regex_compiled=T.re2(v['regex']), 
+		local case_s = (v['regex_flag']~='i')
+		T.dev_table[#T.dev_table+1] = {regex_compiled=T.re2(v['regex'],{case_sensitive=case_s}), 
 									 regex_str=v['regex'], 
 									 dev_replacement=v['device_replacement'], 
 									 brand_replacement=v['brand_replacement'] or "", 
@@ -49,7 +50,8 @@ TrisulPlugin = {
 
 	T.os_table = {} 
 	for k,v in pairs(doc['os_parsers'])  do 
-		T.os_table[#T.os_table+1] = {regex_compiled=T.re2(v['regex']), 
+		local case_s = (v['regex_flag']~='i')
+		T.os_table[#T.os_table+1] = {regex_compiled=T.re2(v['regex'], {case_sensitive=case_s}), 
 									 regex_str=v['regex'], 
 									 os_replacement=v['os_replacement'], 
 									 os_v1_replacement=v['os_v1_replacement'] or "", 
@@ -57,15 +59,8 @@ TrisulPlugin = {
 									 hits=0 }
 	end
 	print("LOADED  "..#T.os_table.." OS regexps")
-
-
-
   end,
 
-  -- WHEN CALLED : your LUA script is unloaded  / detached from Trisul 
-  onunload = function()
-    -- your code 
-  end,
 
 
   -- resource_monitor block 
@@ -128,7 +123,7 @@ TrisulPlugin = {
 				if rx.os_replacement  then
 					os_str = rx.os_replacement ..rx.os_v1_replacement
 				else 
-					os_str = os.."-"..v1
+					os_str = os.."-"..(v1 or "")..(v2 or "")  
 				end 
 				print("OS = "..os_str) 
 				table.sort(T.os_table, function( v1, v2 ) return v1.hits > v2.hits ; end ) 
@@ -162,10 +157,6 @@ TrisulPlugin = {
 			engine:update_counter( "{747F125F-2838-4A76-6D44-55974DE58F78}", 
 								browser_str, 0 , 1)  
 		end 
-
-
     end,
-
   },
-
 }
