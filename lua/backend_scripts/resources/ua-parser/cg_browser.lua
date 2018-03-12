@@ -27,7 +27,7 @@ TrisulPlugin = {
     -- id, type of meter, toppers to track, bottom-ers to track, Name, units, units-short 
     -- 
     meters = {
-        {  0, T.K.vartype.COUNTER,      10, 0, "Hits",  "hits",  "hits" },
+        {  0, T.K.vartype.COUNTER,      10, 10, "Hits",  "hits",  "hits" },
     },  
 
   },

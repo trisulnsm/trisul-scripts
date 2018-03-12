@@ -157,6 +157,18 @@ TrisulPlugin = {
 			engine:update_counter( "{747F125F-2838-4A76-6D44-55974DE58F78}", 
 								browser_str, 0 , 1)  
 		end 
+
+		if os_str then 
+			engine:update_counter( "{0F67F47E-A407-4047-2AF6-8E25FEC75C3A}",
+								os_str, 0 , 1)  
+		end
+
+		if device_str then
+			engine:update_counter( "{EB232F1A-05E6-45E7-1888-9AF224511E6D}",
+								device_str, 0 , 1)  
+
+		end
+
     end,
   },
 }
