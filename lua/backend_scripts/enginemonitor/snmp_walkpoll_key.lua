@@ -62,13 +62,16 @@ TrisulPlugin = {
 
   -- load polling targets from DB 
   onload = function()
-    T.poll_targets = TrisulPlugin.load_poll_targets(SNMP_DATABASE)
+    T.poll_targets =  nil
   end,
 
   engine_monitor = {
 
     -- only do this from Engine 0. Run thru each port and send separat SNMP get 
     onbeginflush = function(engine, tv)
+     
+     if T.poll_targets == nil then return end
+
 
       for _,agent in ipairs(T.poll_targets) do 
 
@@ -156,7 +159,7 @@ TrisulPlugin = {
       ok, stepret = pcall(stmt.step, stmt) 
     end
     for ipkey,snmp in pairs(snmp_attributes) do
-      if T.util.hash( snmp["snmp.ip"],0) == tonumber(engine_id) then 
+      if T.util.hash( snmp["snmp.ip"],1) == tonumber(engine_id) then 
         targets[ #targets + 1] = { agent_ip = snmp["snmp.ip"], agent_community = snmp["snmp.community"], agent_version = snmp["snmp.version"] } 
         T.log(T.K.loglevel.INFO, "Loaded ip="..snmp["snmp.ip"].." version"..snmp["snmp.version"].." comm=".. snmp["snmp.community"])
         print("Loaded ip="..snmp["snmp.ip"].." version="..snmp["snmp.version"].." comm=".. snmp["snmp.community"])
