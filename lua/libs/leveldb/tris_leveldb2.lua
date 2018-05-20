@@ -85,49 +85,49 @@ unsigned long long int strtoull(const char *nptr, char **endptr,
 
 local siterator = {
 
-	create=function(ldb)
-		local read_db_opts  = L.leveldb_readoptions_create();
-		return L.leveldb_create_iterator(ldb,  read_db_opts)
-	end, 
+  create=function(ldb)
+    local read_db_opts  = L.leveldb_readoptions_create();
+    return L.leveldb_create_iterator(ldb,  read_db_opts)
+  end, 
 
 
-	seek_to_first=function(tbl)
-		L.leveldb_iter_seek_to_first(tbl._iter)
-	end,
+  seek_to_first=function(tbl)
+    L.leveldb_iter_seek_to_first(tbl._iter)
+  end,
 
 
-	seek_to=function(tbl,key)
-		L.leveldb_iter_seek(tbl._iter,key,#key)
-	end,
+  seek_to=function(tbl,key)
+    L.leveldb_iter_seek(tbl._iter,key,#key)
+  end,
 
-	iter_next=function(tbl)
-		L.leveldb_iter_next(tbl._iter)
-	end,
-	
-	iter_prev=function(tbl)
-		L.leveldb_iter_prev(tbl._iter)
-	end,
+  iter_next=function(tbl)
+    L.leveldb_iter_next(tbl._iter)
+  end,
+  
+  iter_prev=function(tbl)
+    L.leveldb_iter_prev(tbl._iter)
+  end,
 
-	destroy=function(tbl)
-		L.leveldb_iter_destroy(tbl._iter)
-	end,
+  destroy=function(tbl)
+    L.leveldb_iter_destroy(tbl._iter)
+  end,
 
-	valid=function(tbl)
-		return L.leveldb_iter_valid(tbl._iter)==1
-	end,
+  valid=function(tbl)
+    return L.leveldb_iter_valid(tbl._iter)==1
+  end,
 
-	key_value=function(tbl)
-		if tbl:valid() then
-			local readlen = ffi.new(' size_t  [1]') 
-			local v = L.leveldb_iter_value( tbl._iter, readlen);
-			local vs =  ffi.string(v,readlen[0]);
-			local k = L.leveldb_iter_key( tbl._iter, readlen);
-			local ks =  ffi.string(k,readlen[0]);
-			return ks,vs
-		else
-			return nil
-		end 
-	end,
+  key_value=function(tbl)
+    if tbl:valid() then
+      local readlen = ffi.new(' size_t  [1]') 
+      local v = L.leveldb_iter_value( tbl._iter, readlen);
+      local vs =  ffi.string(v,readlen[0]);
+      local k = L.leveldb_iter_key( tbl._iter, readlen);
+      local ks =  ffi.string(k,readlen[0]);
+      return ks,vs
+    else
+      return nil
+    end 
+  end,
 }
 
 local Iterator  = { 
@@ -141,139 +141,139 @@ local Iterator  = {
 
 local sleveldb = {
 
-	-- return true or false,errmsg 
-	open=function(tbl, dbpath)
+  -- return true or false,errmsg 
+  open=function(tbl, dbpath)
 
-		local errmsg = ffi.new(' char *[1]') 
-		local db_opts  = L.leveldb_options_create();
-		L.leveldb_options_set_create_if_missing( db_opts, 1 );
+    local errmsg = ffi.new(' char *[1]') 
+    local db_opts  = L.leveldb_options_create();
+    L.leveldb_options_set_create_if_missing( db_opts, 1 );
 
-		tbl._db = L.leveldb_open(db_opts,   dbpath  , errmsg)
-		if tbl._db == nil    then
-			print('Error opening leveldb database'..ffi.string(errmsg[0])  )
-			return  false, ffi.string(errmsg[0])
-		end
+    tbl._db = L.leveldb_open(db_opts,   dbpath  , errmsg)
+    if tbl._db == nil    then
+      print('Error opening leveldb database'..ffi.string(errmsg[0])  )
+      return  false, ffi.string(errmsg[0])
+    end
 
-		-- vars used everywhere  
-		tbl.errmsg = ffi.new(' char *[1]') 
-		tbl.read_opts  = L.leveldb_readoptions_create();
-		tbl.write_opts  = L.leveldb_writeoptions_create();
+    -- vars used everywhere  
+    tbl.errmsg = ffi.new(' char *[1]') 
+    tbl.read_opts  = L.leveldb_readoptions_create();
+    tbl.write_opts  = L.leveldb_writeoptions_create();
 
-		return true
-	end,
-
-
-
-	-- close 
-	close=function(tbl)
-		L.leveldb_close(tbl._db)
-		tbl._db=nil 
-	end, 
-
-
-	-- get key,val 
-	-- get a k,value with a k
-	get=function(tbl,k)
-		local readlen = ffi.new(' size_t  [1]') 
-		local val = L.leveldb_get( tbl._db, tbl.read_opts, k, #k, readlen, tbl.errmsg);
-		if val == nil  then 
-			return nil 
-		else 
-			return k,ffi.string(val,readlen[0])
-		end 
-	end,
-
-	-- getval
-	getval=function(tbl,k)
-		local readlen = ffi.new(' size_t  [1]') 
-		local val = L.leveldb_get( tbl._db, tbl.read_opts, k, #k, readlen, tbl.errmsg);
-		if val == nil  then 
-			return nil 
-		else 
-			return ffi.string(val,readlen[0])
-		end 
-	end,
+    return true
+  end,
 
 
 
-	-- put a KV 
-	put=function(tbl,k,v)
-
-		L.leveldb_put( tbl._db, tbl.write_opts, k,#k, v, #v, tbl.errmsg)
-		if tbl.errmsg[0] == nil then
-			return true, ""
-		else
-			local emsg = ffi.string(tbl.errmsg[0]);
-			L.leveldb_free( tbl.errmsg[0] ) 
-			return false, emsg
-		end
-
-	end,
+  -- close 
+  close=function(tbl)
+    L.leveldb_close(tbl._db)
+    tbl._db=nil 
+  end, 
 
 
-	-- delete a key 
-	delete=function(tbl,k)
-		L.leveldb_delete( tbl._db, tbl.write_opts, k,#k ,tbl.errmsg)
-		if tbl.errmsg[0] == nil then
-			return true
-		else
-			local emsg = ffi.string(tbl.errmsg[0]);
-			L.leveldb_free( tbl.errmsg[0] ) 
-			return false, emsg
-		end
-	end,
+  -- get key,val 
+  -- get a k,value with a k
+  get=function(tbl,k)
+    local readlen = ffi.new(' size_t  [1]') 
+    local val = L.leveldb_get( tbl._db, tbl.read_opts, k, #k, readlen, tbl.errmsg);
+    if val == nil  then 
+      return nil 
+    else 
+      return k,ffi.string(val,readlen[0])
+    end 
+  end,
+
+  -- getval
+  getval=function(tbl,k)
+    local readlen = ffi.new(' size_t  [1]') 
+    local val = L.leveldb_get( tbl._db, tbl.read_opts, k, #k, readlen, tbl.errmsg);
+    if val == nil  then 
+      return nil 
+    else 
+      return ffi.string(val,readlen[0])
+    end 
+  end,
 
 
-	
-	-- iterator 
-	create_iterator=function(tbl)
-		return Iterator.new(tbl._db)
-	end,
 
-	-- get keys lexicographically above and below the key
-	-- return k0,v0,k1,v1  - if exact match, k0,v0,k0,v0
-	-- nils if invalid 
-	get_bounds=function(tbl,iterator, key)
+  -- put a KV 
+  put=function(tbl,k,v)
 
-			iterator:seek_to(key)
-			if not iterator:valid()  then return nil end 
+    L.leveldb_put( tbl._db, tbl.write_opts, k,#k, v, #v, tbl.errmsg)
+    if tbl.errmsg[0] == nil then
+      return true, ""
+    else
+      local emsg = ffi.string(tbl.errmsg[0]);
+      L.leveldb_free( tbl.errmsg[0] ) 
+      return false, emsg
+    end
 
-			local k0,v0 = iterator:key_value()
-			if k0==key then 
-				return k0,v0,k0,v0
-			end
+  end,
 
-			iterator:iter_prev()
-			if not iterator:valid()  then return nil end 
-			local k1,v1 = iterator:key_value()
-			return k0,v0,k1,v1
 
-	end,
+  -- delete a key 
+  delete=function(tbl,k)
+    L.leveldb_delete( tbl._db, tbl.write_opts, k,#k ,tbl.errmsg)
+    if tbl.errmsg[0] == nil then
+      return true
+    else
+      local emsg = ffi.string(tbl.errmsg[0]);
+      L.leveldb_free( tbl.errmsg[0] ) 
+      return false, emsg
+    end
+  end,
 
-	-- upper match
-	upper=function(tbl,iterator,key)
-		iterator:seek_to(key)
-		if not iterator:valid()  then return nil end 
 
-		local k0,v0 = iterator:key_value()
-		return k0,v0
-	end,
+  
+  -- iterator 
+  create_iterator=function(tbl)
+    return Iterator.new(tbl._db)
+  end,
 
-	-- dump the whole database 
-	dump=function(tbl)
+  -- get keys lexicographically above and below the key
+  -- return k0,v0,k1,v1  - if exact match, k0,v0,k0,v0
+  -- nils if invalid 
+  get_bounds=function(tbl,iterator, key)
 
-		print("Dumping----")
-		local iter=tbl.create_iterator(tbl)
-		iter:seek_to_first()
-		while iter:valid() do 
-			local k,v = iter:key_value()
-			print(k.."="..v)
-			iter:iter_next()
-		end 
-		iter:destroy()
-		print("End----")
+      iterator:seek_to(key)
+      if not iterator:valid()  then return nil end 
 
-	end
+      local k0,v0 = iterator:key_value()
+      if k0==key then 
+        return k0,v0,k0,v0
+      end
+
+      iterator:iter_prev()
+      if not iterator:valid()  then return nil end 
+      local k1,v1 = iterator:key_value()
+      return k0,v0,k1,v1
+
+  end,
+
+  -- upper match
+  upper=function(tbl,iterator,key)
+    iterator:seek_to(key)
+    if not iterator:valid()  then return nil end 
+
+    local k0,v0 = iterator:key_value()
+    return k0,v0
+  end,
+
+  -- dump the whole database 
+  dump=function(tbl)
+
+    print("Dumping----")
+    local iter=tbl.create_iterator(tbl)
+    iter:seek_to_first()
+    while iter:valid() do 
+      local k,v = iter:key_value()
+      print(k.."="..v)
+      iter:iter_next()
+    end 
+    iter:destroy()
+    print("End----")
+
+  end
 
 
 }
@@ -282,9 +282,9 @@ local LevelDB   = {
   new = function( ) 
     return setmetatable(  {
       _db = nil ,
-	  write_opts=nil,
-	  read_opts=nil,
-	  errmsg=nil
+    write_opts=nil,
+    read_opts=nil,
+    errmsg=nil
     }, { __index = sleveldb} )
   end
 } 
