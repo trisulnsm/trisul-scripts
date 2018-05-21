@@ -8,9 +8,7 @@
 -- Raw DB of Country/Region is > 300MB. Why levelDB? we love it!  and two threads
 -- can share a handle. 
 -- 
-
-
-local leveldb=require'tris_leveldb2' 
+local leveldb=require'tris_leveldb' 
 local bit=require'bit'
 
 -- ip number to trisulkey format
@@ -44,7 +42,7 @@ function do_compile(leveldb_path, csv_file_path)
 						local k2 = ipnum_tokey(linearr[2])
 						ldb:put("CTRY:"..k2.."-"..k1, linearr[3]..' '..linearr[4])
 						ldb:put("STAT:"..k2.."-"..k1, linearr[3]..'_'..linearr[5])
-						ldb:put("CITY:"..k2.."-"..k1, linearr[3]..' '..linearr[6])
+						ldb:put("CITY:"..k2.."-"..k1, linearr[3]..'_'..linearr[6])
 				 end)
 
 
