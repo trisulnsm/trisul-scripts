@@ -8,22 +8,21 @@ Import SilK (https://tools.netsa.cert.org/silk/docs.html)  netflow  dumps into T
 
 Using this script, you can use Trisul as an analytics platform over a SiLK deployment.  Trisul automatically does all of the counting , aggregating , and indexing you normally want to use. You visually work with hundreds of metrics, flow summaries, toppers, bottom-K, etc. This analysis could be hard to put together using CLI tools alone. 
 
+> #### How this works**  
+> We use a named FIFO say `/tmp/silkpipe` to connect the SiLK and Trisul tools. The SiLK tool `rwcat` pumps records into the FIFO . 
 
 ## Using this script
 
-> **How this works**  We use a named FIFO say /tmp/silkpipe to connect the SiLK and Trisul tools. rwcat dumps SiLK records into the FIFO . 
+Install "TrisulNSM":https://trisul.org/download  and the SiLK tools.  You probably already have this in place. 
 
 
-**Step 1 : Install** 
+**Step 1 : Install the LUA scripts** 
 
-Install SiLK tools.  You probably already have this in place. 
-
-Download the two LUA files in this directory onto the Trisul probe.  You can put them in any directory that is world readable, lets say `/tmp`
+Download the two LUA files in this directory onto the Trisul probe. You can put them in any directory that is world readable, lets say `/tmp`
 
 ````
 $ ls -l  /tmp
 -rw-rw-r-- 1 vivek vivek 8658 May 22 13:43 flowimport.lua
--rw-rw-r-- 1 vivek vivek 2860 May 22 13:50 README.md
 -rw-rw-r-- 1 vivek vivek 4089 May 22 13:43 silk.lua
 ````
 
@@ -90,5 +89,5 @@ root@Inspiron-3442:~# /usr/local/sbin/rwflowpack '--pack-interfaces' \
 Ref
 ----
 
-SiLK documentation : https://tools.netsa.cert.org/silk/docs.html
-Blog post : [How to send flow record to trisul](https://www.unleashnetworks.com/blog/?p=688)
+1. SiLK documentation : https://tools.netsa.cert.org/silk/docs.html
+2. Blog post : [How to send flow record to trisul](https://www.unleashnetworks.com/blog/?p=688)
