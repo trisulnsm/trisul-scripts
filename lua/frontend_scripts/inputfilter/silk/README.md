@@ -1,46 +1,74 @@
 silk.lua
 ========
 
-Import SilK (https://tools.netsa.cert.org/silk/docs.html)  data dumps into Trisul for further analysis.
-
-SiLK is a suite of tools that work with large scale Netflow/IPFIX monitoring.  The flows are stored in "packed" files by the packing tools. Then there is another set of analysis tools to read data off the packed files and perform some analysis.
-
-This script allows you to feed the packed files as input to the Trisul Streaming Analytics pipelines. This gives you spectacular visibility that would be quite hard to put together with the tools alone. 
+Import SilK (https://tools.netsa.cert.org/silk/docs.html)  netflow  dumps into Trisul for further analysis.
 
 
+## Why would you want to do this ?
 
-How this works ?
------------------
+Trisul Network Analytics is an excellent platform for flow analytics. You can use Trisul as a tool to visualize a SiLK deployment.  Trisul automatically does all of the counting and aggregating and indexing you normally want to use. You get to visually work with hundreds of metrics, flow summaries, toppers, bottom-K. This analysis could be hard to put together using CLI tools alone. 
 
-The tool `rwcat` is used to read SiLK dump files and write them to a named pipe, this lua script (silk.lua) readsfrom the named pipe, converts each binary record, and pushes into Trisul pipeline.
-
-
-Running the script
------------------
-
-This script depends on the helper module `flowimport.lua` available in the parent directory. 
-
-1. Download silk.lua and flowimport.lua in a directory say @/tmp/@
-2. `mkfifo /tmp/silkpipe` to create the named pipe
-3. `rwcat --ipv4-output --compression=none file1.17  -o /tmp/silkpipe` to write records
-
-Then you need to start Trisul, the best way is to create a new context and use that.
-
-1. Run `trisulctl_probe`
-2. Create a new context using `create context silk111'
-3. `start context silk111 mode=initdb`
-4. At this time you can login and set home networks and other settings
-5. Start trisul `trisulctl_probe importlua /tmp/silk.lua  /tmp/silkpipe`
-
-To view the progress you can check the logs
-1. trisulctl_probe 
-2. View log file for progress using `log silk111@probe0 log=ns tail' to view
-
-Once the import is done, you can log in and voilA! 
+Also read the blog post : [How to send flow record to trisul](https://www.unleashnetworks.com/blog/?p=688)
 
 
-A note about SiLK and ifIndex  
-------------------
+## Using this script
+
+>> **How this works**  We use a named FIFO say /tmp/silkpipe to connect the SiLK and Trisul tools. rwcat dumps SiLK records into the FIFO . 
+
+
+**Step 1 : Install** 
+
+Install SiLK tools.  You probably already have this in place. 
+
+Download the two LUA files in this directory onto the Trisul probe.  You can put them in any directory that is world readable, lets say `/tmp`
+
+````
+$ ls -l  /tmp
+-rw-rw-r-- 1 vivek vivek 8658 May 22 13:43 flowimport.lua
+-rw-rw-r-- 1 vivek vivek 2860 May 22 13:50 README.md
+-rw-rw-r-- 1 vivek vivek 4089 May 22 13:43 silk.lua
+````
+
+
+**Step 2 : Create a FIFO** 
+
+This named pipe is the connector between the SiLK world and the TrisulNSM world. 
+
+````
+mkfifo /tmp/silkpipe
+````
+
+
+**Step 3:  Run Trisul**
+
+We use the `importlua` tool and a new context to store the data. A context is a separate dataset. 
+
+
+````bash
+trisulctl_probe importlua /tmp/silk.lua /tmp/silkpipe  context=silk111
+````
+
+Now, Trisul is waiting for records on the named FIFO `/tmp/silkpipe` You're ready to go
+
+
+**Step 4:  Run rwcat**
+
+rwcat is used to send silk files to the FIFO. You can set up a live system or play out previously captured `YAF` files. The following example shows how you can dump a YAF file to the FIFO.  Note that we need to uncompress it as shown.
+
+
+````bash
+$ rwcat --ipv4-output --compression=none /tmp/a12.yaf -o /tmp/silkpipe
+
+````
+
+Now you can logon to the `silk111` context and view reports.
+
+---- 
+
+
+## A note about SiLK and ifIndex  
+
+
 By default SiLK suite do not seem to store the SNMP input and output inteface numbers that are present in Netflow.  Trisul uses the interface information to enable device based drilldowns.    
 
 

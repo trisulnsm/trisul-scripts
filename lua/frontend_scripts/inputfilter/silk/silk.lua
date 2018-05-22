@@ -103,11 +103,12 @@ TrisulPlugin = {
       local stime = tonumber(cCast.sTime)/1000
       local ltime=stime+tonumber(cCast.elapsed)/1000
 
+
       -- set fields in table and call helper library to import into Trisul 
-      packet:set_timestamp(stime)
+      packet:set_timestamp(ltime)
       FI.process_flow(engine, {
         first_timestamp=stime,
-        last_timestamp=stime+tonumber(cCast.elapsed)/1000,
+        last_timestamp=ltime,
         router_ip= T.util.ntop(cCast.sID),
         source_ip= T.util.ntop(cCast.sIP),
         source_port= cCast.sPort,
