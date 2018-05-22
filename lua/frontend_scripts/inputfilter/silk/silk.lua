@@ -66,8 +66,8 @@ struct rwGenericRec_V5_st {
 TrisulPlugin = {
 
     id = {
-      name = "Netflow from KiwiSYSLOG - 2, using flowimport library ",
-      description = "NFSYSLOG2",
+      name = "Netflow from SiLK rwcat, using flowimport library ",
+      description = "SILK",
     },
 
     onload = function()

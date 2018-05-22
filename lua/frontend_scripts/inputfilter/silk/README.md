@@ -6,14 +6,12 @@ Import SilK (https://tools.netsa.cert.org/silk/docs.html)  netflow  dumps into T
 
 ## Why would you want to do this ?
 
-Trisul Network Analytics is an excellent platform for flow analytics. You can use Trisul as a tool to visualize a SiLK deployment.  Trisul automatically does all of the counting and aggregating and indexing you normally want to use. You get to visually work with hundreds of metrics, flow summaries, toppers, bottom-K. This analysis could be hard to put together using CLI tools alone. 
-
-Also read the blog post : [How to send flow record to trisul](https://www.unleashnetworks.com/blog/?p=688)
+Using this script, you can use Trisul as an analytics platform over a SiLK deployment.  Trisul automatically does all of the counting , aggregating , and indexing you normally want to use. You visually work with hundreds of metrics, flow summaries, toppers, bottom-K, etc. This analysis could be hard to put together using CLI tools alone. 
 
 
 ## Using this script
 
->> **How this works**  We use a named FIFO say /tmp/silkpipe to connect the SiLK and Trisul tools. rwcat dumps SiLK records into the FIFO . 
+> **How this works**  We use a named FIFO say /tmp/silkpipe to connect the SiLK and Trisul tools. rwcat dumps SiLK records into the FIFO . 
 
 
 **Step 1 : Install** 
@@ -93,3 +91,4 @@ Ref
 ----
 
 SiLK documentation : https://tools.netsa.cert.org/silk/docs.html
+Blog post : [How to send flow record to trisul](https://www.unleashnetworks.com/blog/?p=688)
