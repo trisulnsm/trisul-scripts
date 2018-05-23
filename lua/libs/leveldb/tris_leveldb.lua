@@ -289,13 +289,40 @@ local sleveldb = {
   end,
 
   -- upper match
-  upper=function(tbl,iterator,key)
+  upper=function(tbl,iterator,key,fn_match)
     iterator:seek_to(key)
     if not iterator:valid()  then return nil end 
 
     local k0,v0 = iterator:key_value()
-    return k0,v0
+
+	if fn_match(k0,key) then 
+		return k0,v0
+	else
+		iterator:iter_prev()
+		if not iterator:valid()  then return nil end 
+		return iterator:key_value()
+	end
+
   end,
+
+
+  -- lower match
+  lower=function(tbl,iterator,key, fn_match)
+    iterator:seek_to(key)
+    if not iterator:valid()  then return nil end 
+
+    local k0,v0 = iterator:key_value()
+	if fn_match(k0,key) then 
+		return k0,v0
+	else
+		iterator:iter_next()
+		if not iterator:valid()  then return nil end 
+		return iterator:key_value()
+	end
+  end,
+
+
+
 
   -- dump the whole database 
   dump=function(tbl)
