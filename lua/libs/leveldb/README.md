@@ -7,9 +7,6 @@ Nothing  that you couldnt do yourself with the LuaJIT FFI.We use this quite a bi
 storing and looking up security indicators in Trisul Network Analytics, similar use cases
 will find this very useful. 
 
-The wrapping is optimized for a READ lookup workload, so we havent added the LevelDB method `WriteBatch` or other
-`write_options` that improve write performance. 
-
 Usage
 -------
 

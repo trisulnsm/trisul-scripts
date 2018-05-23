@@ -19,6 +19,7 @@ typedef struct leveldb_options_t       leveldb_options_t;
 typedef struct leveldb_writeoptions_t  leveldb_writeoptions_t;
 typedef struct leveldb_readoptions_t   leveldb_readoptions_t;
 typedef struct leveldb_iterator_t      leveldb_iterator_t;
+typedef struct leveldb_writebatch_t    leveldb_writebatch_t;
 
 /* DB operations */
 
@@ -80,6 +81,16 @@ void leveldb_readoptions_destroy(leveldb_readoptions_t*);
 unsigned long long int strtoull(const char *nptr, char **endptr,
                                        int base);
 
+
+leveldb_writebatch_t* leveldb_writebatch_create();
+void leveldb_writebatch_destroy(leveldb_writebatch_t*);
+void leveldb_writebatch_put(leveldb_writebatch_t*,
+                            const char* key, size_t klen,
+							const char* val, size_t vlen);
+
+void leveldb_write(leveldb_t* db,
+    const leveldb_writeoptions_t* options,
+	leveldb_writebatch_t* batch, char** errptr);
 
 ]]
 
@@ -210,6 +221,38 @@ local sleveldb = {
 
   end,
 
+  -- put bulk
+  -- uses writeBatch to write out the table (k,v) 
+  puttable=function(tbl, keyval_table) 
+
+  	local wbatch = L.leveldb_writebatch_create()
+
+	for k,v in pairs(keyval_table)
+	do 
+		local ks= tostring(k)
+		local vs= tostring(v) 
+		print(ks)
+		print(vs)
+		L.leveldb_writebatch_put( wbatch, ks,#ks,vs,#vs)
+	end 
+
+
+    L.leveldb_write( tbl._db, tbl.write_opts, wbatch,  tbl.errmsg)
+    L.leveldb_writebatch_destroy(wbatch)
+
+    if tbl.errmsg[0] == nil  
+	then
+		print("WRTE")
+	
+	else 
+      local emsg = ffi.string(tbl.errmsg[0]);
+      L.leveldb_free( tbl.errmsg[0] ) 
+	  print(emsg) 
+      return false, emsg
+    end
+
+
+  end, 
 
   -- delete a key 
   delete=function(tbl,k)
@@ -262,7 +305,7 @@ local sleveldb = {
   -- dump the whole database 
   dump=function(tbl)
 
-    print("Dumping----")
+    print("----Dumping----")
     local iter=tbl.create_iterator(tbl)
     iter:seek_to_first()
     while iter:valid() do 
