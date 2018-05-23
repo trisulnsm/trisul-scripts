@@ -15,15 +15,13 @@ function key_toipnum(key)
   return  tonumber(b1,16)*16777216+tonumber(b2,16)*65536+tonumber(b3,16)*256+tonumber(b4,16) 
 end
 
-local dbg=require'debugger'
-
 local ipprefixdb   = {
 
   -- put functions
   -- 
   put=function(tbl, ipnum_from, ipnum_to, val)
-	tbl.ldb:put("FWD/".. ipnum_tokey(ipnum_from).."-"..ipnum_tokey(ipnum_to).."/"..(ipnum_to-ipnum_from+1), val)
-	tbl.ldb:put("REV/".. ipnum_tokey(ipnum_to).."-"..ipnum_tokey(ipnum_from).."/"..(ipnum_to-ipnum_from+1), val)
+	tbl.ldb:put(tbl.ldb_keyprefix.."FWD/".. ipnum_tokey(ipnum_from).."-"..ipnum_tokey(ipnum_to).."/"..(ipnum_to-ipnum_from+1), val)
+	tbl.ldb:put(tbl.ldb_keyprefix.."REV/".. ipnum_tokey(ipnum_to).."-"..ipnum_tokey(ipnum_from).."/"..(ipnum_to-ipnum_from+1), val)
   end, 
 
   put_cidr = function( tbl, ip_range, val )
@@ -43,8 +41,8 @@ local ipprefixdb   = {
 
   put_trisul_key = function( tbl, key_from, key_to, val )
     local range = key_toipnum(key_to) - key_toipnum(key_from) + 1
-	tbl.ldb:put( "FWD/"..key_from.."-"..key_to.."/"..range, val)
-	tbl.ldb:put( "REV/"..key_to.."-"..key_from.."/"..range, val)
+	tbl.ldb:put( tbl.ldb_keyprefix.."FWD/"..key_from.."-"..key_to.."/"..range, val)
+	tbl.ldb:put( tbl.ldb_keyprefix.."REV/"..key_to.."-"..key_from.."/"..range, val)
   end,
 
   put_dotted_ip = function( tbl, ip_dotted_from, ip_dotted_to, val )
@@ -57,19 +55,8 @@ local ipprefixdb   = {
 							  string.format("%02X.%02X.%02X.%02X", c1,c2,c3,c4), val )
   end,
 
-
-  lookup_prefix_fwd = function(tbl,key)
-    local k0,v0= tbl.ldb:upper(tbl.ldb_iterator, "FWD/"..key,tbl.range_match)
-    if k0 then
-        local k1,k2,range = k0:match("FWD/([%x%.]+)-([%x%.]+)/(%d+)")
-        if key <= k2 and key >= k1 then
-            return v0,tonumber(range)
-        end
-    end
-  end,
-
   range_match=function(dbkey, keyin)
-	local dir,k1,k2,range = dbkey:match("(%w+)/([%x%.]+)-([%x%.]+)/(%d+)")
+	local dir,k1,k2,range = dbkey:match("|(%w+)/([%x%.]+)-([%x%.]+)/(%d+)")
 	local key=string.sub(keyin,5)
 	if dir=="REV" and key <= k1 and key >= k2 then
 		return true
@@ -80,8 +67,19 @@ local ipprefixdb   = {
 	end
   end, 
 
+  lookup_prefix_fwd = function(tbl,key)
+    local k0,v0= tbl.ldb:upper(tbl.ldb_iterator, tbl.ldb_keyprefix.."FWD/"..key,tbl.range_match)
+    if k0 then
+        local k1,k2,range = k0:match("FWD/([%x%.]+)-([%x%.]+)/(%d+)")
+        if key <= k2 and key >= k1 then
+            return v0,tonumber(range)
+        end
+    end
+  end,
+
+
   lookup_prefix_rev = function(tbl,key)
-    local k0,v0= tbl.ldb:lower(tbl.ldb_iterator, "REV/"..key, tbl.range_match )
+    local k0,v0= tbl.ldb:lower(tbl.ldb_iterator, tbl.ldb_keyprefix.."REV/"..key, tbl.range_match )
     if k0 then
         local k1,k2,range = k0:match("REV/([%x%.]+)-([%x%.]+)/(%d+)")
         if key <= k1 and key >= k2 then
@@ -134,11 +132,16 @@ local ipprefixdb   = {
 	end
 	tbl.ldb_iterator=tbl.ldb:create_iterator()
 
-	tbl.ldb:put("FWD/FF.FF.FF.FF-FF.FF.FF.FF/1", "last" ) 
-	tbl.ldb:put("REV/FF.FF.FF.FF-FF.FF.FF.FF/1", "last" ) 
-	tbl.ldb:put("FWD/00.00.00.00-00.00.00.00/1", "first" ) 
-	tbl.ldb:put("REV/00.00.00.00-00.00.00.00/1", "first" ) 
+	tbl.set_databasename(tbl,"0")
+  end,
 
+  -- set databasename 
+  set_databasename=function(tbl, dbname)
+  	tbl.ldb_keyprefix=dbname.."|"
+	tbl.ldb:put(tbl.ldb_keyprefix.."FWD/FF.FF.FF.FF-FF.FF.FF.FF/1", "last" ) 
+	tbl.ldb:put(tbl.ldb_keyprefix.."REV/FF.FF.FF.FF-FF.FF.FF.FF/1", "last" ) 
+	tbl.ldb:put(tbl.ldb_keyprefix.."FWD/00.00.00.00-00.00.00.00/1", "first" ) 
+	tbl.ldb:put(tbl.ldb_keyprefix.."REV/00.00.00.00-00.00.00.00/1", "first" ) 
   end,
 
   -- close 
@@ -148,10 +151,20 @@ local ipprefixdb   = {
   end,
 
   -- dump
-
   dump=function(tbl)
 	  tbl.ldb:dump()
   end,
+
+  -- putraw
+  -- pass thru to level db
+  putraw=function(tbl,key,val)
+  	tbl.ldb:put("ZZZZ"..key,val)
+  end,
+
+  getraw=function(tbl,key)
+  	return tbl.ldb:get("ZZZZ"..key)
+  end
+
 
 }
 
@@ -160,18 +173,11 @@ local IPPrefixDB   = {
       return setmetatable(  {
 	        ldb=nil ,
 			ldb_iterator=nil,
+			ldb_keyprefix="0|",
 	 }, { __index = ipprefixdb} )
   end
 }
 
 return IPPrefixDB
-
-
-
-
-
-
-
-
 
 
