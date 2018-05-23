@@ -27,31 +27,31 @@ function do_compile(leveldb_path, csv_file_path)
 
 	-- ASN is a prefix 
 	process_csv_file(ldb, csv_file_path.. "/IP2LOCATION-LITE-ASN.CSV",
-					 function(ldb, linearr)
+					 function(ldb, linearr, kvtable  )
 						local k1 = ipnum_tokey(linearr[1])
 						local k2 = ipnum_tokey(linearr[2])
-						ldb:put("ASN:"..k2.."-"..k1, linearr[4]..' '..linearr[5])
+						kvtable["ASN:"..k2.."-"..k1]= linearr[4]..' '..linearr[5]
 				 end)
 
 	-- IPR (Ip region  ) 
 	-- IPC (Ip countr  )
 	-- IPC (Ip city )
 	process_csv_file(ldb, csv_file_path.. "/IP2LOCATION-LITE-DB3.CSV",
-					 function(ldb, linearr)
+					 function(ldb, linearr, kvtable )
 						local k1 = ipnum_tokey(linearr[1])
 						local k2 = ipnum_tokey(linearr[2])
-						ldb:put("CTRY:"..k2.."-"..k1, linearr[3]..' '..linearr[4])
-						ldb:put("STAT:"..k2.."-"..k1, linearr[3]..'_'..linearr[5])
-						ldb:put("CITY:"..k2.."-"..k1, linearr[3]..'_'..linearr[6])
+						kvtable["CTRY:"..k2.."-"..k1]=  linearr[3]..' '..linearr[4]
+						kvtable["STAT:"..k2.."-"..k1]=  linearr[3]..'_'..linearr[5]
+						kvtable["CITY:"..k2.."-"..k1]=  linearr[3]..'_'..linearr[6]
 				 end)
 
 
 	-- PRXY (Proxy-Type-CC) 
 	process_csv_file(ldb, csv_file_path.. "/IP2PROXY-LITE-PX2.CSV",
-					 function(ldb, linearr)
+					 function(ldb, linearr, kvtable )
 						local k1 = ipnum_tokey(linearr[1])
 						local k2 = ipnum_tokey(linearr[2])
-						ldb:put("PRXY:"..k2.."-"..k1, linearr[3]..' '..linearr[4])
+						kvtable["PRXY:"..k2.."-"..k1]= linearr[3]..' '..linearr[4]
 				 end)
 
 	ldb:put("last_updated_tm",tostring(os.time()))
@@ -87,8 +87,9 @@ process_csv_file=function( ldb, csv_file, cbfunc)
 		return false, err 
 	end 
 
-
 	local nitems = 0 
+	local kvtable = {} 
+	local kvtable_size = 0 
 	for l in f:lines() do 
 	  local  validline=true 
 	  if #l==0  or l:match("%s*#") then validline=false end 
@@ -99,8 +100,16 @@ process_csv_file=function( ldb, csv_file, cbfunc)
 		for k in l:gmatch('".-"')  do
 			linearr[#linearr+1] = k:gsub('"','')
 		end 
-		cbfunc( ldb, linearr) 
+		cbfunc( ldb, linearr, kvtable) 
 		nitems = nitems + 1
+
+		kvtable_size=kvtable_size+1
+		if kvtable_size>10000 then
+			ldb:puttable( kvtable)
+			kvtable={}
+			kvtable_size=0
+		end
+		
 	  end
 	end 
 
@@ -116,7 +125,7 @@ end
 
 if #arg ~= 2 then
 	print("Usage : compile_ip2loc leveldbpath  directory_where_the_IP2LOCATION_files_are_kept")
-	exit() 
+	return 
 end
 
 

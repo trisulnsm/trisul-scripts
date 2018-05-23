@@ -231,8 +231,6 @@ local sleveldb = {
 	do 
 		local ks= tostring(k)
 		local vs= tostring(v) 
-		print(ks)
-		print(vs)
 		L.leveldb_writebatch_put( wbatch, ks,#ks,vs,#vs)
 	end 
 
@@ -240,11 +238,8 @@ local sleveldb = {
     L.leveldb_write( tbl._db, tbl.write_opts, wbatch,  tbl.errmsg)
     L.leveldb_writebatch_destroy(wbatch)
 
-    if tbl.errmsg[0] == nil  
-	then
-		print("WRTE")
-	
-	else 
+    if tbl.errmsg[0] ~= nil  
+	then 
       local emsg = ffi.string(tbl.errmsg[0]);
       L.leveldb_free( tbl.errmsg[0] ) 
 	  print(emsg) 
