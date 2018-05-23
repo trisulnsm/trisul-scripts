@@ -57,7 +57,7 @@ local ipprefixdb   = {
 
   range_match=function(dbkey, keyin)
 	local dir,k1,k2,range = dbkey:match("|(%w+)/([%x%.]+)-([%x%.]+)/(%d+)")
-	local key=string.sub(keyin,5)
+	local key=keyin:match("/(.*)$")
 	if dir=="REV" and key <= k1 and key >= k2 then
 		return true
 	elseif dir=="FWD" and key >=k1 and key <=k2 then
@@ -68,7 +68,9 @@ local ipprefixdb   = {
   end, 
 
   lookup_prefix_fwd = function(tbl,key)
-    local k0,v0= tbl.ldb:upper(tbl.ldb_iterator, tbl.ldb_keyprefix.."FWD/"..key,tbl.range_match)
+  	local iter = tbl.ldb:create_iterator()
+    local k0,v0= tbl.ldb:upper(iter, tbl.ldb_keyprefix.."FWD/"..key,tbl.range_match)
+	iter:destroy()
     if k0 then
         local k1,k2,range = k0:match("FWD/([%x%.]+)-([%x%.]+)/(%d+)")
         if key <= k2 and key >= k1 then
@@ -79,7 +81,9 @@ local ipprefixdb   = {
 
 
   lookup_prefix_rev = function(tbl,key)
-    local k0,v0= tbl.ldb:lower(tbl.ldb_iterator, tbl.ldb_keyprefix.."REV/"..key, tbl.range_match )
+  	local iter = tbl.ldb:create_iterator()
+    local k0,v0= tbl.ldb:lower(iter, tbl.ldb_keyprefix.."REV/"..key, tbl.range_match )
+	iter:destroy()
     if k0 then
         local k1,k2,range = k0:match("REV/([%x%.]+)-([%x%.]+)/(%d+)")
         if key <= k1 and key >= k2 then

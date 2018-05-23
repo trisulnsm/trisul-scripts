@@ -1,23 +1,26 @@
 ipprefix db 
 ==================
 
-A library that does prefix matching over a very large dataset using levelDB 
+A library that does prefix matching over a very large dataset using LevelDB backend. 
 
-Can be used for IP lookups, routing etc. 
+Can be used for applications in routing, network security . 
 
-Goal
+Features
 ----
 
 1. Fast
 2. Easy
 3. Low memory use (considering 2GB limit in LuaJIT) 
+4. Designed to support millions of prefixes 
+4. Supports multiple databases 
 
 
+Pre-requisities
+-----
 
-Usage
--------
+You must have LevelDB installed on your system , we're looking for `libleveldb.so` somewhere in your library search path. 
 
-
+## Usage
 
 ````lua 
 local IPPrefixDB=require'ipprefixdb'
@@ -52,4 +55,18 @@ db1:dump()
 db1:close()
 
 ````
+
+## Query tool
+
+Use the `querytool.lua` script to query the database 
+
+
+Usage 
+````lua
+luajit querytools.lua  <database-path>  [optional-database-prefix] <IP Address>
+````
+
+Examples 
+
+
 

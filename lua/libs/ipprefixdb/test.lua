@@ -14,8 +14,10 @@ db1:put_dotted_ip("192.168.4.18","192.168.4.22", "4.18 to 4.22 special ")
 
 db1:dump() 
 
+print ("\n192.168.4.18=")
+print (db1:get_dotted_ip("192.168.4.18") )
 
--- get 
+-- Test there are 3 nested  ranges  
 print ("\n192.168.4.22=")
 print (db1:get_dotted_ip("192.168.4.22") )  
 
