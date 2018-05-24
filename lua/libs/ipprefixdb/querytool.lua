@@ -16,12 +16,13 @@ else
 end
 
 local db1=ipdb:new()
-db1:open(dbname,true) 
+db1:open(dbpath,true) 
 
-
+print(dbname) 
 if dbname then 
 	db1:set_databasename(dbname)
 end 
+
 
 print("For IP ".. ipaddr)
 print(db1:get_dotted_ip(ipaddr))
