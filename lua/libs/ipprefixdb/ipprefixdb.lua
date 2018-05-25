@@ -4,6 +4,7 @@
 -- 
 local leveldb=require'tris_leveldb' 
 local bit=require'bit'
+local IP6=require'ip6'
 
 -- ip number to trisulkey format
 function ipnum_tokey(ipnum)
@@ -42,11 +43,11 @@ local ipprefixdb   = {
   end, 
 
   put_ipv6_cidr = function( tbl, ipv6, val )
-    local _,_,ip ,cidr = ip_range:find("([%x:]*)/(%d*)")
+    local _,_,ip ,cidr = ipv6:find("([%x:]*)/(%d*)")
 	local f,l = IP6.ip6_cidr(ip,cidr)
-	tbl.ldb:put(tbl.ldb_keyprefix.."FWD/".. f.."-"..t.."/"..math.pow(2,128-cidr), val)
-	tbl.ldb:put(tbl.ldb_keyprefix.."REV/".. t.."-"..f.."/"..math.pow(2,128-cidr), val)
-  end
+	tbl.ldb:put(tbl.ldb_keyprefix.."FWD/".. f.."-"..l.."/"..cidr, tostring(val))
+	tbl.ldb:put(tbl.ldb_keyprefix.."REV/".. l.."-"..f.."/"..cidr, tostring(val))
+  end,
 
   put_ipnum = function( tbl, ipnum_from, ipnum_to, val )
   	tbl.put(tbl,ipnum_from, ipnum_to, val)
