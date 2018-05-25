@@ -3,7 +3,10 @@ ipprefix db
 
 A library that does prefix matching over a very large dataset using LevelDB backend. 
 
-Can be used for applications in routing, network security . 
+Can be used for applications in routing, network security. 
+
+> Uses the trisul_leveldb library in this repository to store the prefix database 
+
 
 Features
 ----

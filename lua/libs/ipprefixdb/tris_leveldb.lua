@@ -223,7 +223,7 @@ local sleveldb = {
 
   -- put bulk
   -- uses writeBatch to write out the table (k,v) 
-  puttable=function(tbl, keyval_table) 
+  put_table=function(tbl, keyval_table) 
 
   	local wbatch = L.leveldb_writebatch_create()
 
@@ -289,30 +289,32 @@ local sleveldb = {
   end,
 
   -- upper match
+  -- 
   upper=function(tbl,iterator,key,fn_match)
     iterator:seek_to(key)
     if not iterator:valid()  then return nil end 
 
     local k0,v0 = iterator:key_value()
 
-	if fn_match(k0,key) then 
+	if fn_match == nil or fn_match(k0,key) then 
 		return k0,v0
 	else
 		iterator:iter_prev()
 		if not iterator:valid()  then return nil end 
 		return iterator:key_value()
 	end
-
   end,
 
 
   -- lower match
+  --
   lower=function(tbl,iterator,key, fn_match)
     iterator:seek_to(key)
     if not iterator:valid()  then return nil end 
 
     local k0,v0 = iterator:key_value()
-	if fn_match(k0,key) then 
+
+	if fn_match == nil or fn_match(k0,key) then 
 		return k0,v0
 	else
 		iterator:iter_next()
