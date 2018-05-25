@@ -46,7 +46,7 @@ local ipprefixdb   = {
 	local f,l = IP6.ip6_cidr(ip,cidr)
 	tbl.ldb:put(tbl.ldb_keyprefix.."FWD/".. f.."-"..t.."/"..math.pow(2,128-cidr), val)
 	tbl.ldb:put(tbl.ldb_keyprefix.."REV/".. t.."-"..f.."/"..math.pow(2,128-cidr), val)
-  end
+  end,
 
   put_ipnum = function( tbl, ipnum_from, ipnum_to, val )
   	tbl.put(tbl,ipnum_from, ipnum_to, val)
