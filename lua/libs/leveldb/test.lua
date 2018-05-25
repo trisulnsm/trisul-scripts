@@ -1,4 +1,5 @@
 
+-- version: %VERSION%
 local LDB=require'tris_leveldb'
 
 
