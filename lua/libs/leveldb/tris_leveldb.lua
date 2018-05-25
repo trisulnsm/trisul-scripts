@@ -223,7 +223,7 @@ local sleveldb = {
 
   -- put bulk
   -- uses writeBatch to write out the table (k,v) 
-  puttable=function(tbl, keyval_table) 
+  put_table=function(tbl, keyval_table) 
 
   	local wbatch = L.leveldb_writebatch_create()
 

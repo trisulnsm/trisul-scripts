@@ -7,6 +7,7 @@ Nothing  that you couldnt do yourself with the LuaJIT FFI.We use this quite a bi
 storing and looking up security indicators in Trisul Network Analytics, similar use cases
 will find this very useful. 
 
+
 Usage
 -------
 
@@ -16,7 +17,6 @@ The following test code shows you to use the various functions
 
 
 ````lua 
-
 
 local LDB=require'tris_leveldb'
 
@@ -33,6 +33,15 @@ db1:put("k10.0.0.22","Pakdam")
 db1:put("k1","veeraTheDogOverWrite")
 db1:put("Longerkey with spaces ","Pakdam Pakdai")
 db1:put("k100","ChottaBheem")
+
+-- put a few keys at once (atomic) 
+-- use a table underlying will use LevelDB WriteBatch 
+db1:put_table( {
+	k1   = "valu1",
+	key2 = "value2",
+	kkk5 = 10002,
+	["What is this long key"] = "long key value"
+} )
 
 -- get 
 print(db1:get("k1"))
