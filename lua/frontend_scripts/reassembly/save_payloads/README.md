@@ -1,8 +1,7 @@
 savetcp.lua
 ===========
 
-Saves TCP Payloads into separate files.
-
+Saves reassembled TCP Payloads into separate files. 
 
 
 How to run
@@ -10,14 +9,17 @@ How to run
 
 Save the lua file into [one of the directories](https://www.trisul.org/docs/lua/basics.html#installing_and_uninstalling)  Trisul will search for  Lua scripts.
 
-1. Run over a PCAP file
+### 1. Run over a PCAP file
 
+We make sure we create the special development context called `debug0` 
 
 ````bash
 
-cp savetcp.lua /usr/local/var/lib/trisul-probe/domain0/probe0/context0/config/local-lua 
+trisulctl_probe create context debug0 
 
-trisulctl_probe testbench run /home/mgilcl/pcaps/upload.tcpd
+cp savetcp.lua /usr/local/var/lib/trisul-probe/domain0/probe0/context_debug0/config/local-lua
+
+trisulctl_probe testbench run /home/mgill/pcaps/upload.tcpd
 
 ````
 
@@ -39,6 +41,24 @@ mgill@mgill14$  ls -1 /tmp/
 * _0 contains payloads in  IN direction
 * _1 for OUT direction 
 
+
+
+
+### Run over live traffic 
+
+Copy to the file to a live Trisul context. All Trisul deployments have a context called `context0`. Use that 
+
+
+````bash
+cp savetcp.lua /usr/local/var/lib/trisul-probe/domain0/probe0/context0/config/local-lua 
+````
+
+Then just restart Trisul probe
+
+````
+trisulctl_probe restart context default@probe0 
+
+````
 
 
 
