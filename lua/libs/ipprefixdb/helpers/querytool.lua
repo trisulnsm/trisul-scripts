@@ -1,6 +1,5 @@
 local ipdb=require'ipprefixdb' 
 
-
 if #arg ==2 then
 	dbpath = arg[1]
 	dbname = nil  

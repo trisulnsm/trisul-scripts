@@ -1,12 +1,9 @@
 ipprefix db 
 ==================
 
-A library that does prefix matching over a very large dataset using LevelDB backend. 
+A library that does stores and queries very large IP ranges using LevelDB backend. 
 
 Can be used for applications in routing, network security. 
-
-> Uses the trisul_leveldb library in this repository to store the prefix database 
-
 
 Features
 ----
@@ -15,8 +12,7 @@ Features
 2. Easy
 3. Low memory use (considering 2GB limit in LuaJIT) 
 4. Designed to support millions of prefixes 
-4. Supports multiple databases 
-
+5. Supports multiple databases 
 
 Pre-requisities
 -----
@@ -28,11 +24,9 @@ You must have LevelDB installed on your system , we're looking for `libleveldb.s
 ````lua 
 local IPPrefixDB=require'ipprefixdb'
 
-
 -- create and open 
 local db1 = IPPrefixDB.new()
 db1:open("/tmp/ipdb.level")
-
 
 -- store 
 
@@ -68,8 +62,4 @@ Usage
 ````lua
 luajit querytools.lua  <database-path>  [optional-database-prefix] <IP Address>
 ````
-
-Examples 
-
-
 
