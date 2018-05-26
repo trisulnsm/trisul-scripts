@@ -12,7 +12,6 @@ ffi.cdef [[
     static const int AF_INET6=10;  
 ]]
 
-
 IP6 = {}
 
 function IP6.ip6_to_bin(ip6)
@@ -68,5 +67,4 @@ function IP6.tests()
 end 
 
 return IP6
-
 

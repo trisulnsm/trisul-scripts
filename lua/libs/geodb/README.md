@@ -1,9 +1,12 @@
 GeoDB - compilers for various Geo Databases
 ===========================================
 
+These compilers convert IP subnet to Geo mappings from a CSV format into a LevelDB backend.  
 
-This directory contains compilers for various Geo Databases.
-The IP ranges are taken from a CSV format into the IP Prefix Database backed by LevelDB.
+#### Purpose ?
+
+You could use the API's that come with these databases.  Those who desire a common format
+for storing IP Subnet information will find this useful. 
 
 
 The following compilers are available
