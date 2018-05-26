@@ -8,7 +8,7 @@ TrisulPlugin = {
 
   id =  {
     name = "savetcp",
-    description = "app to save reassembled  TCP payloads to file ",
+    description = "app to save reassembled  TCP payloads to separate file ",
   },
 
   --
@@ -16,7 +16,6 @@ TrisulPlugin = {
   --  we need to open TWO files per flow, one for each direction
   --
   onload = function()
-    T.flowfiles = { } 
   end,
 
 
@@ -33,11 +32,7 @@ TrisulPlugin = {
     -- setup two filenames and store it at the flowid
     --
     onnewflow = function(engine, time, flow)
-
-      T.flowfiles[flow:id()] =  { "/tmp/kk/" .. flow:id().."_in", 
-                    "/tmp/kk/" .. flow:id().."_out" };
-      
-      -- print( "SCRIPT3 : opened 2 files IN/OUT " )
+      print( "SCRIPT3 : new flow started ".. flow:to_s())
     end,
 
 
@@ -50,22 +45,14 @@ TrisulPlugin = {
 
       print("SCRIPT3: payload "..flow:porta_readable().." size = "..buff:size().." seekpos="..seekpos .." edir="..dir);
 
-      local f= T.flowfiles[flow:id()]
-    
-      local f_in_out = nil;
-      if dir==0 then
-        f_in_out = f[1]
-      else 
-        f_in_out = f[2]
-      end
-      buff:writetofile(f_in_out,seekpos)
+      buff:writetofile("/tmp/payloads_"..flow:id().."_"..dir,seekpos)
     end,
 
     -- flow ends 
     -- nothing interesting here 
     -- if you had opened any files related to the flow you would close them here
     onterminateflow  = function(engine, time, flow)
-      print( "SCRIPT3 : closing " .. flow:porta_readable ())
+      print( "SCRIPT3 : new flow started ".. flow:to_s())
     end,
 
 
