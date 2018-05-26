@@ -15,3 +15,10 @@ There are two libs you can use independently.
 2. sweepbuf : break up bytes into protocol fields  
 
 
+
+PDU Record Usage 
+=====
+
+You attach a dissector to a PDURecord. 
+
+

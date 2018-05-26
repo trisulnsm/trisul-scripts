@@ -4,7 +4,7 @@
 --
 --  TODO: unoptimized but need profiling LuaJIT traces 
 --
--- local dbg=require'debugger'
+local dbg=require'debugger'
 local SweepBuf  = {
 
   u8le = function(tbl)
@@ -89,10 +89,10 @@ local SweepBuf  = {
 
 
   next_str_to_pattern = function(tbl, patt)
-    local f =string.find(tbl.buff,patt,tbl.seekpos,true) 
+    local f,l =string.find(tbl.buff,patt,tbl.seekpos,false)  -- last param = true for non regex 
     if f then
-        local r = string.sub(tbl.buff,tbl.seekpos,f+#patt)
-        tbl.seekpos = f+#patt
+        local r = string.sub(tbl.buff,tbl.seekpos,l)
+        tbl.seekpos = l+1
         return r
     else
         return nil 
