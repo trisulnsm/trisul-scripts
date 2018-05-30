@@ -4,7 +4,7 @@
 --
 --  TODO: unoptimized but need profiling LuaJIT traces 
 --
-local dbg=require'debugger'
+
 local SweepBuf  = {
 
   u8le = function(tbl)

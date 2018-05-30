@@ -4,8 +4,6 @@
 --
 local SweepBuf=require'sweepbuf'
 
-local dbg=require 'debugger'
-
 local PDURecord = {
 
     -- States
