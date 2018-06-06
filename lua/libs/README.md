@@ -11,6 +11,5 @@ Mostly LuaJIT based.
 1. tris_leveldb :  LevelDB wrapper. 
 2. ipprefixdb:  Large scale and fast IP subnet database used for Geo lookups
 3. geodb: Compilers to free CSV files released by popular GeoIP providers
-4. bitmaul : Bit mauler, easy to use protocol dissector that supports TCP message boundaries 
 
 
