@@ -9,25 +9,25 @@
 -- local FI = require'FlowImporter'
 --
 -- FI.process_flow( engine,  {
---      first_timestamp:        <number>,   -- unix epoch secs when flow first seen
---      last_timestamp:         <number>,   -- unix epoch secs  when last seen 
---      router_ip:              <ipaddr>,   -- router (exporter ip) dotted ip format
---      protocol:               <number>,   -- ip protocol number 0-255
---      source_ip:              <ipaddr>,   -- dotted ip format
---      source_port:            <number>,   -- source port number 0-65535
---      destination_ip:         <ipaddr>,   -- dotted ip 
---      destination_port:       <number>,   -- source port number 0-65535
---      input_interface:        <number>,   -- ifIndex IN of flow 0-65535
---      output_interface:       <number>,   -- ifIndex OUT of flow 0-65535
---      bytes:                  <number>,   -- octets, 
---      packets:                <number>,   -- packets 
+--      first_timestamp=        <number>,   -- unix epoch secs when flow first seen
+--      last_timestamp=         <number>,   -- unix epoch secs  when last seen 
+--      router_ip=              <ipaddr>,   -- router (exporter ip) dotted ip format
+--      protocol=               <number>,   -- ip protocol number 0-255
+--      source_ip=              <ipaddr>,   -- dotted ip format
+--      source_port=            <number>,   -- source port number 0-65535
+--      destination_ip=         <ipaddr>,   -- dotted ip 
+--      destination_port=       <number>,   -- source port number 0-65535
+--      input_interface=        <number>,   -- ifIndex IN of flow 0-65535
+--      output_interface=       <number>,   -- ifIndex OUT of flow 0-65535
+--      bytes=                  <number>,   -- octets, 
+--      packets=                <number>,   -- packets 
 --      -- optional --                      
---      bytes_out:              <number>,   -- octets in Src->Dest diflowtbl.ion
---      packets_out:            <number>,   -- packets in Src->Dest diflowtbl.ion
---      bytes_in:               <number>,   -- octets in Dest->Src diflowtbl.ion
---      packets_in:             <number>,   -- packets in Dest->Src diflowtbl.ion
---      as:                     <number>,   -- ASN (0-65535)
---      tos:                    <number>,   -- IP TOS 
+--      bytes_out=              <number>,   -- octets in Src->Dest diflowtbl.ion
+--      packets_out=            <number>,   -- packets in Src->Dest diflowtbl.ion
+--      bytes_in=               <number>,   -- octets in Dest->Src diflowtbl.ion
+--      packets_in=             <number>,   -- packets in Dest->Src diflowtbl.ion
+--      as=                     <number>,   -- ASN (0-65535)
+--      tos=                    <number>,   -- IP TOS 
 -- })
 --
 -- For a working example see kiwisyslog.lua on trisul-script@github 
@@ -63,19 +63,27 @@ end
 
 FlowImporter.toflow_format=function( dir, tkey)
   if dir=='AZ' then 
-      return string.format("%sC:%s:%s_%s:%s_%s_%04X_%04X", 
+      return string.format("%sC:%s:%s_%s:%s_%s_%08X_%08X", 
               tkey.protocol,   tkey.source_ip,   tkey.source_port,   
               tkey.destination_ip,   tkey.destination_port, 
               tkey.router_ip,   tkey.input_interface_number,   tkey.output_interface_number ) 
   else
-      return string.format("%sC:%s:%s_%s:%s_%s_%04X_%04X", 
+      return string.format("%sC:%s:%s_%s:%s_%s_%08X_%08X", 
               tkey.protocol,   tkey.destination_ip,   tkey.destination_port, 
               tkey.source_ip,   tkey.source_port,   
               tkey.router_ip,   tkey.output_interface_number,   tkey.input_interface_number ) 
   end
+
 end
 
 FlowImporter.process_flow=function(engine, flowtbl)
+
+    -- defaults if there are no netflow
+	if flowtbl.router_ip==nil then
+		flowtbl.router_ip="0.0.0.0"
+		flowtbl.input_interface=0
+		flowtbl.output_interface=0
+	end 
 
     -- convert the incoming raw entities into Trisul Key Formats
     --
@@ -86,11 +94,11 @@ FlowImporter.process_flow=function(engine, flowtbl)
          source_port = FlowImporter.toport_format(  flowtbl.source_port),
          destination_ip = FlowImporter.toip_format(  flowtbl.destination_ip),
          destination_port = FlowImporter.toport_format(  flowtbl.destination_port),
-         input_interface_number = flowtbl.input_interface,
-         output_interface_number = flowtbl.output_interface
+         input_interface_number = tonumber(flowtbl.input_interface),
+         output_interface_number = tonumber(flowtbl.output_interface)
     }
-    tkey.input_interface = tkey.router_ip..'_'..string.format("%04X",tonumber(flowtbl.input_interface))
-    tkey.output_interface = tkey.router_ip..'_'..string.format("%04X",tonumber(flowtbl.output_interface))
+    tkey.input_interface = tkey.router_ip..'_'..string.format("%08X",tonumber(flowtbl.input_interface))
+    tkey.output_interface = tkey.router_ip..'_'..string.format("%08X",tonumber(flowtbl.output_interface))
 
 
     -- home network perspective 
@@ -175,7 +183,7 @@ FlowImporter.process_flow=function(engine, flowtbl)
       engine:new_flow_record( tkey.flow,  0, flowtbl.bytes, 0,flowtbl.packets);
     end 
 
-    engine:set_flow_duration( tkey.flow, (flowtbl.last_timestamp - flowtbl.first_timestamp)/100);
+    engine:set_flow_duration( tkey.flow, flowtbl.last_timestamp - flowtbl.first_timestamp);
 
     local COUNTER_GUIDS = {
       flowgen  = '{2314BB8E-2BCC-4B86-8AA2-677E5554C0FE}',
