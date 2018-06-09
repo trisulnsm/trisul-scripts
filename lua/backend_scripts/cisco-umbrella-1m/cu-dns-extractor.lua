@@ -34,7 +34,7 @@ TrisulPlugin = {
   --
   fts_monitor   = {
 
-    -- DNS FTS - ensure <CreateFTSDocument> is enabled in config file 
+    -- DNS FTS - ensure <CreateFTSDocument> is enabled in the DNS Plugin config file 
     fts_guid = '{09B305DF-078C-4B9E-8E2F-EA64B7326880}',
 
     -- WHEN CALLED : a new fts doc  is seen (within 1sec)

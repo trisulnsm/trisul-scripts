@@ -31,7 +31,7 @@ TrisulPlugin = {
     -- Indices
     T.json = require 'JSON'
     T.uri = protocol.."://"..host..":"..port.."/trisul"
-    local h = io.popen("curl -XHEAD -i '"..T.uri.."' 2>/dev/null")
+    local h = io.popen("curl -XHEAD -I '"..T.uri.."' 2>/dev/null")
     if not h:read("*a"):match("200 OK") then
       local mappings = { 
         mappings={
@@ -51,7 +51,7 @@ TrisulPlugin = {
           }
         }
        }
-      local h = io.popen("curl -XPUT '"..T.uri.."' -d '" ..T.json:encode(mappings).."' 2>/dev/null")
+      local h = io.popen("curl -X PUT '"..T.uri.."'".." -H 'Content-Type: application/json' -d'"..T.json:encode(mappings).."' 2>/dev/null")
     end
     T.uri = T.uri.."/flows"
   end,
@@ -89,7 +89,7 @@ TrisulPlugin = {
     flow["start_time"]=st*1000;
     flow["end_time"]=et*1000;
     flow["duration"]=et-st;
-    local h = io.popen("curl -XPOST '"..T.uri.."' -d '" ..T.json:encode(flow).."' 2>/dev/null")
+    local h = io.popen("curl -X POST -i '"..T.uri.."' -H 'Content-Type: application/json' -d '" ..T.json:encode(flow).."' 2>/dev/null")
   end,
 
   onendflush = function(dbengine)
