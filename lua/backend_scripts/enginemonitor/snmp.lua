@@ -11,7 +11,7 @@
 
 function get_if_octets( dir, port_ifindex)
   local oid = (dir == "in")  and 6 or 10 
-  local h = io.popen("snmpget -v2c -c 'cstring' 172.16.207.251  .1.3.6.1.2.1.31.1.1.1."..oid.."."..port_ifindex)
+  local h = io.popen("snmpget -v2c -c 'community' 172.16.0.1  .1.3.6.1.2.1.31.1.1.1."..oid.."."..port_ifindex)
   local val = h:read("*a")
   print("val = "..val)
   h:close()
@@ -49,13 +49,13 @@ TrisulPlugin = {
       local val_out = get_if_octets("out", port) 
 
       engine:update_counter( "{9781db2c-f78a-4f7f-a7e8-2b1a9a7be71a}",
-             "if-"..port, 0, tv+10, val_in + val_out   );
+             "if-"..port, 0,  val_in + val_out   );
 
       engine:update_counter( "{9781db2c-f78a-4f7f-a7e8-2b1a9a7be71a}",
-             "if-"..port, 1, tv+10, val_in  );
+             "if-"..port, 1,  val_in  );
 
       engine:update_counter( "{9781db2c-f78a-4f7f-a7e8-2b1a9a7be71a}",
-             "if-"..port, 2, tv+10, val_out  ); 
+             "if-"..port, 2,  val_out  ); 
 
       T.log(T.K.loglevel.DEBUG, "SNMP vals tv="..(tv+10).."port="..port.." in="..val_in.." out="..val_out);
       end 
