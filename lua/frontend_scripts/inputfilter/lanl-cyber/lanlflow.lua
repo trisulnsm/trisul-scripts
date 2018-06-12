@@ -86,6 +86,13 @@ TrisulPlugin = {
         packets=                fields[8],   -- packets 
       })
 
+	  -- update the labels, so you can see the host strings 
+	  engine:update_key_info('{4CD742B1-C1CA-4708-BE78-0FCA2EB01A86}' , FI.toip_format(ipa),   fields[3])
+	  engine:update_key_info('{4CD742B1-C1CA-4708-BE78-0FCA2EB01A86}' , FI.toip_format(ipz),   fields[5])
+	  engine:update_key_info('{C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}' , FI.toport_format(pra), fields[4])
+	  engine:update_key_info('{C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}' , FI.toport_format(prz), fields[6])
+
+
       -- print(nextline)
       return true -- has more
            
