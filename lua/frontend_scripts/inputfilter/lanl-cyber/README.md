@@ -49,15 +49,18 @@ trisulctl_probe start context lanl1@hub0
 
 # run Trisul manually , notice mode=lua , in=the-lua-script , args=the-flows.txt-file
 #
-trisul -nodemon /usr/local/etc/trisul-probe/domain0/probe0/context_lanl1/trisulProbeConfig.xml \ 
-  -mode lua \ 
-   -in /usr/local/share/trisul-probe/lanlflow.lua \ 
+trisul -nodemon /usr/local/etc/trisul-probe/domain0/probe0/context_lanl1/trisulProbeConfig.xml \
+  -mode lua \
+   -in /usr/local/share/trisul-probe/lanlflow.lua \
     -args /trisulroot/flows.txt
 
 ````
 
 
-## Checking Errors
+## Checking Progress 
+
+
+If all goes well, the import will start and may take upwards of 30 minutes. 
 
 If the script doesnt run, check the log files 
 
@@ -67,15 +70,12 @@ tailf ns-001.log
 
 ````
 
-or use the Trisul probe macros
+or use the Trisul probe macros to check the progress 
 
 ````
 source /usr/local/share/trisul-probe/trisbashrc lanl1
 tailf.ns
 ````
-
-You can also tail the log files using the above methods to judge the progress of the script. It might have an hour or two.
-
 
 
 ## How lanlflow.lua works
