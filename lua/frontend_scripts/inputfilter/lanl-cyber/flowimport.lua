@@ -79,27 +79,26 @@ end
 FlowImporter.process_flow=function(engine, flowtbl)
 
     -- defaults if there are no netflow
-	if flowtbl.router_ip==nil then
-		flowtbl.router_ip="0.0.0.0"
-		flowtbl.input_interface=0
-		flowtbl.output_interface=0
-	end 
+    if flowtbl.router_ip==nil then
+      flowtbl.router_ip="0.0.0.0"
+      flowtbl.input_interface=0
+      flowtbl.output_interface=0
+    end 
 
     -- convert the incoming raw entities into Trisul Key Formats
     --
     local tkey = {
-         router_ip = FlowImporter.toip_format(  flowtbl.router_ip),
-         protocol = FlowImporter.toproto_format(  flowtbl.protocol),
-         source_ip = FlowImporter.toip_format(  flowtbl.source_ip),
-         source_port = FlowImporter.toport_format(  flowtbl.source_port),
-         destination_ip = FlowImporter.toip_format(  flowtbl.destination_ip),
-         destination_port = FlowImporter.toport_format(  flowtbl.destination_port),
-         input_interface_number = tonumber(flowtbl.input_interface),
-         output_interface_number = tonumber(flowtbl.output_interface)
+      router_ip = FlowImporter.toip_format(  flowtbl.router_ip),
+      protocol = FlowImporter.toproto_format(  flowtbl.protocol),
+      source_ip = FlowImporter.toip_format(  flowtbl.source_ip),
+      source_port = FlowImporter.toport_format(  flowtbl.source_port),
+      destination_ip = FlowImporter.toip_format(  flowtbl.destination_ip),
+      destination_port = FlowImporter.toport_format(  flowtbl.destination_port),
+      input_interface_number = tonumber(flowtbl.input_interface),
+      output_interface_number = tonumber(flowtbl.output_interface)
     }
     tkey.input_interface = tkey.router_ip..'_'..string.format("%08X",tonumber(flowtbl.input_interface))
     tkey.output_interface = tkey.router_ip..'_'..string.format("%08X",tonumber(flowtbl.output_interface))
-
 
     -- home network perspective 
     local src_home = T.host:is_homenet( flowtbl.source_ip)
@@ -155,7 +154,6 @@ FlowImporter.process_flow=function(engine, flowtbl)
       engine:update_counter( "{4CD742B1-C1CA-4708-BE78-0FCA2EB01A86}",  tkey.destination_ip, 2, flowtbl.bytes );
     end 
 
-
     -- network layer
     engine:update_counter( "{E89BCD56-30AD-40F5-B1C8-8B7683F440BD}",  tkey.protocol, 0, flowtbl.bytes);
 
@@ -210,7 +208,4 @@ FlowImporter.process_flow=function(engine, flowtbl)
         
 end
 
-
 return FlowImporter;
-
-
