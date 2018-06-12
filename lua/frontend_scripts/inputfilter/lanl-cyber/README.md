@@ -33,20 +33,22 @@ This is an [input-filter](https://www.trisul.org/docs/lua/inputfilter.html) scri
 ````
 # download the two *.lua files in this directory
 # or any other directory that is readable by the trisul.trisul user 
+#
 cd /usr/local/share/trisul-probe
+wget .. put the two lua file in this place 
 
 
 # create a new context
-
+#
 trisulctl_probe create context lanl1
 
 # start the lanl1 context on the hub node (start database)
-
+#
 trisulctl_probe start context lanl1@hub0 
 
 
 # run Trisul manually , notice mode=lua , in=the-lua-script , args=the-flows.txt-file
-
+#
 trisul -nodemon /usr/local/etc/trisul-probe/domain0/probe0/context_lanl1/trisulProbeConfig.xml \ 
   -mode lua \ 
    -in /usr/local/share/trisul-probe/lanlflow.lua \ 
