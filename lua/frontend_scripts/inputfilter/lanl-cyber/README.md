@@ -85,3 +85,21 @@ What we do in this script is convert the strings into IP addresses. We simply ha
 
 
 
+## Screenshots
+
+Some samples from the "Retro Analysis" tools 
+
+### Top apps 
+
+![Showing Top Applications](la1.png)
+
+### Top hosts by total , xmit, recv, connections  
+
+![Showing Top hosts by total, recv, transmot ](la2.png)
+
+### Trends over time 
+
+![Trends ](la3.png)
+
+
+
