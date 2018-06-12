@@ -4,7 +4,7 @@ LANL-Cyber Dataset
 ## Processing the dataset 
 
 LANL has published about 58 days of network flow data for cyber security purposes at
-http://csr.lanl.gov/data/cyber1/
+https://csr.lanl.gov/data/cyber1/
 
 The `flows.txt.gz` file is a 1.1G dump that contains netflow like data in the format
 
@@ -22,13 +22,13 @@ With the Trisul API you can even process these types of flow records by being a 
 
 ## Running this script 
 
-This is an "input-filter":https://www.trisul.org/docs/lua/inputfilter.html script type that processes the text file flows.txt.
+This is an [input-filter](https://www.trisul.org/docs/lua/inputfilter.html) script type that processes the text file flows.txt.
 
 
-> We create a new context called `lanl1` and process the file in that context. 
+> *Example* We will create a new context called `lanl1` and process the file in that context. A context is a separate database [more](https://www.trisul.org/docs/ug/domain/index.html#contexts)
 
 
-Instructions  
+### Instructions  
 
 ````
 # download the two *.lua files in this directory
