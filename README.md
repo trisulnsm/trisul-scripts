@@ -6,19 +6,18 @@ Trisul Network Analytics https://www.trisul.org offers a scriptable platform upo
 There are two APIs available.
 
 
-1. LUA API 
-   -----------
+## LUA API 
+-----------
 
-   Lua scripts are used to customize the Trisul Real Time analytics engine. 
+Lua scripts are used to customize the Trisul Real Time analytics engine. 
 
-   The LUA API is documented  at http://www.trisul.org/docs/lua 
+The LUA API is documented  at https://www.trisul.org/docs/lua 
 
 
-2. TRP API 
-   -----------
+## TRP API 
+-----------
 
-   Trisul Remote Protocol use scripts in Ruby, Javascript, or Python to query and hunt through historical data. 
+Trisul Remote Protocol use scripts in Ruby, Javascript, or Python to query and hunt through historical data. 
 
-   The TRP API is documented  at http://www.trisul.org/docs/trp 
-
+The TRP API is documented  at https://www.trisul.org/docs/trp 
 
