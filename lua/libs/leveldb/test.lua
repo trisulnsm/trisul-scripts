@@ -3,6 +3,7 @@
 local LDB=require'tris_leveldb'
 
 
+print("Testing : in output LevelDB database /tmp/mytest1.level") 
 -- create and open 
 local db1 = LDB.new()
 db1:open("/tmp/mytest1.level")
@@ -15,6 +16,7 @@ db1:put("k10.0.0.22","Pakdam")
 db1:put("k1","veeraTheDogOverWrite")
 db1:put("Longerkey with spaces ","Pakdam Pakdai")
 db1:put("k100","ChottaBheem")
+db1:put("GETFROMCLONE", "Hi this message is to test, cloned database ") 
 
 -- put a few keys at once (atomic) 
 -- use a table underlying will use LevelDB WriteBatch 
@@ -42,7 +44,6 @@ while iter:valid() do
 	iter:iter_next()
 end 
 iter:destroy()
-
 
 
 -- delete and then dump the database 
@@ -105,14 +106,39 @@ iter:destroy() -- remember to do this with iterators you create
 db1:close() 
 
 
-
 -- test put Table
 db1:open("/tmp/mytest1.level")
 
 
 db1:dump()
-
 db1:close() 
 
+
+
+-- test handle clone 
+db1:open("/tmp/mytest1.level")
+
+
+local db_copy  =  LDB.new()
+local str = db1:toaddr()
+db_copy:fromaddr(str)
+
+print("Testing cloned database ----  ")
+print(db_copy:get("GETFROMCLONE"))
+
+print("Deleting  CLONED_DELETE")
+db_copy:delete("CLONED_DELETE")
+
+print("Writing CLONED_DELETE FROM main DB")
+db1:put("CLONED_DELETE", "Hey this one is written from db1 (the owner)" )
+
+print("Reading  CLONED_DELETE")
+print(db_copy:get("CLONED_DELETE"))
+
+local err=pcall(function() db_copy:close() end  ) 
+
+assert(err==false,"Hey, expecting close() of copy database to error out") 
+
+db1:close() 
 
 
