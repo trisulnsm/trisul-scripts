@@ -4,9 +4,7 @@
 #
 # Usage ruby  hello.rb  <ip address of trisul sensor> 
 #
-
 require 'trisulrp'
-
 
 USAGE = "Usage:   hello.rb  ZMQ_ENDPT \n" \
         "Example: 1) ruby hello.rb tcp://localhost:5555 \n"\
@@ -22,9 +20,9 @@ req = mk_request(TRP::Message::Command::HELLO_REQUEST,
                           :station_id => "MyAutomationProg")
 
 get_response_zmq(zmq_endpt,req) do |resp|
-  p resp.trisul_id
-  p resp.connection_id
-  p resp.version_string
-
- end
+  p resp.station_id
+  p resp.station_id_request
+  p resp.message
+  p resp.local_timestamp
+end
 
