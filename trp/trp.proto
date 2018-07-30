@@ -89,6 +89,7 @@ message KeyStats {
 }
 
 
+
 /// KeyT : Represents a Key 
 /// Top level objects are named ObjT 
 ///   eg KeyT - Key Type, SessionT - Session Type etc.
@@ -98,6 +99,12 @@ message KeyT {
     optional string         label=3;                /// a user label eg, a hostname or manually assigned name 
     optional string         description=4;          /// description 
     optional int64          metric=5;               /// optional : a single metric value - relevant to the query used 
+
+	message  NameValueT {
+		required string		attr_name=1;
+		required string		attr_value=2;
+	}
+	repeated NameValueT		attributes=6;			/// New: Attributes are NVP for keys 
 }
 
 
@@ -462,7 +469,7 @@ message CounterGroupTopperRequest{
     required string         counter_group=2;                /// guid of CG 
     optional int64          meter=3 [default=0];            /// meter; eg to get Top Hosts By Connections use cg=Hosts meter = 6(connections)
     optional int64          maxitems=4 [default=100];       /// number of top items to retreive 
-    optional TimeInterval   time_interval=5;                /// time interval 
+    optional TimeInterval   time_interval=5;                /// time interval , leave blank for latest interval 
     optional Timestamp      time_instant=6;                 /// 
     optional int64          flags=7;                        
     optional bool           resolve_keys=8 [default=true];  /// retrieve labels as set in the response for each key 
@@ -486,6 +493,7 @@ message SearchKeysRequest{
     repeated string         keys=6;
     optional int64          offset=7[default=0];
     optional bool           get_totals=8[default=false];
+	optional bool			get_attributes=9[default=false];
 } 
 
 /// SearchKeysResponse
@@ -548,7 +556,7 @@ message QuerySessionsResponse {
 /// Response = OKResponse or ErrorResponse
 message UpdateKeyRequest{
     required string         counter_group=2;
-    repeated KeyT           keys=4;  /// key  : if you set both key and label, the DB label will be updated 
+    repeated KeyT           keys=4;  		/// key  : if you set both key and label, the DB label will be updated 
 }
 
 /// SessionTrackerRequest  - query session trackers 
@@ -556,10 +564,11 @@ message UpdateKeyRequest{
 ///     They are Top Sessions fulfilling a particular preset criterion 
 message SessionTrackerRequest {
     optional string         session_group=2[default="{99A78737-4B41-4387-8F31-8077DB917336}"];
-    required int64          tracker_id=3 [default=1];       /// session tracker id 
+    optional int64          tracker_id=3;       /// session tracker id 
     optional int64          maxitems=4 [default=100];       
     required TimeInterval   time_interval=5;
     optional bool           resolve_keys=6 [default=true];
+    optional string         tracker_name=7;       /// query by tracker name for auto generated trackers
 }
 
 /// SessionTrackerResponse - results of tracker
@@ -595,13 +604,15 @@ message QueryAlertsRequest  {
     optional KeyT           any_port=19;            /// search by any_port (source_dest) 
     repeated KeyT           ip_pair=20;             /// array of 2 ips 
     optional string         message_regex=21;       /// searech via regex of the dispatch message 
+	optional bool			approx_count_only=22[default=false];	/// approx count per alert group 
 }
 
 /// QueryAlertsResponse - response 
 /// if you used group_by_fieldname then AlertT.occurrances would contain the count 
 message QueryAlertsResponse {
     required string         alert_group=2;
-    repeated AlertT         alerts=3;       /// array of matching alerts 
+    repeated AlertT         alerts=3;       		/// array of matching alerts 
+	optional int64			approx_count=4; 		/// approx count 
 }
 
 
@@ -614,20 +625,24 @@ message QueryResourcesRequest {
     optional KeyT           source_port=6;
     optional KeyT           destination_ip=7; 
     optional KeyT           destination_port=8;
-    optional string         uri_pattern=9;
-    optional string         userlabel_pattern=10;
-    repeated string         regex_uri=12;            // cant be combined with others 
-    repeated string         idlist=13;               // resource ID list 
+    optional string         uri_pattern=9;			 /// DEPRECATED: use regex_uri for everything
+    optional string         userlabel_pattern=10;	 /// DEPRECATED: uri_pattern will search both URI and USERLABEL 
+    repeated string         regex_uri=12;            /// cant be combined with others 
+    repeated string         idlist=13;               /// resource ID list 
     optional bool           resolve_keys=14 [default=true];
     optional KeyT           any_port=15;
     optional KeyT           any_ip=16;
     repeated KeyT           ip_pair=17;              // array of 2 ips 
+	optional bool			approx_count_only=18[default=false];	 // count-star  only  over time interval 
+	repeated string 		exclude_iplist=19;		 /// Exclude these IPs, cant be used with other IP fields 
+	optional bool			invert_regex=20[default=false]; /// Invert the regex RE2 cant reject 
 }
 
 /// QueryResourceResponse  
 message QueryResourcesResponse {
     required string         resource_group=2;
     repeated ResourceT      resources=3;
+	optional int64			approx_count=4;
 }
 
 
@@ -645,14 +660,16 @@ message KeySpaceRequest {
         required KeyT   to_key=2;       /// end of key space 
     }
 
-    repeated KeySpace       spaces=5;
-    optional bool           resolve_keys=6[default=true];
+    repeated KeySpace       spaces=5;	                   /// space1 OR space2 OR ..
+    optional bool           resolve_keys=6[default=true];  /// resolve names 
+	optional bool           totals_only=7[default=false];  /// if set, only totals returned
 }
 
 /// KeySpaceResponse  
 message KeySpaceResponse  {
-    optional string         counter_group=2;
+    optional string         counter_group=2;    /// counter group 
     repeated KeyT           hits=3;             /// array of keys in the requested space 
+	optional int64          total_hits=4;       /// if totals_only() this contains total(hits) 
 }
 
 /// TopperTrendRequest - raw top-K at each topper snapshot interval
@@ -710,6 +727,7 @@ message QueryFTSRequest  {
     required string             fts_group=3;
     required string             keywords=4;
     optional int64              maxitems=5[default=100];
+	optional bool               approx_count_only=6[default=false];
 }
 
 
@@ -717,6 +735,7 @@ message QueryFTSResponse {
 
     required string             fts_group=2;
     repeated DocumentT          documents=3;   
+	optional int64			    approx_count=4; 		/// approx count 
 
 }
 
@@ -921,7 +940,7 @@ message ContextDeleteRequest   {
 message ContextStartRequest   {
      required   string         context_name=1;      /// if not  set all context get in 
      optional   string         mode=2;				/// same as trisul cmdline run mode 
-     optional   bool           background=3;
+     optional   bool           background=3[default=true];
      optional   string         pcap_path=4;
      optional   string         run_tool=5;          /// snort, suricata supported..
      optional   string         tool_ids_config=6;
@@ -1106,6 +1125,7 @@ message GraphRequest {
 	required TimeInterval	time_interval=1;  /// time window 
 	required string			subject_group=2;  /// guid of subject, eg counter or alert guid 
     required KeyT           subject_key=3;    /// key (can specify key.key, key.label, etc too 
+	optional string			vertex_group=4;	  /// optional vertex group (only get vertices in this group) 
 }
 
 message GraphResponse {
