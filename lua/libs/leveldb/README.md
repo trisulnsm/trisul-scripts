@@ -50,6 +50,9 @@ db1:open("/tmp/ip2loc.level")
 db1:put("k1","veeraTheDog")
 db1:put("Longerkey with spaces ","Pakdam Pakdai")
 
+-- get a few keys
+print(db1:get("veeraTheDog"))
+
 -- put a few keys at once (atomic) using LevelDB WriteBatch under the hood
 db1:put_table( {
 	k1   = "valu1",
