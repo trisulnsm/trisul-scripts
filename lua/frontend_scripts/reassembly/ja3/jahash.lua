@@ -135,8 +135,11 @@ TrisulPlugin = {
 
     local payload = SWP.new(attr_value)
 
-    -- Only interested in TLS handshake (type = 22) + client_hello only
-    if payload:next_u8() == 22 and payload:skip(4) and payload:next_u8() == 1 then
+	-- only want TLS handshakes (type = 22 0x16) 
+	if payload:next_u8() ~= 22 then return; end 
+
+    -- handle client_hello JA3
+    if payload:skip(4) and payload:next_u8() == 1 then
 
       payload:reset()
       payload:inc(5)
@@ -238,6 +241,7 @@ TrisulPlugin = {
       engine:add_flow_edges(flowkey:id(), '{B91A8AD4-C6B6-4FBC-E862-FF94BC204A35}', snihostname)
       engine:add_flow_edges(flowkey:id(), '{E8D5E68F-B320-49F3-C83D-66751C3B485F}', ja3_hash)
 
+    elseif payload:next_u8() == 22 and payload:skip(4) and payload:next_u8() == 1 then
     end
     
   end,    

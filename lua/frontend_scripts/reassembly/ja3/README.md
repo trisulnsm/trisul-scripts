@@ -3,7 +3,7 @@ IOC based on Client Hello fingerprinting
 
 An experimental Trisul plugin for collecting client hello fingerprints.  
 
->  Requires the sweepbuf.lua buffer parsing library https://github.com/trisulnsm/trisul-scripts/blob/master/lua/bitmaul/sweepbuf.lua
+>  Requires the sweepbuf.lua buffer parsing library https://github.com/trisulnsm/bitmaul
 
 This method is an implementation of https://github.com/salesforce/ja3  
 
@@ -11,12 +11,6 @@ Change to original  - handle GREASE
 ------
 I deployed this script on a live Trisul system and noticed a unexpectedly huge number of hashes streaming by.  I dug a bit deeper and found that  Google Chrome was the culprit, they were randomly inserting reserved values of TLS Ciphers, Extensions, and EllipticCurve  in the Client Hello.  *Why on earth would they do that !!*  Well it turns out there is a Draft-RFC called [GREASE](https://tools.ietf.org/html/draft-davidben-tls-grease-01) 
 that explains this behavior.
-
-~~I added a bit of code to replace all GREASE values in the ja3 hash fields with 0 and re-calculate the MD5~~. The noise immediately died down and the signatures are now proving to be interesting. I might publish a set of fingerprints once we have enough data.
-
-** Correction to above ** 
-Turns out the GREASE positions can be random within the lists, so replacing them with 0 is still no good. The script has now been modified to remove them completely before computing the hash.
- 
 
 What jahash.lua does 
 --------------
