@@ -3,7 +3,6 @@
 -- 
 
 local ffi=require'ffi'
-local dbg=require'debugger'
 
 ffi.cdef [[
 	typedef uint32_t  socklen_t;
