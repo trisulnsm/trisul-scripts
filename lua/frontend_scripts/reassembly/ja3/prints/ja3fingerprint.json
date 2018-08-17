@@ -609,8 +609,8 @@
 {"desc":"Malware Test FP: dhl-malspam-traffic, st-run-hookads-rig-ek, eitest-rig-ek-sends-dreambot, traffic-from-malspam-pushing-dreambot, nd-run-hookads-rig-ek-sends-dreambot, nd-run-hookads-rig-ek-sends-drembot-with-post-infection-traffic, japanese-malspam-pushing-ursnif-traffic, nd-run-hookads-rig-ek, nd-run-hookads-rig-ek-sends-dreambot-with-post-infection-traffic, st-run-hookads-rig-ek-sends-dreambot, th-run-hookads-rig-ek-sends-dreambot","ja3_hash":"c201b92f8b483fa388be174d6689f534","ja3_str":"769,49162-49172-136-135-57-56-49167-49157-132-53-49159-49161-49169-49171-69-68-51-50-49164-49166-49154-49156-150-65-4-5-47-49160-49170-22-19-49165-49155-65279-10-255,0-11-10-13-15,23-25-28-27-24-26-22-14-13-11-12-9-10,0-1-2"}
 
 # added some JA3S 
-{"desc":"JA3S: Apache 2.4.18 Ubuntu 16.04","ja3_hash":"b898351eb5e266aefd3723d466935494,","ja3_str":"771,49199,0-65281-11-35-16"}
-{"desc":"JA3S: Apache 2.4.18 Ubuntu 16.04","ja3_hash":"7bee5c1d424b7e5f943b06983bb11422,","ja3_str":"771,49199,65281-16"}
+{"desc":"JA3S: Apache 2.4.18 Ubuntu 16.04","ja3_hash":"b898351eb5e266aefd3723d466935494","ja3_str":"771,49199,0-65281-11-35-16"}
+{"desc":"JA3S: Apache 2.4.18 Ubuntu 16.04","ja3_hash":"7bee5c1d424b7e5f943b06983bb11422","ja3_str":"771,49199,65281-16"}
 {"desc":"JA3S: ESF/Golfe2 Google Static",  "ja3_hash":"f93a0b1f80e58bc666e2efad32108aa2","ja3_str":"771,52393,65281-23-35-18-16-30032-11"}
 {"desc":"JA3S: ESF/Golfe2 Google Static",  "ja3_hash":"965ecee2ef1d30d9cf7f26ed94c52e3d","ja3_str":"771,52393,65281-23-35-18-16-11"}
 {"desc":"JA3S: NGINX unknown ver",         "ja3_hash":"9a31479427499ded4d3656a260298ec7","ja3_str":"771,49200,65281-11-35-5-16"}
