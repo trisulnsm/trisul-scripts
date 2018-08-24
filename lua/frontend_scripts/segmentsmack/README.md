@@ -40,6 +40,12 @@ end
 
 ````
 
+## Installing
+
+Use the same process as [installing any Trisul Lua script](https://www.trisul.org/docs/lua/basics.html#installing_and_uninstalling). Just copy the *.lua files over to 
+
+`/usr/local/var/lib/trisul-probe/domain0/probe0/context0/config/local-lua` then restart Trisul. 
+
 
 ## DevZone
 
