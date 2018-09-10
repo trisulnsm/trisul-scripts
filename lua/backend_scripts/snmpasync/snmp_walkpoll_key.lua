@@ -9,12 +9,13 @@ local lsqlite3 = require 'lsqlite3'
 local JSON=require'JSON'
 local dbg = require("debugger")
 
-local SNMP_DATABASE="/usr/local/var/lib/trisul-hub/domain0/hub0/context0/meters/persist/c-2314BB8E-2BCC-4B86-8AA2-677E5554C0FE.SQT"
+-- local SNMP_DATABASE="/usr/local/var/lib/trisul-hub/domain0/hub0/context0/meters/persist/c-2314BB8E-2BCC-4B86-8AA2-677E5554C0FE.SQT"
+local SNMP_DATABASE="/home/vivek/dev/pulsesnmp/c-2314BB8E-2BCC-4B86-8AA2-677E5554C0FE.SQT"
 
 
 TrisulPlugin = {
 
-  request_async_workers=6,
+  request_async_workers=16,
 
   id = {
     name = "SNMP Interface",
@@ -45,8 +46,21 @@ TrisulPlugin = {
 
   engine_monitor = {
 
-    -- only do this from Engine 0. Run thru each port and send separat SNMP get 
-    onbeginflush = function(engine, tv)
+    -- every interval reload the map -
+    onendflush = function(engine,tv)
+
+	  print("---- ENDFLUSH FROM PAST CYCLE    --"..T.async:pending_items())
+      local new_targets =  TrisulPlugin.load_poll_targets(engine:instanceid(), SNMP_DATABASE)
+      if new_targets ~= nil then
+        T.poll_targets = TrisulPlugin.load_poll_targets(engine:instanceid(),SNMP_DATABASE)
+      end
+	  print("---- ENDFLUSH ASYNC PENDING ITEMS--"..T.async:pending_items())
+
+	  TrisulPlugin.engine_monitor.schedule_polls(engine,tv)
+    end,
+
+    -- schedule polls 
+    schedule_polls  = function(engine, tv)
      
       if T.poll_targets == nil then return end
 
@@ -59,18 +73,6 @@ TrisulPlugin = {
         T.async:schedule ( async_task) 
 
       end
-
-	  print("---- BEGINFLUSH ASYNC PENDING ITEMS--"..T.async:pending_items())
-
-    end,  -- onbeginflush 
-
-    -- every interval reload the map -
-    onendflush = function(engine,tv)
-      local new_targets =  TrisulPlugin.load_poll_targets(engine:instanceid(), SNMP_DATABASE)
-      if new_targets ~= nil then
-        T.poll_targets = TrisulPlugin.load_poll_targets(engine:instanceid(),SNMP_DATABASE)
-      end
-	  print("---- ENDFLUSH ASYNC PENDING ITEMS--"..T.async:pending_items())
     end,
 
   },
@@ -112,9 +114,14 @@ TrisulPlugin = {
     end
     for ipkey,snmp in pairs(snmp_attributes) do
       if T.util.hash( snmp["snmp.ip"],1) == tonumber(engine_id) then 
-        targets[ #targets + 1] = { agent_ip = snmp["snmp.ip"], agent_community = snmp["snmp.community"], agent_version = snmp["snmp.version"] } 
-        T.log(T.K.loglevel.INFO, "Loaded ip="..snmp["snmp.ip"].." version"..snmp["snmp.version"].." comm=".. snmp["snmp.community"])
-        print("Loaded ip="..snmp["snmp.ip"].." version="..snmp["snmp.version"].." comm=".. snmp["snmp.community"])
+	  	if snmp['snmp.community'] ~= nil and #snmp['snmp.community'] > 0  then 
+			targets[ #targets + 1] = { agent_ip = snmp["snmp.ip"], agent_community = snmp["snmp.community"], agent_version = snmp["snmp.version"] } 
+			T.log(T.K.loglevel.INFO, "LOADED  ip="..snmp["snmp.ip"].." version"..snmp["snmp.version"].." comm=".. snmp["snmp.community"])
+			print("LOADED  ip="..snmp["snmp.ip"].." version="..snmp["snmp.version"].." comm=".. snmp["snmp.community"])
+		else
+			T.log(T.K.loglevel.INFO, "NULL community , skipping deleted SNMP agent  ip="..snmp["snmp.ip"].." version="..snmp["snmp.version"])
+			print("NULL    community , skipping deleted SNMP agent  ip="..snmp["snmp.ip"].." version="..snmp["snmp.version"])
+		end
       else
         T.log(T.K.loglevel.INFO, "SKIPPED ip="..snmp["snmp.ip"].." version"..snmp["snmp.version"].." comm=".. snmp["snmp.community"])
         print("SKIPPED ip="..snmp["snmp.ip"].." version="..snmp["snmp.version"].." comm=".. snmp["snmp.community"])

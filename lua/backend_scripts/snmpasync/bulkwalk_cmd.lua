@@ -12,7 +12,11 @@ function do_bulk_walk( agent, version, community, oid  )
   for oneline in h:lines()
   do
     local  k,v = oneline:match("%.(%d+)%s+(.+)") 
-    ret[agent.."_"..k] = v:gsub('"','')
+	if k then 
+		ret[agent.."_"..k] = v:gsub('"','')
+	else
+		print("ERROR in snmp output line="..oneline)
+	end 
   end 
   h:close()
   os.remove(ofile)
