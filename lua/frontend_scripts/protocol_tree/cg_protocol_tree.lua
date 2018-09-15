@@ -22,13 +22,22 @@ TrisulPlugin = {
 
     -- meters table
     meters = {
-        {  0, T.K.vartype.COUNTER,      20, 10, "Bytes",    "bytes",  "Bytes" },
-        {  1, T.K.vartype.COUNTER,      20, 10, "Packets",  "pkts",   "Pkts" },
+        {  0, T.K.vartype.COUNTER,      50, 20, "Bytes",    "bytes",  "Bytes" },
+        {  1, T.K.vartype.COUNTER,      50, 20, "Packets",  "pkts",   "Pkts" },
     },  
 
 	-- key info 
 	-- nothing but mapping of port info to make it readable 
     keyinfo = {
+		{'2048/1/3','ip/icmp/dest-unreachable'},
+		{'2048/1/5','ip/icmp/redirect'},
+		{'2048/1/8','ip/icmp/echo'},
+		{'2048/1/9','ip/icmp/router-adv'},
+		{'2048/1/10','ip/icmp/router-solicit'},
+		{'2048/1/11','ip/icmp/time-exceeded'},
+		{'2048/1/12','ip/icmp/parameter-problem'},
+		{'2048/1/13','ip/icmp/timestamp'},
+		{'2048/1/14','ip/icmp/timestamp-reply'},
 		{'2048/0','ip/hopopt'},
 		{'34525/0','ip6/hopopt'},
 		{'2048/1','ip/icmp'},
