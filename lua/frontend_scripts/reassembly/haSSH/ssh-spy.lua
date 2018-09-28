@@ -46,7 +46,7 @@ TrisulPlugin = {
 
     -- 
     onterminateflow  = function(engine, timestamp, flowkey)
-      -- print("Terminating SSH Analyzer attached to a PDURecord f="..flowkey:id() )
+      print("Terminating SSH Analyzer attached to a PDURecord f="..flowkey:id() )
       T.Pimpl[flowkey:id()]  = nil 
     end,
 

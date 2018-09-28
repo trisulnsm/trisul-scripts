@@ -4,16 +4,15 @@
 --
 local SweepBuf=require'sweepbuf'
 
--- local dbg=require 'debugger'
-
 local PDURecord = {
 
     -- States
     --       0: start 
     --       1: want_bytes
-    --       2: want_pattern
+    --       2: want_to_pattern
     --       3: skip_bytes 
     --       4: abort 
+	--       6: want_to_start_pattern
 
     -- TODO: unoptimized 
     -- 
@@ -72,6 +71,14 @@ local PDURecord = {
               tbl.state=0
               run_pump=true
           end
+        elseif st==6 then
+          -- STATE want start pattern
+          local mb = tbl._sweepbuffer:next_str_to_pattern_exclude(tbl.want_pattern)
+          if mb then 
+              tbl.diss:on_record(tbl, mb )    --> * emit *
+              tbl.state=0
+              run_pump=true
+          end
         elseif st==1 then
           -- STATE_want bytes
           if  tbl._sweepbuffer:bytes_left() >= tbl.want_bytes then  
@@ -100,6 +107,11 @@ local PDURecord = {
     want_to_pattern = function(tbl, patt )
       tbl.want_pattern=patt
       tbl.state =2
+    end,
+
+    want_to_start_pattern = function(tbl, patt )
+      tbl.want_pattern=patt
+      tbl.state = 6
     end,
 
     skip_next = function(tbl, bytes)

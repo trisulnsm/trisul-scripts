@@ -16,8 +16,8 @@ TrisulPlugin = {
 
     control = {
       guid = "{E49AA7D0-3DC8-46AC-E278-5DD07B298F0A}", 
-      name = "SSH Prints",
-      description = "SSH Prints",
+      name = "HaSSH Prints",
+      description = "HaSSH Prints",
 	  bucketsize = 60,
     },
 
