@@ -3,7 +3,7 @@
 --
 -- 1. Port Independent  SSH-detector
 -- 2. Connects to Trisul TCP reassembly
--- 3. Uses PDURecord helper library to interface wth ssh_dissect
+-- 3. Uses PDURecord helper library to interface wth ssh-dissect
 -- 
 
 local PDURecord = require'pdurecord'
@@ -26,7 +26,7 @@ TrisulPlugin = {
       local ctl = T.Pimpl[flowkey:id()] 
       if not ctl then 
         if seekpos==0 and buffer:tostring():find("^SSH%-2%.0") == 1  then
-          print("New SSH Analyzer attached to a PDURecord f="..flowkey:id() )
+          print("New haSSH  Analyzer attached to a PDURecord f="..flowkey:id() )
           local ssh1, ssh2 = SSHDissector.new_pair()
           local ins =    PDURecord.new(flowkey:id(), ssh1)
           local outs =   PDURecord.new(flowkey:id(), ssh2)
@@ -41,12 +41,13 @@ TrisulPlugin = {
       local pdur = ctl[direction]
       pdur.engine=engine
       pdur.timestamp=timestamp
+      pdur.flowid = flowkey:id() 
       pdur:push_chunk(seekpos, buffer:tostring())
     end,
 
     -- 
     onterminateflow  = function(engine, timestamp, flowkey)
-      print("Terminating SSH Analyzer attached to a PDURecord f="..flowkey:id() )
+      -- print("Terminating SSH Analyzer attached to a PDURecord f="..flowkey:id() )
       T.Pimpl[flowkey:id()]  = nil 
     end,
 

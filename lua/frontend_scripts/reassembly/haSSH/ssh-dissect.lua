@@ -10,16 +10,12 @@ local SSHDissector =
    ST = {               -- states 
     START=0,
     BEFORE_NEWKEYS=1,
-	ABORT=2,
+    ABORT=2,
    },
 
-  -- 
-  -- how to get the next record 
-  -- SSH2.0 is simple - 
+  -- how to get the next record in SSH Protocol 
   --  1. the first pkt looks for \r\n
   --  2. the others Up-Until the NEW KEYS are length
-  --  3. after that *-etm HMACs have clear text length, others dead-end 
-  -- 
   what_next =  function( tbl, pdur, swbuf)
     if tbl.ssh_state  == tbl.ST.START  then
       pdur:want_to_pattern("\n")
@@ -27,14 +23,12 @@ local SSHDissector =
       pdur:abort()
     elseif tbl.ssh_state == tbl.ST.BEFORE_NEWKEYS  then 
       pdur:want_next(swbuf:u32() + 4)
-	else 
-	  pdur:abort()
+  else 
+    pdur:abort()
     end 
   end,
 
   -- handle a record
-  --   the main task here : handle the cipher/mac exchange so we know what packetlengths
-  --   to expect for successful login, keystroke, and keystroke within tunnel 
   --
   on_record = function( tbl, pdur, strbuf)
 
@@ -66,31 +60,32 @@ local SSHDissector =
         tbl.hshake. languages_server_to_client  = sb:split(sb:next_str_to_len(sb:next_u32()),",")
         tbl.hshake_complete=true
 
-		local hashstr = table.concat(tbl.hshake.kex_algos,',') .. ';'..
-						table.concat(tbl.hshake.encryption_algorithms_client_to_server,',')..';'..
-						table.concat(tbl.hshake.mac_algorithms_client_to_server,',')..';'..
-						table.concat(tbl.hshake.compression_algorithms_client_to_server,',')
+        local hashstr = table.concat(tbl.hshake.kex_algos,',') .. ';'..
+            table.concat(tbl.hshake.encryption_algorithms_client_to_server,',')..';'..
+            table.concat(tbl.hshake.mac_algorithms_client_to_server,',')..';'..
+            table.concat(tbl.hshake.compression_algorithms_client_to_server,',')
 
-		local haSSH = md5sum(hashstr)
+        local haSSH = md5sum(hashstr)
 
-		print( haSSH.." = ".. tbl.ssh_version_string)
+        print( haSSH.." = ".. tbl.ssh_version_string)
 
-		if tbl.role=="client" then
-			pdur.engine:update_counter("{E49AA7D0-3DC8-46AC-E278-5DD07B298F0A}", 
-										haSSH, 0, 1); 
+        if tbl.role=="client" then
+          pdur.engine:update_counter("{E49AA7D0-3DC8-46AC-E278-5DD07B298F0A}", 
+                        haSSH, 0, 1); 
 
-			pdur.engine:update_key_info("{E49AA7D0-3DC8-46AC-E278-5DD07B298F0A}", 
-										haSSH, tbl.ssh_version_string)
-		else 
-			pdur.engine:update_counter("{E49AA7D0-3DC8-46AC-E278-5DD07B298F0A}", 
-										haSSH, 1, 1); 
+          pdur.engine:update_key_info("{E49AA7D0-3DC8-46AC-E278-5DD07B298F0A}", 
+                        haSSH, tbl.ssh_version_string)
+        else 
+          pdur.engine:update_counter("{E49AA7D0-3DC8-46AC-E278-5DD07B298F0A}", 
+                        haSSH, 1, 1); 
 
-			pdur.engine:update_key_info("{E49AA7D0-3DC8-46AC-E278-5DD07B298F0A}", 
-										haSSH, tbl.ssh_version_string)
+          pdur.engine:update_key_info("{E49AA7D0-3DC8-46AC-E278-5DD07B298F0A}", 
+                        haSSH, tbl.ssh_version_string)
 
-		end 
+        end 
 
-		
+        pdur.engine:add_flow_edges("{E49AA7D0-3DC8-46AC-E278-5DD07B298F0A}", haSSH,  pdur.flowid) 
+    
 
       end
 
