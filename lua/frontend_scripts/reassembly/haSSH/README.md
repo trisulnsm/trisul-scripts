@@ -13,6 +13,8 @@ We use the [Trisul LUA API](https://trisul.org/docs/lua) to decode the SSH2.0 pr
 2. Labels for each hassh based on the SSL Version String 
 3. Graph analytics edges to enable pivoting from hash -> IPs using them 
 
+also see [Intro to Trisul scripting for Bro script devs](https://www.trisul.org/devzone/doku.php/scripting:introbro) 
+
 ### The files
 
 The main code is in `ssh-dissect.lua` in this snippet 
