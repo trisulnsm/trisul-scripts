@@ -4,6 +4,7 @@
 #  ruby ptree.rb 
 #
 require 'trisulrp'
+require 'io/console'
 
 class String
   def black;          "\e[30m#{self}\e[0m" end
@@ -22,7 +23,7 @@ class ProtoTree
   def initialize
     @tree = {}
     @totals = {}
-   
+    @screen_width=IO.console.winsize[1]
   end
 
   def check_argv
@@ -43,7 +44,7 @@ class ProtoTree
     #Get the time interval
     req =TrisulRP::Protocol.mk_request(TRP::Message::Command::TIMESLICES_REQUEST,{get_total_window:true})
     TrisulRP::Protocol.get_response_zmq(zmq_endpt,req) do |resp|
-      @windows_fromts = resp.total_window.from.tv_sec
+      @windows_fromts = resp.total_window.to.tv_sec - 300
       @windows_tots =  resp.total_window.to.tv_sec
     end
 
@@ -80,13 +81,14 @@ class ProtoTree
     end
 
     @totals = @tree.delete("SYS:GROUP_TOTALS")
-    puts "-"*140
-    puts "Protocol".ljust(20)+
-         "bytes  ( %total)".rjust(50)+
+    puts "-"*@screen_width
+    puts "Protocol".ljust(15)+
+         "bytes  ( %total)".rjust(30)+
          " ".rjust(10)+
-         "Packets  ( %total)".rjust(40)
+         "Packets  ( %total)".rjust(30)+
+         "bytes/packet".rjust(20)
 
-    puts "-"*140
+    puts "-"*@screen_width
            
     print_tree({"total counts"=>@totals},0)
     print_tree(@tree,0)
@@ -110,7 +112,7 @@ class ProtoTree
 
   def print_tree(subtree,level)
     totals = @totals
-    subtree.sort.reject{|a| a[0]=="bytes" or a[0]=="packets"}.sort{|a,b| b[1]["bytes"]<=>a[1]["bytes"]}.each_with_index do | t,idx|
+    subtree.sort.reject{|a| a[0]=="bytes" or a[0]=="packets" or a[1]["bytes"].nil? or a[1]["packets"].nil? }.sort{|a,b|  b[1]["bytes"]  <=>a[1]["bytes"]}.each_with_index do | t,idx|
       if t[0]=="bytes" || t[0]=="packets"
         next
       end
@@ -132,11 +134,12 @@ class ProtoTree
       pkt_per =   "(#{(t[1]["bytes"].to_f*100/totals["bytes"]).round(2)}%)"
 
 
-      puts "#{@nested}#{t[0].ljust(20)}"\
-           "#{t[1]["bytes"].to_s.rjust(40)}"\
+      puts "#{@nested}#{t[0].ljust(15)}"\
+           "#{t[1]["bytes"].to_s.rjust(25)}"\
            "#{bytes_per.rjust(10)}" \
-           "#{t[1]["packets"].to_s.rjust(40)}"\
-           "#{pkt_per.rjust(10)}"
+           "#{t[1]["packets"].to_s.rjust(25)}"\
+           "#{pkt_per.rjust(10)}"\
+           "#{(t[1]["bytes"].to_f/t[1]["packets"]).round(2).to_s.rjust(20)}"
 
       if(t[1]["nodetype"]!="leaf")
         print_tree(t[1],1)
