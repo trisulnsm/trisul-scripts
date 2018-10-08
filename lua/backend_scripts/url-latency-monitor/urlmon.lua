@@ -22,20 +22,19 @@ TrisulPlugin = {
 
     -- add
     onnewresource  = function(engine, resource )
-		local res = resource:uri()
-		local l,k,v = res:match("(%S+)%s(%S+)%s([^%?%s]+)")
-		local usec = resource:label():match("usec:(%d+)")
+      local res = resource:uri()
+      local l,k,v = res:match("(%S+)%s(%S+)%s([^%?%s]+)")
+      local usec = resource:label():match("usec:(%d+)")
 
-		if usec then
-			local key = l.."/"..k..v
-			local latency = tonumber(usec)
-			engine:update_counter( "{C93B79D5-20A0-49D8-FA27-160B45D49C00}", key, 0, 1);
-			engine:update_counter( "{C93B79D5-20A0-49D8-FA27-160B45D49C00}", key, 1, latency);
-			engine:update_counter( "{C93B79D5-20A0-49D8-FA27-160B45D49C00}", key, 2, latency);
-			engine:update_counter( "{C93B79D5-20A0-49D8-FA27-160B45D49C00}", key, 3, latency);
-
-			print(key.."="..latency)
-		end 
+      if usec then
+        local key = l.."/"..k..v
+        key=key:sub(1,50)
+        local latency = tonumber(usec)
+        engine:update_counter( "{C93B79D5-20A0-49D8-FA27-160B45D49C00}", key, 0, 1);
+        engine:update_counter( "{C93B79D5-20A0-49D8-FA27-160B45D49C00}", key, 1, latency);
+        engine:update_counter( "{C93B79D5-20A0-49D8-FA27-160B45D49C00}", key, 2, latency);
+        engine:update_counter( "{C93B79D5-20A0-49D8-FA27-160B45D49C00}", key, 3, latency);
+      end 
     end,
 
   },
@@ -46,7 +45,7 @@ TrisulPlugin = {
       guid = "{C93B79D5-20A0-49D8-FA27-160B45D49C00}", 
       name = "URL Service ",
       description = "URL Service Response Times ",
-	  bucketsize = 10,
+      bucketsize = 60,
     },
 
     -- meters table

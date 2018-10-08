@@ -7,8 +7,7 @@ apis = Socket.new(:UNIX, :DGRAM)  # UNIX datagram socket
 s1_ai = Socket.sockaddr_un("/usr/local/var/lib/trisul-probe/domain0/probe0/context0/run/api.sock.0")
 apis.connect(s1_ai)
 
-#uri = URI.parse("https://192.168.2.99")
-uri = URI.parse("https://api.saas.paytm.com")
+uri = URI.parse("https://192.168.2.99")
 request = Net::HTTP.new(uri.host, uri.port)
 
 while true do 
