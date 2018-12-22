@@ -32,5 +32,28 @@ We want to pull the results back into the Trisul pipeline. All the `strelka-json
 
 
 
+## Using 
+
+Once it is integrated and running, the Strelka Scan results will be sucked into Trisul Resources.  
+
+### A new resource type Strelka Scan  
+
+![Find a new resource type called Strelka Scan](strelka1.png)
+
+
+### Search / view scan results 
+
+Clicking on Strelka Scan resource, will take you to the Resources Page. Where you will see all the scan results, then you can search , view , download them
+
+The following screenshot shows you JSON scan output of an EXE file
+
+![Sample scan results](strelka2.png)
+
+
+
+
+
+
+
 
 
