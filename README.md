@@ -5,6 +5,8 @@ Trisul Network Analytics https://www.trisul.org offers a scriptable platform upo
 
 There are two APIs available.
 
+> The JA3 TLS Fingerprints database has now moved to a new repository ja3prints
+
 
 ## LUA API 
 -----------

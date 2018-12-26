@@ -1,6 +1,10 @@
 ja3fingerprint.json
 ====================
 
+> ## Moved 
+> **JA3 Prints Database moved to new repository** [trisulnsm/ja3prints](https://github.com/trisulnsm/ja3prints)
+> Please submit any pull requests there. Thanks !  
+
 A database of JA3 Fingerprints in JSON format. 
 
 The original sources of these prints can be found as comments.  If you come across prints not seen in the list, please submit a pull request. 

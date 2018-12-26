@@ -1,6 +1,10 @@
 IOC based on Client Hello fingerprinting 
 ======================
 
+> ## Moved 
+> **JA3 Prints Database moved to new repository** [trisulnsm/ja3prints](https://github.com/trisulnsm/ja3prints)
+> Please submit any pull requests there. Thanks !  
+
 An experimental Trisul plugin for collecting client hello fingerprints.  
 
 >  Requires the sweepbuf.lua buffer parsing library https://github.com/trisulnsm/bitmaul
