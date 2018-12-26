@@ -25,9 +25,10 @@ First install [Trisul](https://www.trisul.org)   and [Strelka](https://github.co
   3. Then follow the instructions on [strelka](https://github.com/target/strelka) to run the servers and dirstream
   ````
   # on trisul-probe (the client)
-  /usr/local/bin/strelka_dirstream.py -d -c etc/dirstream/dirstream.yml
+  strelka_dirstream.py -d -c etc/dirstream/dirstream.yml
+
   # on the server
-  /usr/local/bin/strelka
+  strelka
   ````
 That ought to be enough to get started.  The results of the file scanning can be found in the JSON output files in `/var/log/strelka`
 
