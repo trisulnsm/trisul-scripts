@@ -7,6 +7,7 @@
 --              building a C&C channel. This script checks for echo/reply match
 -- 
 local SB=require'sweepbuf'
+local MM=require'mrumap'
 
 TrisulPlugin = { 
 
@@ -19,7 +20,7 @@ TrisulPlugin = {
 
 
   onload = function()
-	 T.icmp_echo_pending = {} 
+	 T.icmp_echo_pending =  MM.new() 
   end,
 
   -- simple_counter  block
@@ -46,19 +47,16 @@ TrisulPlugin = {
 	    local flowid=layer:packet():num_layers()
 
 	    -- need the ips + id 
-	    local iplayer=layer:packet():find_layer('{0A2C724B-5B9F-4BA6-9C97-B05080558574}')
-	    local sbip = SB.new(iplayer:rawbytes():tostring())
-	    local _,sip,dip=sbip:skip(12), sbip:next_ipv4(), sbip:next_ipv4()
-	    local icmpflowkey 
+	    local icmpflowkey=layer:packet():flowid():id() 
+		print(icmpflowkey)
+
 	    if t==0 then
-		    icmpflowkey=sip.."-"..dip.."-"..id
-		    T.icmp_echo_pending[icmpflowkey]=hsh
+		    T.icmp_echo_pending:put(icmpflowkey,hsh)
 		    print("\nadding    "..icmpflowkey.." = "..hsh )
 	    else
-		    icmpflowkey=dip.."-"..sip.."-"..id
 		    -- check replies hash
 		    --
-		    local req_hash = T.icmp_echo_pending[icmpflowkey]
+		    local req_hash = T.icmp_echo_pending:get(icmpflowkey)
 		    print("checking  -"..icmpflowkey.." = "..req_hash)
 		    if req_hash and req_hash ~= hsh then
 			    print("Alert tunnel on ? "..icmpflowkey)
@@ -70,8 +68,13 @@ TrisulPlugin = {
 					     1,
 					     "Possible ICMP Echo (Ping) tunnel, payloads dont match")
 		    end
-		    T.icmp_echo_pending[icmpflowkey]=nil
+		    T.icmp_echo_pending:delete(icmpflowkey)
 	    end 
+
+		-- cap at 100
+		if T.icmp_echo_pending:size() > 100 then 
+			T.icmp_echo_pending:pop_back()
+		end
 
     end,
 

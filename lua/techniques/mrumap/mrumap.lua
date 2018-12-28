@@ -87,12 +87,12 @@ local MruMap = {
       end
       tbl._size=tbl._size-1
     elseif n==tbl._Head and n==tbl._Tail then 
-      tbl.reset()
+      tbl:reset()
     end
     return n
   end,
 
-  reset=function()
+  reset=function(tbl)
     tbl._size=0;
     tbl._Head=nil;
     tbl._Tail=nil;
