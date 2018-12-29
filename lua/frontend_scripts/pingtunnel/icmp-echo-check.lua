@@ -56,9 +56,9 @@ TrisulPlugin = {
         --
         local resp_hash = T.icmp_echo_pending:get(icmpflowkey)
         if resp_hash and resp_hash ~= hsh then
-          print("Alert tunnel on ? "..icmpflowkey)
 
           -- hey ! funny stuff, req and resp payloads dont match raise an alert, 
+          print("Alert tunnel on ? "..icmpflowkey)
           engine:add_alert("{B5F1DECB-51D5-4395-B71B-6FA730B772D9}",
                     "06A:00.00.00.00_icmp00:00.00.00.00_icmp01",
                     "PING-TUNNEL",
@@ -68,9 +68,9 @@ TrisulPlugin = {
           local u=T.unsolicited:get(layer:flowkey())  or 0 
           T.unsolicited:put(layer:flowkey(),u+1)
           if u== 5 then
-            print("Hey, looks like a ptunnel type hole puncher? "..icmpflowkey)
             
             -- hey looks like pTunnel ! funny stuff, too many unsolicited
+            print("Hey, looks like a ptunnel type hole puncher? "..icmpflowkey)
             engine:add_alert("{B5F1DECB-51D5-4395-B71B-6FA730B772D9}",
                      "06A:00.00.00.00_icmp00:00.00.00.00_icmp01",
                      "PING-TUNNEL",
