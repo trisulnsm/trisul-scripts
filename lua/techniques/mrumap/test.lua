@@ -7,6 +7,7 @@ tst:put('oldest',1)
 tst:put('secondoldest',1)
 tst:put('oldestbutaccessedlater',1)
 
+tst:put('deletedlater',1)
 -- 
 local function randstr() 
 local chars={}
@@ -38,9 +39,14 @@ end
 
 print("size="..tst:size())
 
+-- delete 
+tst:delete("deletedlater")
+
+print("size="..tst:size())
+
 -- roll back all to zero
 while tst:pop_back() do
-print("size="..tst:size())
+--print("size="..tst:size())
 end
 
 print("size="..tst:size())
