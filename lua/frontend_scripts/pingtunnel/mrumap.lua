@@ -1,7 +1,10 @@
 -- mrumap.lua
--- operations like  LUA table lookup but pop_oldest()  is O(1) 
 -- 
---local dbg=require'debugger'
+-- lua lookup table but pop_lru()/pop_oldest()  is O(1) 
+-- 
+-- see https://github.com/trisulnsm/trisul-scripts/tree/master/lua/techniques/mrumap
+-- 
+-- local dbg=require'debugger'
 
 local MruMap = {
 

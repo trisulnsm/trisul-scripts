@@ -20,7 +20,6 @@ TrisulPlugin = {
 
   onload = function()
     T.icmp_echo_pending =  MM.new() 
-    T.unsolicited =  MM.new() 
   end,
 
   -- simple_counter  block
@@ -43,7 +42,6 @@ TrisulPlugin = {
 
       local paystr = sb:buffer_left()
       local hsh=T.util.hash(paystr,32)
-      local flowid=layer:packet():num_layers()
 
       -- need the ips + id 
       local icmpflowkey=layer:flowkey().."-"..id.."-"..seqno
@@ -60,36 +58,19 @@ TrisulPlugin = {
           -- hey ! funny stuff, req and resp payloads dont match raise an alert, 
           print("Alert tunnel on ? "..icmpflowkey)
           engine:add_alert("{B5F1DECB-51D5-4395-B71B-6FA730B772D9}",
-                    "06A:00.00.00.00_icmp00:00.00.00.00_icmp01",
+                    layer:flowkey(),
                     "PING-TUNNEL",
                     1,
                     "Possible ICMP Echo (Ping) tunnel, payloads dont match")
-        elseif not resp_hash then 
-          local u=T.unsolicited:get(layer:flowkey())  or 0 
-          T.unsolicited:put(layer:flowkey(),u+1)
-          if u== 5 then
-            
-            -- hey looks like pTunnel ! funny stuff, too many unsolicited
-            print("Hey, looks like a ptunnel type hole puncher? "..icmpflowkey)
-            engine:add_alert("{B5F1DECB-51D5-4395-B71B-6FA730B772D9}",
-                     "06A:00.00.00.00_icmp00:00.00.00.00_icmp01",
-                     "PING-TUNNEL",
-                     1,
-                     "Possible ICMP pTunnel style, unsolicited replies")
-          end
         end
         T.icmp_echo_pending:delete(icmpflowkey)
       end 
 
-      -- cap at 100
-      if T.icmp_echo_pending:size() > 100 then 
+      -- cap at 500 (last 500 pkts) 
+      if T.icmp_echo_pending:size() > 500 then 
         T.icmp_echo_pending:pop_back()
       end
 
-      -- unsolicited cap at 100 
-      if T.unsolicited:size() > 100 then 
-        T.unsolicited:pop_back()
-      end
     end,
 
   },
