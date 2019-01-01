@@ -21,7 +21,7 @@ TrisulPlugin = {
   },
 
   onload = function()
-    T.icmp_pairs  =  MM.new() 
+    T.icmp_pairs  =  MM.new(500) 
   end,
 
   -- simple_counter  block
@@ -68,12 +68,6 @@ TrisulPlugin = {
         hamming_threshold_crossed=1
       })
       end 
-
-      -- cap at 100 simultaneous PING Convos 
-      if T.icmp_pairs:size() > 100 then 
-        T.icmp_pairs:pop_back()
-      end
-
     end
 
   },

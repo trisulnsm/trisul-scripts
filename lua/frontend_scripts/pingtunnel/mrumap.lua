@@ -1,15 +1,18 @@
 -- mrumap.lua
 -- 
--- lua lookup table but pop_lru()/pop_oldest()  is O(1) 
+-- lua lookup table where pop_lru() is O(1) 
 -- 
 -- see https://github.com/trisulnsm/trisul-scripts/tree/master/lua/techniques/mrumap
 -- 
--- local dbg=require'debugger'
-
+-- 2018-19  Trisul Network Analytics 
+-- 
 local MruMap = {
 
-  put=function(tbl,k,v)
-    local wrap=tbl:newnode(k,v)
+  put=function(tbl,k,v,createtick)
+
+    if tbl._Capacity > 0 and tbl._Size > tbl._Capacity then tbl:pop_lru() end 
+
+    local wrap=tbl:newnode(k,v,createtick)
     tbl:push_front(wrap)
     tbl.basetable[k]=wrap 
   end,
@@ -30,28 +33,28 @@ local MruMap = {
     wrap=nil 
   end,
 
-  delete_lru=function(tbl)
+  pop_lru=function(tbl)
     local wrap = tbl:pop_back()
     if wrap==nil then return nil end
     tbl.basetable[wrap.k]=nil 
-    wrap=nil 
+	return wrap.data,wrap.created
   end,
 
   pop_back=function(tbl)
-    if tbl._size>0 then 
+    if tbl._Size>0 then 
       local  wrap = tbl._Tail;
       tbl._Tail = tbl._Tail.p;
       if tbl._Tail then  tbl._Tail.n=nil end
-      tbl._size=tbl._size-1
+      tbl._Size=tbl._Size-1
       return wrap;
     else
       return nil
     end
   end,
 
-  newnode=function(tbl,k,v)
+  newnode=function(tbl,k,v,tick)
     return {
-      k=k, data=v, p=nil, n=nil
+      k=k, data=v, p=nil, n=nil, created=tick
     }
   end,
 
@@ -70,12 +73,12 @@ local MruMap = {
       tbl._Tail=tbl._Head;
     end
 
-    tbl._size=tbl._size+1
+    tbl._Size=tbl._Size+1
     return n
   end,
 
   erase=function(tbl,n)
-    if tbl._size==0 then return end
+    if tbl._Size==0 then return end
 
     if n.p or n.n then
       if n.p then
@@ -88,7 +91,7 @@ local MruMap = {
       else
         tbl._Tail=n.p
       end
-      tbl._size=tbl._size-1
+      tbl._Size=tbl._Size-1
     elseif n==tbl._Head and n==tbl._Tail then 
       tbl:reset()
     end
@@ -96,13 +99,17 @@ local MruMap = {
   end,
 
   reset=function(tbl)
-    tbl._size=0;
+    tbl._Size=0;
     tbl._Head=nil;
     tbl._Tail=nil;
   end,
 
   size=function(tbl)
-    return tbl._size
+    return tbl._Size
+  end,
+
+  capacity=function(tbl)
+  	return tbl._Capacity
   end,
 
   mru_iter=function(tbl)
@@ -123,12 +130,15 @@ local MruMap = {
 MruMap.__index=MruMap
 
 local mrumap  = { 
-   new = function() 
+   new = function(capacity) 
+     
      return setmetatable(  {
         basetable={},
         _Head=nil,
         _Tail=nil,
-        _size=0
+        _Size=0,
+		_Capacity=capacity or -1,
+		_
       },MruMap)
     end
 } 

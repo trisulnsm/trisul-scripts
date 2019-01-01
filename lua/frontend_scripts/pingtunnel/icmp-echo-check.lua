@@ -19,7 +19,7 @@ TrisulPlugin = {
   },
 
   onload = function()
-    T.icmp_echo_pending =  MM.new() 
+    T.icmp_echo_pending =  MM.new(1000) 
   end,
 
   -- simple_counter  block
@@ -66,12 +66,6 @@ TrisulPlugin = {
         T.icmp_echo_pending:delete(icmpflowkey)
       end 
 
-      -- cap at 500 (last 500 pkts) 
-      if T.icmp_echo_pending:size() > 500 then 
-        T.icmp_echo_pending:pop_back()
-      end
-
     end,
-
   },
 }

@@ -2,7 +2,6 @@
 
 A map backed by a MRU list that allows you to prune the least recently used keys in O(1) 
 
-
 ## Motivation 
 
 A very common pattern in Trisul network scripting is to store a per-flow state. This is usually done by 
@@ -10,15 +9,14 @@ means of a normal MAP with a string FLOWKEY.
 
 ```
 flowlookup[flowkey] = { packet_count = 88, 
-						last_seen_id = 77,
-						.. }
+						last_seen_id = 77, .. }
 ```
 
-Now the issue is handling the maintenance of this table. Since,  we are dealing with a network scripting framework
+Now the issue is handling the maintenance of this table. Since  we are dealing with a network scripting framework
 like Trisul, we cant be sure of getting the 'cleanup' signal or in the case of case of UDP or ICMP flows, there is no 'cleanup' signal.  
 						
-One common solution is to record the "last seen action" for each flow. Then periodically sweep the table and throw out
-old items say over 2 minutes old.  This works, but the sweep operation is O(N) will stall the fast path for large tables. 
+One common solution is to record the "last seen" for each flow. Then periodically sweep the table and throw out
+old items say over 2 minutes old.  This works, but the sweep operation is O(N) which can stall the fast path for large tables. 
 
 In Trisul we try to do better.
 
@@ -34,10 +32,9 @@ In Trisul we try to do better.
 
 Also see test.lua 
 
-### Creating the map 
+#### creating the map 
 
 in your LUA code do the following
-
 
 ```lua
 
@@ -47,18 +44,19 @@ mmflows = MM.new(1000)   -- map with a max capacity of 1000 (default 100)
 ```
 
 
-### looking up
+#### looking up
 
-use the get method
+use the get() method
 
 ````
 local state=mmflows:get("aflowid") 
 ````
 
-### inserting
+#### inserting
 
-the put method
-````
+use put()
+
+````lua 
 local state=mmflows:get("aflowid") 
 if state==nil then
 	mmflows:put("aflowid", { sequence=1, 
@@ -66,9 +64,9 @@ if state==nil then
 			   )
 end 
 ````
-
 Thats it !! if the map grows beyond the capacity, then the LRU item is automatically popped to make way for new entries. 
 
+-----
 
 
 ## Advanced usage
