@@ -45,9 +45,11 @@ tst:delete("deletedlater")
 print("size="..tst:size())
 
 -- roll back all to zero
-while tst:pop_back() do
+while tst:pop_lru() do
 --print("size="..tst:size())
 end
 
 print("size="..tst:size())
+
+print("capacity="..tst:capacity())
 
