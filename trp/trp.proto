@@ -69,6 +69,8 @@ message MeterInfo {
         VT_RUNNING_COUNTER=8;                 ///  running counter, no delta calc 
         VT_AVERAGE=9;                         ///  average of samples, total/sampl uses 32bt|32bit
         VT_DELTA_RATE_COUNTER=10;             ///  link snmp running counter 
+		VT_MAX=11;                 		      /// max of samples 
+		VT_MIN=12;                 		      /// min of samples 
     }
 
 
@@ -117,6 +119,14 @@ message CounterGroupT {
     optional TimeInterval   time_interval=4;        /// total time interval available in DB 
     optional int64          topper_bucket_size=5;   /// topper bucketsize (streaming analytics window)
     repeated MeterInfo      meters=6;               /// array of meter information (m0, m1, .. mn) 
+
+	message Crosskey {
+		required string		parentguid=1;			/// parent GUID of ckey counter group
+		required string		crosskeyguid_1=2;		/// crosskey 1 guid - required 
+		optional string		crosskeyguid_2=3;		/// crosskey 2 guid - optional 
+	}
+	optional Crosskey		crosskey=7;				/// for cross key counter group
+
 }
 
 /// SessionT : an IP flow 
@@ -338,6 +348,8 @@ message Message {
                     SUBSYSTEM_EXIT=125;
                     GRAPH_REQUEST=130;
                     GRAPH_RESPONSE=131;
+                    AGGREGATE_SESSIONS_REQUEST=132;                     
+                    AGGREGATE_SESSIONS_RESPONSE=133;
     }
 
     required Command    trp_command=1;
@@ -401,6 +413,10 @@ message Message {
     optional FileResponse    file_response=123;
     optional GraphRequest   graph_request=130;
     optional GraphResponse    graph_response=131;
+    optional AggregateSessionsRequest  aggregate_sessions_request=140;
+    optional AggregateSessionsResponse  aggregate_sessions_response=141;
+    optional AggregateResourcesRequest  aggregate_resources_request=142;
+    optional AggregateResourcesResponse  aggregate_resources_response=143;
     optional string     destination_node=200;   // todo move 2nd
     optional string     probe_id=201;           // todo move 3rd 
     optional bool       run_async=202;          /// if run_async = true, then you will immediately get a AsynResponse with a token you can poll 
@@ -552,6 +568,61 @@ message QuerySessionsResponse {
     optional string             outputpath=4;       /// if 'outputpath' set in request, the sessions are here (in CSV format)
 }
 
+
+/// AggregateSessions - count star 
+///   query flow and then count the numbers 
+///   by default aggregate on ALL fields
+message AggregateSessionsRequest {
+    optional string         session_group=2[default="{99A78737-4B41-4387-8F31-8077DB917336}"];
+    optional TimeInterval   time_interval=3;
+    optional KeyT           source_ip=5;
+    optional KeyT           source_port=6;
+    optional KeyT           dest_ip=7;
+    optional KeyT           dest_port=8;
+    optional KeyT           any_ip=9;           /// source or dest match
+    optional KeyT           any_port=10;            /// source or dest match
+    repeated KeyT           ip_pair=11;         /// array of 2 ips 
+    optional KeyT           protocol=12;
+    optional string         flowtag=13;         /// string flow tagger text 
+    optional KeyT           nf_routerid=14;
+    optional KeyT           nf_ifindex_in=15;
+    optional KeyT           nf_ifindex_out=16;
+    optional string         subnet_24=17;       /// ip /24 subnet  matching 
+    optional string         subnet_16=18;       /// ip /16 subnet 
+    optional int64          aggregate_topcount=19[default=100];   	/// number of count-star per field 
+	optional string         group_by_fields=20; /// list of field names 
+}
+
+/// AggregateSessionsResponse 
+///   contains counts  of each key 
+message AggregateSessionsResponse {
+
+	message KeyTCount {
+		required KeyT	key=1;                  ///  aggregate key 
+		required int64  count=2;                ///  number of matching flows
+		required int64  metric=3;               ///  aggregated metrics, eg total bytes 
+	}
+
+    required string         session_group=2;
+    optional TimeInterval   time_interval=3;
+    repeated KeyTCount      source_ip=5;        /// top IPs 
+    repeated KeyTCount      source_port=6;      /// top ports 
+    repeated KeyTCount      dest_ip=7;	        /// dest IPs
+    repeated KeyTCount      dest_port=8;	    /// dest ports 
+    repeated KeyTCount      any_ip=9;           /// source or dest match
+    repeated KeyTCount      any_port=10;        /// source or dest match
+    repeated KeyTCount      ip_pair=11;         /// array of 2 ips 
+    repeated KeyTCount      protocol=12;        /// protocols 
+    repeated KeyTCount      flowtag=13;         /// string flow tagger text 
+    repeated KeyTCount      nf_routerid=14;
+    repeated KeyTCount      nf_ifindex_in=15;
+    repeated KeyTCount      nf_ifindex_out=16;
+    repeated KeyTCount      subnet_24=17;       /// ip /24 subnet  matching 
+    repeated KeyTCount      internal_port=18;   /// internal IP ports
+    repeated KeyTCount      internal_ip=19;     /// internal IPs 
+    repeated KeyTCount      external_ip=20;     /// external IPs
+}
+
 /// UpdatekeysRequest
 /// Response = OKResponse or ErrorResponse
 message UpdateKeyRequest{
@@ -617,6 +688,7 @@ message QueryAlertsResponse {
 
 
 ///  QueryResourcesRequest - resource queries 
+///     DNS, HTTP, 
 message QueryResourcesRequest {
     required string         resource_group=2;
     optional TimeInterval   time_interval=3;
@@ -645,6 +717,30 @@ message QueryResourcesResponse {
 	optional int64			approx_count=4;
 }
 
+
+///  AggregatedResourceRequest - resource queries 
+///     DNS, HTTP, 
+message AggregateResourcesRequest  {
+	required QueryResourcesRequest	query=1;
+    optional int64                  aggregate_topcount=2[default=100];   	/// number of count-star per field 
+}
+
+/// AggregateResourcesResponse  
+///     various counters 
+message AggregateResourcesResponse {
+
+	message KeyTCount {
+		required KeyT	key=1;
+		required int64  count=2;
+	}
+
+    repeated KeyTCount           source_ip=5;
+    repeated KeyTCount           source_port=6;
+    repeated KeyTCount           destination_ip=7; 
+    repeated KeyTCount           destination_port=8;
+    repeated KeyTCount           uri=9;			 ///  group by URI 
+    repeated KeyTCount           userlabel=10;	 ///  group by Pattern
+}
 
 
 /// KeySpaceRequest - search hits in Key Space 
