@@ -13,7 +13,7 @@ TrisulPlugin = {
     onflush = function(engine, flow) 
       -- packet size into  log10 range  
       local totalbytes = flow:az_bytes()  + flow:za_bytes() 
-      if totalbytes > 0 then 
+	  if bit.bor(flow:state(),0x09C0) ~= 0  and totalbytes > 0 then     
         local key =  tostring(math.ceil( math.log10(totalbytes))) .. " Dig"
         engine:update_counter( "{91D08D08-B846-4C28-1FC9-A2C419DCC605}", key, 0, 1)
         engine:update_counter( "{91D08D08-B846-4C28-1FC9-A2C419DCC605}", key, 1, totalbytes)
