@@ -6,7 +6,7 @@
 --
 -- 
 local ffi=require'ffi'
-local L=ffi.load'./libftrie.so'
+local L=ffi.load'/usr/local/trisul-probe/lib/libftrie.so'
 
 -- 
 -- From LevelDB c.h API - we are only using a basic subset 
