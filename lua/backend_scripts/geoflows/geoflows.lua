@@ -21,13 +21,13 @@ TrisulPlugin = {
 
     T.ldb_country=  FT.new()
     T.ldb_country:open(T.ldb_root.. "/incoming_0_GeoLite2-Country-Blocks-IPv4.csv")
-    print("Loaded Geo Country into FTRIE")
+    T.loginfo("Loaded Geo Country into FTRIE ")
 
     T.ldb_city=     FT.new()
-    T.ldb_city:open(T.ldb_root.. "/incoming_0_GeoLite2-Country-Blocks-IPv4.csv")
+    T.ldb_city:open(T.ldb_root.. "/incoming_0_GeoLite2-City-Blocks-IPv4.csv")
     T.key_labels_added = { } 
 
-    print("Loaded Geo City into FTRIE")
+    T.loginfo("Loaded Geo City into FTRIE")
   end,
 
   onunload=function()
@@ -60,22 +60,16 @@ TrisulPlugin = {
 
 		-- filter out multicast and broadcast
 		if ip > "E0" then return end
-
-
-print("lookup ".. ip)
 		
 		local key,label = T.ldb_country:lookup_key(ip)
 		if key then 
-print("found COUNTRY="..ip.. " k="..key.. "l="..label)
 			TrisulPlugin.update_metrics(engine, flow, "{F962527D-985D-42FD-91D5-DA39F4D2A222}",  key, label) 
 		end
 
 		local key,val = T.ldb_city:lookup_key(ip)
 		if key then 
-print("found CITY ="..ip.. " k="..key.. "l="..label)
 			TrisulPlugin.update_metrics(engine, flow, "{E85FEB77-942C-411D-DF12-5DFCFCF2B932}",  key, label) 
 		end
-
 
     end,
 
