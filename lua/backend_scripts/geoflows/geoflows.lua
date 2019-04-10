@@ -66,7 +66,7 @@ TrisulPlugin = {
 			TrisulPlugin.update_metrics(engine, flow, "{F962527D-985D-42FD-91D5-DA39F4D2A222}",  key, label) 
 		end
 
-		local key,val = T.ldb_city:lookup_key(ip)
+		local key,label = T.ldb_city:lookup_key(ip)
 		if key then 
 			TrisulPlugin.update_metrics(engine, flow, "{E85FEB77-942C-411D-DF12-5DFCFCF2B932}",  key, label) 
 		end
