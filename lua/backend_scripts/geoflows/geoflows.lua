@@ -49,11 +49,14 @@ TrisulPlugin = {
 		-- homenetworks not considered for Geo
 		--
 		local ip =nil
+		local iphome_readable =nil
 		local f= flow:flow()
 		if not T.host:is_homenet_key(f:ipa()) then 
 			ip=f:ipa()
+			iphome_readable=f:ipz_readable()
 		elseif not T.host:is_homenet_key(f:ipz()) then 
 			ip=f:ipz()
+			iphome_readable=f:ipa_readable()
 		else
 			return
 	 	end 	
@@ -61,14 +64,20 @@ TrisulPlugin = {
 		-- filter out multicast and broadcast
 		if ip > "E0" then return end
 		
+		-- country 
 		local key,label = T.ldb_country:lookup_key(ip)
 		if key then 
 			TrisulPlugin.update_metrics(engine, flow, "{F962527D-985D-42FD-91D5-DA39F4D2A222}",  key, label) 
 		end
 
+		-- city 
 		local key,label = T.ldb_city:lookup_key(ip)
 		if key then 
 			TrisulPlugin.update_metrics(engine, flow, "{E85FEB77-942C-411D-DF12-5DFCFCF2B932}",  key, label) 
+			if not label:find("//",1,true) then 
+				local flowpath=label:gsub("/","\\")
+				TrisulPlugin.update_metrics(engine, flow, "{E44FC20C-2869-42E5-CCCC-074A962D832B}",  iphome_readable.."/"..key, iphome_readable.."\\"..flowpath) 
+			end
 		end
 
     end,
