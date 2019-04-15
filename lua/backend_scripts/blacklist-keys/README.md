@@ -5,7 +5,7 @@ Uses the Trisul Lua `onnewkey` API method to very efficiently check for blacklis
 
 ##  Shadowhammer
 
-The mac.lua script shows how you can trigger a real time alert whenever a MAC address from the ShadowHammer hack shows up.
+The mac.lua script shows how you can trigger a real time alert whenever a MAC address from the [Operation ShadowHammer attack](https://securelist.com/operation-shadowhammer/89992/)  shows up.
 
 
 The `onnewkey` method  from the Trisul LUA Script API](https://trisul.org/docs/lua/cg_monitor.html#function_onnewkey) is used to check for newly seen keys. 
