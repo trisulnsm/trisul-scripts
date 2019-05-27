@@ -116,7 +116,7 @@ TrisulPlugin = {
 	  	if snmp['snmp.community'] ~= nil and #snmp['snmp.community'] > 0  then 
 			targets[ #targets + 1] = { agent_ip = snmp["snmp.ip"], agent_community = snmp["snmp.community"], agent_version = snmp["snmp.version"] } 
 			T.log(T.K.loglevel.INFO, "LOADED  ip="..snmp["snmp.ip"].." version"..snmp["snmp.version"].." comm=".. snmp["snmp.community"])
-			print("LOADED  ip="..snmp["snmp.ip"].." version="..snmp["snmp.version"].." comm=".. snmp["snmp.community"])
+			--print("LOADED  ip="..snmp["snmp.ip"].." version="..snmp["snmp.version"].." comm=".. snmp["snmp.community"])
 		else
 			T.log(T.K.loglevel.INFO, "NULL community , skipping deleted SNMP agent  ip="..snmp["snmp.ip"].." version="..snmp["snmp.version"])
 			print("NULL    community , skipping deleted SNMP agent  ip="..snmp["snmp.ip"].." version="..snmp["snmp.version"])
@@ -127,6 +127,7 @@ TrisulPlugin = {
       end 
     end
     stmt:finalize()
+    db:close()
     return targets
 
   end, 
