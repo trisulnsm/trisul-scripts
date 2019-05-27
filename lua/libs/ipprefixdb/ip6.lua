@@ -20,6 +20,14 @@ function IP6.ip6_to_bin(ip6)
   return  binip6
 end
 
+function IP6.bin_to_ip6(bin16byte)
+  local strip6 = ffi.new(' char  [64]') 
+  ffi.C.inet_ntop(ffi.C.AF_INET6, bin16byte, strip6, 64);
+  return  ffi.string(strip6)
+
+
+end
+
 function IP6.bin2hex(binarr,len)
 	  local h = {}
 	  for i = 1 , len do 
@@ -64,6 +72,12 @@ function IP6.tests()
 	print( IP6.ip6_to_key("fe80::a60:6eff:fed9:b6bd"))
 	local f,l = IP6.ip6_cidr("2001:1900:5:2:2::2ae0",125)
 	print(f.." to "..l)
+	local readable= IP6.bin_to_ip6(
+	"\x20\x01\x19\x73\x00"..
+	"\x0a\x01\x03\x00\x00"..
+	"\x00\x00\x00\x00\x00"..
+	"\x10\x00\x00\x53\x01")
+	print(readable)
 end 
 
 return IP6
