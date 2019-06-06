@@ -196,7 +196,7 @@ TrisulPlugin = {
         FI.process_flow( engine,  {
            first_timestamp=        tonumber(logtbl['eventtime']),   -- unix epoch secs when flow first seen
            last_timestamp=         tonumber(logtbl['eventtime']) + tonumber(logtbl['duration']),   -- unix epoch secs  when last seen 
-           router_ip=              "10.0.0.1",   -- router (exporter ip) dotted ip format
+           router_ip=              logtbl['routerip'],   -- router (exporter ip) dotted ip format
            protocol=               logtbl['proto'],   -- ip protocol number 0-255
            source_ip=              logtbl['dstip'],   -- dotted ip format
            source_port=            logtbl['dstport'],   -- source port number 0-65535
