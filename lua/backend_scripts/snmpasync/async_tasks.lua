@@ -14,7 +14,14 @@ AsyncTasks.onexecute = function(in_data)
 	  update_counters = {},
 	  update_key_info = {},
 	} 
-
+  print(os.date("%c"))
+  local s=os.date("%S")
+  local diff = 5-s
+  if(diff <=5 and diff >=0) then
+    print("wait"..diff)
+    os.execute("sleep " .. tonumber(diff))
+  end
+  print(os.date("%c"))
 	-- update IN 
 	local oid = ".1.3.6.1.2.1.31.1.1.1.6"
 	if agent.agent_version == "1"  then oid = "1.3.6.1.2.1.2.2.1.10" end
@@ -46,7 +53,10 @@ AsyncTasks.onexecute = function(in_data)
 	  if agent.agent_version == "1"  then oid = "1.3.6.1.2.1.2.2.1.2" end
 	  local up_key =  do_bulk_walk( agent.agent_ip, agent.agent_version, agent.agent_community, oid)
 	  for k,v in pairs( up_key) do 
-		table.insert(async_results.update_key_info, {  "{9781db2c-f78a-4f7f-a7e8-2b1a9a7be71a}", k, v}   );
+      if(v~="") then
+        print(v)
+        table.insert(async_results.update_key_info, {  "{9781db2c-f78a-4f7f-a7e8-2b1a9a7be71a}", k, v}   );
+      end
 	  end
 	end
 
