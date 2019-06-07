@@ -1,7 +1,6 @@
 Flow Importer library 
 =============
 
-
 General purpose import library to process network flow data.
 
 
@@ -11,7 +10,7 @@ Fill up whatever details you have about the flow record in a LUA table and then 
 
 ````lua
 
-local FI = require'FlowImporter'
+local FI = require'flowimport'
 
 FI.process_flow( engine,  {
      first_timestamp=        <number>,   -- unix epoch secs when flow first seen
@@ -38,4 +37,21 @@ FI.process_flow( engine,  {
 
 ````
 
+## For IPv6 use the `flowimport_v6.lua` file,  this handles IPv6 source_ip and dest_ip
+
+
+Typically you would use a choice 
+
+```lua
+
+local FI_v4 = require'flowimport'
+local FI_v6 = require'flowimport_v6'
+
+if is_v4_address(source_ip) then 
+	FI_v4.process_flow(... ) 
+else
+	FI_v6.process_flow(... ) 
+end 
+
+```
 

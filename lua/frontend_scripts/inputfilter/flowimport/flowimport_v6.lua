@@ -1,59 +1,26 @@
+-- flowimport_v6.lua 
 --
--- flowimport.lua 
+-- Same as flowimport_v6.lua but for IPv6 addresses 
 --
--- Library to import arbitrary flow like information into Trisul using inputfilter framework 
---
--- Usage : you fill out the following table and call process_flow() like so
--- 
--- local FI = require'FlowImporter'
---
--- FI.process_flow( engine,  {
---      first_timestamp=        <number>,   -- unix epoch secs when flow first seen
---      last_timestamp=         <number>,   -- unix epoch secs  when last seen 
---      router_ip=              <ipaddr>,   -- router (exporter ip) dotted ip format
---      protocol=               <number>,   -- ip protocol number 0-255
---      source_ip=              <ipaddr>,   -- dotted ip format or IPv6
---      source_port=            <number>,   -- source port number 0-65535
---      destination_ip=         <ipaddr>,   -- dotted ip  or IPv6
---      destination_port=       <number>,   -- source port number 0-65535
---      input_interface=        <number>,   -- ifIndex IN of flow 0-65535
---      output_interface=       <number>,   -- ifIndex OUT of flow 0-65535
---      bytes=                  <number>,   -- octets, 
---      packets=                <number>,   -- packets 
---      -- optional --                      
---      as=                     <number>,   -- ASN (0-65535)
---      tos=                    <number>,   -- IP TOS 
---      router_label=           <string>,   -- 
---      input_interface_label=  <string>,   --
---      output_interface_label= <string>,   --
---      source_label=           <string>,   --
---      destination_label=      <string>,   -- 
---      flowtags=               {t1,t2,..}  -- array of strings 
--- })
---
--- For a working example see kiwisyslog.lua on trisul-script@github 
--- 
 -- local dbg=require'debugger'
 
 local FlowImporter = {}
 
+local ffi=require'ffi'
 
+ffi.cdef [[
+ 	int inet_pton(int af, const char *src, void *dst);
+  static const int AF_INET6=10;  
+]]
 
 local COUNTER_GUIDS = {
   flowgen   = '{2314BB8E-2BCC-4B86-8AA2-677E5554C0FE}',
   flowintf  = '{C0B04CA7-95FA-44EF-8475-3835F3314761}',
   apps      = '{C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}',
-  hosts     = '{4CD742B1-C1CA-4708-BE78-0FCA2EB01A86}',  
   protocols = '{E89BCD56-30AD-40F5-B1C8-8B7683F440BD}',
   aggregates= '{393B5EBC-AB41-4387-8F31-8077DB917336}',
   hostsipv6 = '{9807E97A-6CD2-442F-BB18-8C104C8EB204}'
 }
-
-
-FlowImporter.toip_format = function( dotted_ip )
-  local b1, b2, b3, b4 =  dotted_ip:match("(%d+).(%d+).(%d+).(%d+)")
-  return string.format("%02X.%02X.%02X.%02X",b1, b2, b3, b4 ) 
-end
 
 -- in trisul: port keys look like p-XXXX
 FlowImporter.toport_format=function( strkey)
@@ -75,21 +42,20 @@ end
 
 FlowImporter.toflow_format=function( dir, tkey)
   if dir=='AZ' then 
-      return string.format("%sC:%s:%s_%s:%s_%s_%08X_%08X", 
-              tkey.protocol,   tkey.source_ip,   tkey.source_port,   
-              tkey.destination_ip,   tkey.destination_port, 
-              tkey.router_ip,   tkey.input_interface_number,   tkey.output_interface_number ) 
+    return string.format("%sD:%s:%s_%s:%s_%s_%08X_%08X", 
+            tkey.protocol,   tkey.source_ip,   tkey.source_port,   
+            tkey.destination_ip,   tkey.destination_port, 
+            tkey.router_ip,   tkey.input_interface_number,   tkey.output_interface_number ) 
   else
-      return string.format("%sC:%s:%s_%s:%s_%s_%08X_%08X", 
-              tkey.protocol,   tkey.destination_ip,   tkey.destination_port, 
-              tkey.source_ip,   tkey.source_port,   
-              tkey.router_ip,   tkey.output_interface_number,   tkey.input_interface_number ) 
+    return string.format("%sD:%s:%s_%s:%s_%s_%08X_%08X", 
+            tkey.protocol,   tkey.destination_ip,   tkey.destination_port, 
+            tkey.source_ip,   tkey.source_port,   
+            tkey.router_ip,   tkey.output_interface_number,   tkey.input_interface_number ) 
   end
 
 end
 
 FlowImporter.process_flow=function(engine, flowtbl)
-
 
     -- defaults if there are no netflow
     if flowtbl.router_ip==nil then
@@ -101,11 +67,11 @@ FlowImporter.process_flow=function(engine, flowtbl)
     -- convert the incoming raw entities into Trisul Key Formats
     --
     local tkey = {
-      router_ip = FlowImporter.toip_format(  flowtbl.router_ip),
+      router_ip = FlowImporter.toip_v4_format(  flowtbl.router_ip),
       protocol = FlowImporter.toproto_format(  flowtbl.protocol),
-      source_ip = FlowImporter.toip_format(  flowtbl.source_ip),
+      source_ip = FlowImporter.toip_v6_format(  flowtbl.source_ip),
       source_port = FlowImporter.toport_format(  flowtbl.source_port),
-      destination_ip = FlowImporter.toip_format(  flowtbl.destination_ip),
+      destination_ip = FlowImporter.toip_v6_format(  flowtbl.destination_ip),
       destination_port = FlowImporter.toport_format(  flowtbl.destination_port),
       input_interface_number = tonumber(flowtbl.input_interface),
       output_interface_number = tonumber(flowtbl.output_interface)
@@ -113,19 +79,20 @@ FlowImporter.process_flow=function(engine, flowtbl)
     tkey.input_interface = tkey.router_ip..'_'..string.format("%08X",tonumber(flowtbl.input_interface))
     tkey.output_interface = tkey.router_ip..'_'..string.format("%08X",tonumber(flowtbl.output_interface))
 
-
-    -- address type IPv4 or IPv6
-    local address_guid = COUNTER_GUIDS.hosts
-
-    -- home network perspective 
-    local src_home = T.host:is_homenet_key( tkey.source_ip)
-    local dst_home = T.host:is_homenet_key( tkey.destination_ip)
+    -- home network perspective  (todo - right now assume source is home ) 
+    local src_home = true
+    local dst_home = false
 
     -- flow ke
     local dir='ZA';
     if tkey.source_port > tkey.destination_port then dir = "AZ";  end 
 
     tkey.flow=FlowImporter.toflow_format(dir, tkey)
+
+	for k,v in pairs(tkey) do
+		print( k .. ' = ' .. v)
+	end
+	print("\n")
 
     -- update metrics
     engine:update_counter( "{393B5EBC-AB41-4387-8F31-8077DB917336}", "TOTALBW", 0, flowtbl.bytes)
@@ -141,34 +108,34 @@ FlowImporter.process_flow=function(engine, flowtbl)
     end 
 
     -- hosts 
-    engine:update_counter( address_guid,  tkey.source_ip, 0, flowtbl.bytes)
+    engine:update_counter( '{9807E97A-6CD2-442F-BB18-8C104C8EB204}',  tkey.source_ip, 0, flowtbl.bytes)
 
 
     -- home/ext for src addr 
     if src_home then  
-      engine:update_counter( address_guid,  tkey.source_ip, 6, flowtbl.bytes);
+      engine:update_counter( '{9807E97A-6CD2-442F-BB18-8C104C8EB204}',  tkey.source_ip, 6, flowtbl.bytes);
     else
-      engine:update_counter( address_guid,  tkey.source_ip, 7, flowtbl.bytes);
+      engine:update_counter( '{9807E97A-6CD2-442F-BB18-8C104C8EB204}',  tkey.source_ip, 7, flowtbl.bytes);
     end
 
     if dir == 'AZ' then 
-      engine:update_counter( address_guid,  tkey.source_ip, 1, flowtbl.bytes);
+      engine:update_counter( '{9807E97A-6CD2-442F-BB18-8C104C8EB204}',  tkey.source_ip, 1, flowtbl.bytes);
     else
-      engine:update_counter( address_guid,  tkey.source_ip, 2, flowtbl.bytes );
+      engine:update_counter( '{9807E97A-6CD2-442F-BB18-8C104C8EB204}',  tkey.source_ip, 2, flowtbl.bytes );
     end 
 
     -- dst addr 
-    engine:update_counter( address_guid,  tkey.destination_ip, 0, flowtbl.bytes)
+    engine:update_counter( '{9807E97A-6CD2-442F-BB18-8C104C8EB204}',  tkey.destination_ip, 0, flowtbl.bytes)
     if dst_home then  
-      engine:update_counter( address_guid,  tkey.destination_ip, 6, flowtbl.bytes);
+      engine:update_counter( '{9807E97A-6CD2-442F-BB18-8C104C8EB204}',  tkey.destination_ip, 6, flowtbl.bytes);
     else
-      engine:update_counter( address_guid,  tkey.destination_ip, 7, flowtbl.bytes);
+      engine:update_counter( '{9807E97A-6CD2-442F-BB18-8C104C8EB204}',  tkey.destination_ip, 7, flowtbl.bytes);
     end
 
     if dir == 'AZ' then 
-      engine:update_counter( address_guid,  tkey.destination_ip, 1, flowtbl.bytes);
+      engine:update_counter( '{9807E97A-6CD2-442F-BB18-8C104C8EB204}',  tkey.destination_ip, 1, flowtbl.bytes);
     else
-      engine:update_counter( address_guid,  tkey.destination_ip, 2, flowtbl.bytes );
+      engine:update_counter( '{9807E97A-6CD2-442F-BB18-8C104C8EB204}',  tkey.destination_ip, 2, flowtbl.bytes );
     end 
 
     -- network layer
@@ -213,7 +180,7 @@ FlowImporter.process_flow=function(engine, flowtbl)
     engine:update_counter( COUNTER_GUIDS.flowintf,  tkey.output_interface, 3, 1);
 
     if flowtbl.source_label then
-      engine:update_key_info( address_guid,  tkey.source_ip, flowtbl.source_label)
+      engine:update_key_info( '{9807E97A-6CD2-442F-BB18-8C104C8EB204}',  tkey.source_ip, flowtbl.source_label)
     end 
 
     if flowtbl.input_interface_label then
@@ -236,9 +203,31 @@ FlowImporter.process_flow=function(engine, flowtbl)
 		end
 	end
 
-
     return true -- has more
         
+end
+
+FlowImporter.ip6_to_bin=function(ip6)
+  local binip6 = ffi.new(' char  [16]') 
+  ffi.C.inet_pton(ffi.C.AF_INET6, ip6, binip6);
+  return  binip6
+end
+
+FlowImporter.bin2hex=function(binarr,len)
+  local h = {}
+  for i = 1 , len do 
+  	h[#h+1]=string.format("%02X",bit.band(binarr[i-1],0xff))
+  end
+  return table.concat(h) 
+end 
+
+FlowImporter.toip_v6_format=function(ip6)
+  return FlowImporter.bin2hex(FlowImporter.ip6_to_bin(ip6),16)
+end
+
+FlowImporter.toip_v4_format = function( dotted_ip )
+  local b1, b2, b3, b4 =  dotted_ip:match("(%d+).(%d+).(%d+).(%d+)")
+  return string.format("%02X.%02X.%02X.%02X",b1, b2, b3, b4 ) 
 end
 
 return FlowImporter;
