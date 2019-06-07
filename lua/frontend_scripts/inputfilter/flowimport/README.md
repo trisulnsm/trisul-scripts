@@ -34,6 +34,7 @@ FI.process_flow( engine,  {
      tos=                    <number>,   -- IP TOS 
 })
 
+>  See the top of flowimport.lua for the complete list of fields supported.  
 
 ````
 
