@@ -11,7 +11,8 @@
 --  UDP Port is 
 
 local ffi=require'ffi'
-local FI=require'flowimport'
+local FI_v4=require'flowimport'
+local FI_v6=require'flowimport_v6'
 
 -- FFI 
 ffi.cdef[[
@@ -105,14 +106,11 @@ TrisulPlugin = {
     print("Successfully opened UDP log port : "..UDPLOGPORT)
   end,
 
-
-
   -- close 
   onunload = function ()
     ffi.C.close(T.socket)
     T.log("Bye closing");
   end,
-
 
   -- we're doing input filter 
   inputfilter  = {
@@ -139,7 +137,6 @@ TrisulPlugin = {
         logtbl[a]=b:gsub('"','')
       end 
 
-
       if logtbl['type'] ~= 'traffic' then
         return true
       end 
@@ -147,10 +144,6 @@ TrisulPlugin = {
       if logtbl['action'] == 'deny' then
         return true
       end 
-
-      if string.find(logtbl['srcip'],":",1,true) then 
-        return true
-      end
 
       logtbl['duration']= logtbl['duration'] or 1 
       -- adjust values
@@ -170,10 +163,27 @@ TrisulPlugin = {
       -- adjust
       packet:set_timestamp(tonumber(logtbl['eventtime']))
 
+	  -- which flow importer IP version to use 
+	  local FI_Version = FI_v4
+      if string.find(logtbl['srcip'],":",1,true) then 
+	  	FI_Version = FI_v6
+      end
+
+
+	local ftags = {}
+	if logtbl['service'] then 
+		table.insert(ftags, '[SVC]'..logtbl['service']) 
+	end
+	if logtbl['osname'] then 
+		table.insert(ftags, '[OS]'..logtbl['osname']) 
+	end
+
+	print(" service = ".. logtbl.service)
+
       if logtbl.sentbyte then 
-        FI.process_flow( engine,  {
-           first_timestamp=        tonumber(logtbl['eventtime']),   -- unix epoch secs when flow first seen
-           last_timestamp=         tonumber(logtbl['eventtime']) + tonumber(logtbl['duration']),   -- unix epoch secs  when last seen 
+        FI_Version.process_flow( engine,  {
+           first_timestamp=        tonumber(logtbl['eventtime']) - tonumber(logtbl['duration']),
+           last_timestamp=         tonumber(logtbl['eventtime']),
            router_ip=              logtbl['routerip'],   -- router (exporter ip) dotted ip format
            protocol=               logtbl['proto'],   -- ip protocol number 0-255
            source_ip=              logtbl['srcip'],   -- dotted ip format
@@ -184,19 +194,19 @@ TrisulPlugin = {
            output_interface=       logtbl['dstintfhash'],   -- ifIndex OUT of flow 0-65535
            bytes=                  logtbl['sentbyte'],   -- octets, 
            packets=                logtbl['sentpkt'] or 1,   -- octets, 
-           -- optional --                      
            source_label=           logtbl['srcname'],
            input_interface_label=  logtbl['srcintf'],
            output_interface_label= logtbl['dstintf'],
-           router_label=           logtbl['devname']
+           router_label=           logtbl['devname'],
+		   flowtags=               ftags
         })
       end 
 
       if logtbl.rcvdbyte then 
-        FI.process_flow( engine,  {
+        FI_Version.process_flow( engine,  {
            first_timestamp=        tonumber(logtbl['eventtime']),   -- unix epoch secs when flow first seen
            last_timestamp=         tonumber(logtbl['eventtime']) + tonumber(logtbl['duration']),   -- unix epoch secs  when last seen 
-           router_ip=              logtbl['routerip'],   -- router (exporter ip) dotted ip format
+           router_ip=              "10.0.0.1",   -- router (exporter ip) dotted ip format
            protocol=               logtbl['proto'],   -- ip protocol number 0-255
            source_ip=              logtbl['dstip'],   -- dotted ip format
            source_port=            logtbl['dstport'],   -- source port number 0-65535
