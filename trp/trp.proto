@@ -107,6 +107,9 @@ message KeyT {
 		required string		attr_value=2;
 	}
 	repeated NameValueT		attributes=6;			/// New: Attributes are NVP for keys 
+    optional int64          metric_max=7;           /// optional : max observed value for metric  in context
+    optional int64          metric_min=8;           /// optional : max observed value for metric 
+    optional int64          metric_avg=9;           /// optional : max observed value for metric 
 }
 
 
@@ -350,6 +353,14 @@ message Message {
                     GRAPH_RESPONSE=131;
                     AGGREGATE_SESSIONS_REQUEST=132;                     
                     AGGREGATE_SESSIONS_RESPONSE=133;
+                    RUNTOOL_REQUEST=134;
+                    RUNTOOL_RESPONSE=135;
+                    HA_CONTROL_REQUEST=140;
+                    HA_CONTROL_RESPONSE=141;
+					DOMAIN_PING=142;
+					TOOL_INFO_REQUEST=143;
+					TOOL_INFO_RESPONSE=144;
+
     }
 
     required Command    trp_command=1;
@@ -417,6 +428,12 @@ message Message {
     optional AggregateSessionsResponse  aggregate_sessions_response=141;
     optional AggregateResourcesRequest  aggregate_resources_request=142;
     optional AggregateResourcesResponse  aggregate_resources_response=143;
+    optional RunToolRequest  run_tool_request=144;
+    optional RunToolResponse  run_tool_response=145;
+    optional HAControlRequest  ha_control_request=150;
+    optional HAControlResponse  ha_control_response=151;
+    optional ToolInfoRequest  tool_info_request=152;
+    optional ToolInfoResponse  tool_info_response=153;
     optional string     destination_node=200;   // todo move 2nd
     optional string     probe_id=201;           // todo move 3rd 
     optional bool       run_async=202;          /// if run_async = true, then you will immediately get a AsynResponse with a token you can poll 
@@ -443,6 +460,8 @@ message HelloResponse{
   optional string       station_id_request=2;   /// station id found in the request 
   optional string       message=3;              /// message found in the request 
   optional int64        local_timestamp=4;      /// local timestamp at server, used to detect drifts 
+  optional string       local_timestamp_string=5; /// on server with time zone, use this 
+  optional bool         is_primary=6;              /// is this a primary or HA node 
 }
 
 /// ErrorResponse
@@ -489,6 +508,8 @@ message CounterGroupTopperRequest{
     optional Timestamp      time_instant=6;                 /// 
     optional int64          flags=7;                        
     optional bool           resolve_keys=8 [default=true];  /// retrieve labels as set in the response for each key 
+	optional string			key_filter=9;					/// only get keys with this pattern and SYS:GROUP
+	optional string			inverse_key_filter=10;			/// only get keys without this pattern  NOT
 }
 
 /// CounterGroupTopperResponse  
@@ -590,7 +611,7 @@ message AggregateSessionsRequest {
     optional string         subnet_24=17;       /// ip /24 subnet  matching 
     optional string         subnet_16=18;       /// ip /16 subnet 
     optional int64          aggregate_topcount=19[default=100];   	/// number of count-star per field 
-	optional string         group_by_fields=20; /// list of field names 
+	repeated string         group_by_fields=20; /// list of field names 
 }
 
 /// AggregateSessionsResponse 
@@ -601,6 +622,11 @@ message AggregateSessionsResponse {
 		required KeyT	key=1;                  ///  aggregate key 
 		required int64  count=2;                ///  number of matching flows
 		required int64  metric=3;               ///  aggregated metrics, eg total bytes 
+	}
+
+	message TagGroup {
+		required string 	group_name=1;
+		repeated KeyTCount	tag_metrics=2;
 	}
 
     required string         session_group=2;
@@ -621,13 +647,17 @@ message AggregateSessionsResponse {
     repeated KeyTCount      internal_port=18;   /// internal IP ports
     repeated KeyTCount      internal_ip=19;     /// internal IPs 
     repeated KeyTCount      external_ip=20;     /// external IPs
+	repeated TagGroup		tag_group=21;		/// tag groups 
 }
+
 
 /// UpdatekeysRequest
 /// Response = OKResponse or ErrorResponse
 message UpdateKeyRequest{
     required string         counter_group=2;
-    repeated KeyT           keys=4;  		/// key  : if you set both key and label, the DB label will be updated 
+    repeated KeyT           keys=4;  		         /// key  : if you set both key and label, the DB label will be updated 
+	optional bool           remove_all_attributes=5; /// remove all key attributes from keys 
+	repeated string         remove_attributes=6;     /// remove these attributes only from keys 
 }
 
 /// SessionTrackerRequest  - query session trackers 
@@ -943,6 +973,7 @@ message DomainResponse {
         optional string             extra_info=4;
         optional Timestamp          register_time=5; 
         optional Timestamp          heartbeat_time=6; 
+		optional bool               is_primary=7[default=true]; /// primary or backup HA mode 
 
     }
 
@@ -953,22 +984,60 @@ message DomainResponse {
     optional bool                   need_reconnect=5[default=false];
 }
 
+/// messages to HAControl
+message HAControlRequest {
+    enum HAOperation
+    {
+        HA_TEST_REACHABILITY=0;		///  test if primary or backup is reachable (test the other side)
+        HA_SWITCH_BACKUP=1;			///  switch all nodes to backup HA 
+        HA_SWITCH_PRIMARY=2;        ///  switch to primary HA 
+    }
+
+
+    required    HAOperation         cmd=1;
+    optional    string              station_id=2;
+    optional    string              params=3;
+}
+
+message HAControlResponse {
+    optional    bool                control_success=1;
+    optional    string              station_id=2;
+    optional    string              status_message=3;
+	optional    bool                primary_reachable=4;
+	optional    bool                backup_reachable=5;
+}
+
+/// tool info 
+/// general purpose probe information gathering tool 
+/// use cases :   get BGP route receiver peer status 
+message ToolInfoRequest {
+    optional    string              context_name=1;
+    optional    string              tool_name=2;
+    repeated    string              tool_info_requested=3; ///  array of information elements requested 
+}
+
+message ToolInfoResponse  {
+    repeated    NameValue           tool_info=1;	/// info elements Name=Value 
+}
+
 
 message NodeConfigRequest {
     optional string message=1;
 
     message IntelFeed {
-        required string     guid=1;             /// identifying feed group (eg Geo, Badfellas)
-        optional string     name=2;             /// name
-        optional string     download_rules=3;   /// xml file with feed update instructions
-        repeated string     uri=4;              /// individual files in config//.. for FileRequest download 
+        required string     guid=1;                   /// identifying feed group (eg Geo, Badfellas)
+        optional string     name=2;                   /// feed name (eg badfellas) 
+        optional string     download_rules=3;         /// xml file with feed update instructions
+        repeated string     uri=4;                    /// individual files in config//.. for FileRequest download 
+		repeated string     usernodes=5;              /// user requesting the feed, the probe0, probe1, etc 
+		optional int64		sub_feed_id=6[default=-1];/// sub feed ID, when a feed consists of several sub-feeds 
     }
 
     optional IntelFeed      add_feed=2;
     optional IntelFeed      process_new_feed=3;
     optional bool           get_all_nodes=4[default=true];
     repeated NameValue      query_config=5;
-
+    optional IntelFeed      remove_feed=6;
 }
 
 message NodeConfigResponse {
@@ -999,8 +1068,9 @@ message ContextCreateRequest  {
 /// ContextInfo : one or all contexts
 ///  use is_init to prime with config 
 message ContextInfoRequest {
-     optional   string         context_name=1;     /// if not  set all context get in 
+     optional   string         context_name=1;      /// if not  set all context get in 
      optional   bool           get_size_on_disk=2[default=false]; ///  get size on disk (expensive) 
+	 optional   string         tool_name=3;         /// get status of this tool, freeform bgp, suricata, snort, udpsink etc..
 }
 
 message ContextInfoResponse {
@@ -1010,11 +1080,11 @@ message ContextInfoResponse {
     {
         required string         context_name=1;
         required bool           is_initialized=2;
-        required bool           is_running=3;
+        required bool           is_running=3;       /// trisul processes runs 
         optional int64          size_on_disk=4;
         optional TimeInterval   time_interval=5;
         optional bool           is_clean=6;
-        optional string         extrainfo=7;
+        optional string         extrainfo=7;        /// freeform text output when tool is specified , can be long string 
         repeated TimeInterval   run_history=8;
         optional string         profile=9;
         optional string         runmode=10;
@@ -1229,5 +1299,25 @@ message GraphResponse {
     required KeyT           subject_key=2;    /// from request 
 	repeated EdgeGraphT		graphs=3;		  /// graphs - an EdgeGraphT message 
 											  /// repeated because returned in time chunks 
+}
+
+/// RunToolRequest  : run  set of named tools 
+message RunToolRequest   {
+     required   string         context_name=1;      /// if not  set all context get in 
+	 enum NodeTool {
+	 	PING=1;
+		DF=2;
+		GEOQUERY=3;
+		TOP=4;
+		BGPQUERY=5;
+	 }
+	 required  NodeTool 		tool=2;				/// which of these tools you want to run on node
+	 optional  string           tool_input=3;		/// input 
+}
+
+/// RunToolResponse  : ouput 
+message RunToolResponse   {
+     required   string         context_name=1;      /// if not  set all context get in 
+     optional   string         tool_output=2;       /// cmd lines 
 }
 
