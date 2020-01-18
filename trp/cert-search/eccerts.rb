@@ -31,24 +31,41 @@ each_time_interval(zmq_endpt)  do | tm_interval, slice_id, total_slices |
     get_response_zmq(zmq_endpt,req) do |resp|
 
       resp.documents.each do | doc |
-        cn = doc.fullcontent.match(/CN=(\S+)/)
-        oid = doc.fullcontent.match(/ASN1 OID: (\S+)/)
-        if oid.nil?
-          curve_name = "unnamed_explicit_curve"
-        else 
-          curve_name = oid[1]
-        end 
-        puts " #{curve_name}   #{cn[1]}" 
-        curve_stats[curve_name] ||= 0
-        curve_stats[curve_name] += 1
+
+        cns=[]
+        algos=[]
+        certs = doc.fullcontent.split("-----END CERTIFICATE-----")
+        certs.pop 
+        certs.each do |cert|
+          keyalg = cert.match(/Public Key Algorithm: (.+)\n/)
+          cn = cert.match(/CN=(.+)\n/)
+          cns << cn[1] 
+          if keyalg[1] == "id-ecPublicKey"
+            oid = cert.match(/ASN1 OID: (\S+)/)
+            if oid.nil?
+              algos << "unnamed_explicit_curve"
+            else
+              algos << oid[1]
+            end 
+          else
+            algos << keyalg[1]
+          end 
+
+        end
+        curve_stats[algos.join("/")] ||= 0
+        curve_stats[algos.join("/")] += 1
+        puts "#{algos.join('/').ljust(30)}     #{cns.join('/')}"
       end
     end 
 
 end 
 
 # totals
-puts "\n\nTOTALS" 
+puts "\n\nTOTALS\n" 
+print "PUBLIC KEY ALGO CHAIN".ljust(40) 
+print "COUNT"
+puts
 curve_stats.each do | k, v |
-  puts "#{k.ljust(20)}  #{v}"
+  puts "#{k.ljust(40)}  #{v}"
 end
 

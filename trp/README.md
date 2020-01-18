@@ -12,7 +12,7 @@ How to run these samples ?
 You need to have :
 
 - A running instance of Trisul 
-- Git clone this repo, if you havent already `git clone https://github.com/vivekrajan/trisul-scripts.git ` 
+- Git clone this repo, if you havent already `git clone https://github.com/trisulnsm/trisul-scripts.git ` 
 - Go to the `trisul-scripts/helloworld` directory
 - Run the hello.rb script ( ruby hello.rb 192.168.1.222 ) replace that IP with your Trisul's IP. The password for the private key file is `client` 
 

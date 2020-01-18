@@ -22,31 +22,82 @@ This script here is intented to be run as a batch script
 1. pulls out all SSL Certs FTS documents containing the keyword `id-ecPublicKey`  This gets you all
 the EC Certs
 
-2. Uses a simple regex to pull out the curve name from the OID field. Note that the CVE uses explicit attributes 
-instead of a pre-packaged curve name.  
+2. Then for each certificate in each chain,  compute the public key algorithms used. 
+
+3. Mark any EC public key which is not a named  curve with the string "unnamed_explicit_curve" 
+
+4. Print totals 
+
+## Interpreting the output 
+
+The script prints two parts
+
+- a dump of cert chain CN= and the public key algorithm in the chain
+- totals 
+
+In the following example 
+````
+prime256v1/prime256v1/secp384r1     ssl416124.cloudflaressl.com/COMODO ECC Domain Validation Secure Server CA 2/COMODO ECC Certification Authority
+````
+
+The cert chain is 3 deep with the cloudflaressl at top signed with prime256v1, the next one is a prime256v1 EC signed by COMODO DV, the root is a COMODO ECC CA 
+
+### Totals 
+
+Here a total count of the algorithm chain is shown. Here you can see 
+```
+secp384r1/unnamed_explicit_curve          2
+```
+This is actually due to one of us from our team visiting the testing site !! 
+
 
 ```
-[vivek@f30 cert-search]$ ruby eccerts.rb tcp://192.168.2.1:12004 1
-prime256v1   hubspot.net
-prime256v1   usertrustecccertificationauthority-ev.comodoca.com
-prime256v1   github.com
-prime256v1   *.storage.googleapis.com
-prime256v1   *.facebook.com
-prime256v1   *.evidon.com
-secp384r1   fe3cr.delivery.mp.microsoft.com
-...
-prime256v1   www.google.com
-prime256v1   a248.e.akamai.net
-prime256v1   cloudflare.com
-prime256v1   *.prod.do.dsp.mp.microsoft.com
-prime256v1   ssl817718.cloudflaressl.com
-prime256v1   *.storage.googleapis.com
-prime256v1   *.googleusercontent.com
-prime256v1   *.adnxs.com
+TOTALS
+PUBLIC KEY ALGO CHAIN                   COUNT
+prime256v1/secp384r1                      10
+rsaEncryption/rsaEncryption/secp384r1     1
+prime256v1/prime256v1/secp384r1           5
+prime256v1/rsaEncryption                  19
+prime256v1/rsaEncryption/rsaEncryption    1
+
+```
+
+
+```
+[vivek@fedo30 cert-search]$ ruby eccerts.rb tcp://192.168.2.1:12004 0 
+prime256v1/secp384r1               odc-prod-01.oracle.com/DigiCert ECC Secure Server CA 
+rsaEncryption/rsaEncryption/secp384r1     bko.dynadmic.com/GlobalSign RSA OV SSL CA 2018/GlobalSign
+prime256v1/secp384r1               *.evidon.com/DigiCert ECC Secure Server CA            
+prime256v1/prime256v1/secp384r1     ssl416124.cloudflaressl.com/COMODO ECC Domain Validation Secure Server CA 2/COMODO ECC Certification Authority
+prime256v1/secp384r1               *.adnxs.com/DigiCert ECC Secure Server CA
+prime256v1/rsaEncryption           *.google.com/GTS CA 1O1                                                                                        
+prime256v1/rsaEncryption           *.googleapis.com/GTS CA 1O1                    
+prime256v1/rsaEncryption           AnyNet Relay/AnyNet Root CA/O=philandro Software GmbH/C=DE
+prime256v1/rsaEncryption           www.google.com/GTS CA 1O1                  
+prime256v1/rsaEncryption           mail.google.com/GTS CA 1O1                                                                          
+prime256v1/rsaEncryption           *.storage.googleapis.com/GTS CA 1O1              
+prime256v1/rsaEncryption           *.facebook.com/DigiCert SHA2 High Assurance Server CA
+prime256v1/rsaEncryption           *.g.doubleclick.net/GTS CA 1O1
+prime256v1/rsaEncryption           *.wikipedia.org/DigiCert SHA2 High Assurance Server CA
+prime256v1/rsaEncryption           *.googleusercontent.com/GTS CA 1O1
+secp384r1/unnamed_explicit_curve     SANS ISC DShield Test/INFIGO
+prime256v1/prime256v1/secp384r1     ssl470552.cloudflaressl.com/COMODO ECC Domain Validation Secure Server CA 2/COMODO ECC Certification Authority
+
+..
+
+prime256v1/secp384r1               *.livechatinc.com/DigiCert ECC Secure Server CA
+
 
 TOTALS
-prime256v1            51
-secp384r1             5
+PUBLIC KEY ALGO CHAIN                   COUNT
+prime256v1/secp384r1                      10
+rsaEncryption/rsaEncryption/secp384r1     1
+prime256v1/prime256v1/secp384r1           5
+prime256v1/rsaEncryption                  19
+secp384r1/unnamed_explicit_curve          2
+prime256v1/prime256v1                     3
+prime256v1/rsaEncryption/rsaEncryption    1
+
 ```
 
 
