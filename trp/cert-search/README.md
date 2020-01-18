@@ -35,12 +35,14 @@ The script prints two parts
 - a dump of cert chain CN= and the public key algorithm in the chain
 - totals 
 
+### EC certs Dump 
+
 In the following example 
 ````
 prime256v1/prime256v1/secp384r1     ssl416124.cloudflaressl.com/COMODO ECC Domain Validation Secure Server CA 2/COMODO ECC Certification Authority
 ````
 
-The cert chain is 3 deep with the cloudflaressl at top signed with prime256v1, the next one is a prime256v1 EC signed by COMODO DV, the root is a COMODO ECC CA 
+The cert chain is 3 deep with the _cloudflaressl_ at top signed with `prime256v1`, the next one is a `prime256v1` EC from _COMODO DV_, the root is a _COMODO ECC CA_ 
 
 ### Totals 
 
