@@ -32,12 +32,8 @@ TrisulPlugin = {
     --
     filter = function(engine, timestamp, flow )
 
-      if flow:porta_readable() == "443" or flow:portz_readable() == "443"  then
-        return true
-      else
-        return false
-      end
-      -- return flow:id():match("p-01BB") 
+      return  flow:porta_readable() == "443" or 
+	          flow:portz_readable() == "443"  
 
     end,
 
