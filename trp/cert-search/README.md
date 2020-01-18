@@ -64,6 +64,10 @@ prime256v1/rsaEncryption/rsaEncryption    1
 
 ```
 
+## Sample run 
+
+A Trisul Hub is running on 192.168.2.1:12004, the script connects to it and prints details for the current day. 
+
 
 ```
 [vivek@fedo30 cert-search]$ ruby eccerts.rb tcp://192.168.2.1:12004 0 
