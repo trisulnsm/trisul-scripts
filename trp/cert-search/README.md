@@ -1,23 +1,23 @@
 # eccerts.rb - Queries all EC-certs and prints curve names 
 
-NSA discovered a critical vulnerability in Windows CryptoAPI in CVE-2020-0601.
-Kudelski Security calls it ["Chain of Fools"](https://research.kudelskisecurity.com/2020/01/15/cve-2020-0601-the-chainoffools-attack-explained-with-poc/) 
+CVE-2020-0601 is a new vulnerability in the Windows CryptoAPI related to the way Elliptical Curve certificates are verified.  Kudelski Security calls it the ["Chain of Fools"](https://research.kudelskisecurity.com/2020/01/15/cve-2020-0601-the-chainoffools-attack-explained-with-poc/) 
 
-From a Network Security Monitoring perspective, what I am interested in are the following:
+The TrisulNSM  approach is to improve visiblity to answer the following questions.
 
 1. How many EC certs are you seeing vs RSA certs ?
 2. In those EC certs what are the curve-types you are seeing ?
 3. Which domains are using these 
 4. Can any improvements be made to the metrics going forward to improve visibility.
-5. Can you add live detection ?  
-
-This is the @trisulnsm approach.
 
 
 ## eccerts.rb query certificates
 
-Trisul extracts and stores all X.509 certificates as Full Text Documents, with de-duplication.  
-This script here is intented to be run as a batch script 
+One of the first questions is "Can I scan my history to see if any certificates with this particular characteristic were seen?"  In this case , an explictly specified elliptical curve.
+
+Trisul already extracts and stores all X.509 certificates as Full Text Documents, with de-duplication. This **eccerts.rb**  script shows how you can automate searching for such matches in your database. 
+
+
+### eccerts.rb logic 
 
 1. pulls out all SSL Certs FTS documents containing the keyword `id-ecPublicKey`  This gets you all
 the EC Certs
