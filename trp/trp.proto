@@ -564,7 +564,7 @@ message QuerySessionsRequest {
     optional KeyT           dest_ip=7;
     optional KeyT           dest_port=8;
     optional KeyT           any_ip=9;           /// source or dest match
-    optional KeyT           any_port=10;            /// source or dest match
+    optional KeyT           any_port=10;        /// source or dest match
     repeated KeyT           ip_pair=11;         /// array of 2 ips 
     optional KeyT           protocol=12;
     optional string         flowtag=13;         /// string flow tagger text 
@@ -578,6 +578,7 @@ message QuerySessionsRequest {
     optional bool           resolve_keys=21[default=true];  
     optional string         outputpath=22;      /// write results to a file (CSV) on trisul-hub (for very large dumps) 
     repeated string         idlist=23;          /// array of flow ids , usually from SessionTracker response 
+    optional KeyT           any_nf_ifindex=24;  /// composite query for both ifindex 
 }
 
 
@@ -612,6 +613,7 @@ message AggregateSessionsRequest {
     optional string         subnet_16=18;       /// ip /16 subnet 
     optional int64          aggregate_topcount=19[default=100];   	/// number of count-star per field 
 	repeated string         group_by_fields=20; /// list of field names 
+    optional KeyT           any_nf_ifindex=21;  /// matches either gen2 or gen3 
 }
 
 /// AggregateSessionsResponse 
@@ -805,6 +807,8 @@ message TopperTrendRequest {
     optional int64          meter=3 [default=0];
     optional int64          maxitems=4 [default=100];
     optional TimeInterval   time_interval=5;
+	optional string			key_filter=6;					/// only get keys with this pattern and SYS:GROUP
+	optional string			inverse_key_filter=7;			/// only get keys without this pattern  NOT
 }
 
 /// TopperTrendResponse   
