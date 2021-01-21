@@ -8,7 +8,7 @@ require 'trisulrp'
 
 
 USAGE = "Usage:   cginfo.rb   ZMQ_ENDPOINT CGGUID\n" \
-        "Example: 1) ruby cginfo.rb ipc:///usr/local/var/lib/trisul/CONTEXT0/run/trp_0 {C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}\n"\
+        "Example: 1) ruby cginfo.rb ipc:///usr/local/var/lib/trisul-hub/domain0/hub0/context0/run/trp_0 {C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}\n"\
         "         2) ruby cginfoall.rb tcp://localhost:5555 {C51B48D4-7876-479E-B0D9-BD9EFF03CE2E}" 
 
 # usage 

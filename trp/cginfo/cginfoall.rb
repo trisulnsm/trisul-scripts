@@ -13,7 +13,7 @@ require 'trisulrp'
 
 
 USAGE = "Usage:   cginfoall.rb   ZMQ_ENDPOINT\n" \
-        "Example: 1) ruby cginfoall.rb ipc:///usr/local/var/lib/trisul/CONTEXT0/run/trp_0\n"\
+        "Example: 1) ruby cginfoall.rb ipc:///usr/local/var/lib/trisul-hub/domain0/hub0/context0/run/trp_0\n"\
         "         2) ruby cginfoall.rb tcp://localhost:5555"
 
 # usage 
