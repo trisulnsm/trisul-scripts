@@ -52,7 +52,7 @@ TrisulPlugin = {
       guid = "{a973e25d-4434-4f0a-9656-9d2c0247eaf8}",
       name = "Host TCP",
       description = "Count volume and  TCP flags in all packets",
-      bucketsize = 30,
+      bucketsize = 60,
     },
 
     -- meters table

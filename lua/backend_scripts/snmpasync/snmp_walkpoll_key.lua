@@ -14,7 +14,7 @@ local SNMP_DATABASE="/usr/local/var/lib/trisul-hub/domain0/hub0/context0/meters/
 
 TrisulPlugin = {
 
-  request_async_workers=16,
+  request_async_workers=4,
 
   id = {
     name = "SNMP Interface",

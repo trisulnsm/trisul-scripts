@@ -133,16 +133,16 @@ local sleveldb = {
     tbl.errmsg = ffi.new(' char *[1]') 
     tbl.read_opts  = L.leveldb_readoptions_create();
     tbl.write_opts  = L.leveldb_writeoptions_create();
-	  tbl.owner=true
+    tbl.owner=true
 
     return true
   end,
 
   -- toaddr : used to share open database pointers using Trisul messaging  
   toaddr=function(tbl)
-  	if not tbl.owner then
-		  error("Cannot to toaddr() from databases that do not own the _db pointer")
-		  return
+    if not tbl.owner then
+      error("Cannot to toaddr() from databases that do not own the _db pointer")
+      return
     end 
     return string.format("%X",tonumber(ffi.cast("intptr_t",tbl._db)));
   end,
@@ -160,9 +160,15 @@ local sleveldb = {
 
   -- close 
   close=function(tbl)
-  	if not tbl.owner then
-		  error("Cannot close() leveldb database when  you are not an owner. Did you use fromaddr() to create it ?")
-		  return
+
+    if tbl._db == nil then
+      error("Cannot close() leveldb database not open.")
+      return
+    end
+
+    if not tbl.owner then
+      error("Cannot close() leveldb database when  you are not an owner. Did you use fromaddr() to create it ?")
+      return
     end
     L.leveldb_close(tbl._db)
     tbl._db=nil 
@@ -212,14 +218,14 @@ local sleveldb = {
   -- uses writeBatch to write out the table (k,v) 
   put_table=function(tbl, keyval_table) 
 
-  	local wbatch = L.leveldb_writebatch_create()
+    local wbatch = L.leveldb_writebatch_create()
 
-  	for k,v in pairs(keyval_table)
-  	do 
-  		local ks= tostring(k)
-  		local vs= tostring(v) 
-  		L.leveldb_writebatch_put( wbatch, ks,#ks,vs,#vs)
-  	end 
+    for k,v in pairs(keyval_table)
+    do 
+      local ks= tostring(k)
+      local vs= tostring(v) 
+      L.leveldb_writebatch_put( wbatch, ks,#ks,vs,#vs)
+    end 
 
     L.leveldb_write( tbl._db, tbl.write_opts, wbatch,  tbl.errmsg)
     L.leveldb_writebatch_destroy(wbatch)
@@ -277,13 +283,13 @@ local sleveldb = {
 
     local k0,v0 = iterator:key_value()
 
-  	if fn_match == nil or fn_match(k0,key) then 
-  		return k0,v0
-  	else
-  		iterator:iter_prev()
-  		if not iterator:valid()  then return nil end 
-  		return iterator:key_value()
-  	end
+    if fn_match == nil or fn_match(k0,key) then 
+      return k0,v0
+    else
+      iterator:iter_prev()
+      if not iterator:valid()  then return nil end 
+      return iterator:key_value()
+    end
   end,
 
   -- lower match
@@ -294,13 +300,13 @@ local sleveldb = {
 
     local k0,v0 = iterator:key_value()
 
-  	if fn_match == nil or fn_match(k0,key) then 
-  		return k0,v0
-  	else
-  		iterator:iter_next()
-  		if not iterator:valid()  then return nil end 
-  		return iterator:key_value()
-  	end
+    if fn_match == nil or fn_match(k0,key) then 
+      return k0,v0
+    else
+      iterator:iter_next()
+      if not iterator:valid()  then return nil end 
+      return iterator:key_value()
+    end
   end,
 
   -- dump the whole database 
