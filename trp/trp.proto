@@ -1042,13 +1042,15 @@ message NodeConfigRequest {
         repeated string     uri=4;                    /// individual files in config//.. for FileRequest download 
 		repeated string     usernodes=5;              /// user requesting the feed, the probe0, probe1, etc 
 		optional int64		sub_feed_id=6[default=-1];/// sub feed ID, when a feed consists of several sub-feeds 
+		optional bool       restore_mode=7[default=false]; /// restore mode will backup and restore, used with add,remove
+
     }
 
     optional IntelFeed      add_feed=2;
     optional IntelFeed      process_new_feed=3;
     optional bool           get_all_nodes=4[default=true];
     repeated NameValue      query_config=5;
-    optional IntelFeed      remove_feed=6;
+    optional IntelFeed      remove_feed=6;            
 }
 
 message NodeConfigResponse {
