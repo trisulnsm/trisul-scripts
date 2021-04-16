@@ -56,10 +56,10 @@ TrisulPlugin = {
 			hour =h, min = m, sec = s
 		})
 		local fkey = Fk.toflow_format_v4( proto, sip,sport, dip, dport)
-		print(fkey) 
 
 		if cmd == "START" then
-			engine:update_flow( fkey, 0, 1)
+		print(fkey) 
+			engine:update_flow_raw( fkey, 0, 1)
 			engine:tag_flow ( fkey, "[natip]"..tsip)
 			engine:tag_flow ( fkey, "[natport]"..tsport)
 			engine:tag_flow ( fkey, "[deviceip]"..deviceip)
@@ -70,5 +70,4 @@ TrisulPlugin = {
 
   },
 }
-
 
