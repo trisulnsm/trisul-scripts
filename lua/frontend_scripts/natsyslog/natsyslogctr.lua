@@ -72,6 +72,3 @@ TrisulPlugin = {
 }
 
 
--- "<141>(\\w+)\\s+([\\d:]+)\\s+(\\S+)\\s+NAT_ACCT:(\\w+)\\s+(\\w+)SourceIp\\s+:(\\S+)\\s+Sourceport:(\\d+)\\TransIP\\s+:(\\S+)\\s+Transport:(\\d+)\\s+DestIp\\d+:(\\S+)\\s+Destport:(\\d+)" 
--- <141>Apr 15 17:21:45 115.243.77.202 NAT_ACCT:START udp SourceIp :20.142.142.146  Sourceport:63 TransIP :115.243.77.202 TransPort:1035 DestIp :14.14.14.2 Destport:63
--- <141>Apr 15 17:29:48 115.243.77.202 NAT_ACCT:STOP udp SourceIp :20.142.142.146  Sourceport:63 TransIP :115.243.77.202 TransPort:1035 DestIp :14.14.14.2 Destport:63 
