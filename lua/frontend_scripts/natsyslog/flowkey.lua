@@ -2,7 +2,6 @@
 -- flowkey.lua 
 --
 
-
 local ffi=require'ffi'
 
 ffi.cdef [[
@@ -32,6 +31,8 @@ FlowKey.toproto_format=function( strkey)
   	return "06"
   elseif strkey == "udp" then 
   	return "11"
+  elseif strkey == "icmp" then 
+    return "01"
   else 
     return "00"
   end 

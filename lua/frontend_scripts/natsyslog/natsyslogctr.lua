@@ -29,6 +29,8 @@ TrisulPlugin = {
 
 	T.re2_CiscoNATSyslog=T.re2("(\\w+)\\s+(\\d+)\\s+(\\d\\d):(\\d\\d):(\\d\\d).\\d\\d\\d.*(Created|Deleted)\\s+Translation\\s+(\\w+)\\s+(\\S+):(\\S+)\\s+(\\S+):(\\S+)\\s+(\\S+):(\\S+)\\s+(\\S+):(\\S+)\\d+")
 
+	T.re2_CiscoNATSyslog2=T.re2("(\\w+)\\s+(\\d+)\\s+(\\d\\d):(\\d\\d):(\\d\\d).\\d\\d\\d.*(Created|Deleted)\\s+(\\w+)\\s+(\\S+):(\\d+)\\s+(\\S+):(\\d+)\\s+(\\S+):(\\d+)\\s+(\\S+):(\\d+)")
+
   end,
 
   -- WHEN CALLED : your LUA script is unloaded  / detached from Trisul 
@@ -44,12 +46,21 @@ TrisulPlugin = {
     onpacket = function(engine,layer)
 		local syslogstr = layer:rawbytes():tostring()
 
+		engine:add_resource( "{7B431613-9291-49BF-F8D3-73578A445310}", 
+							 layer:packet():flowid():id(),
+							 "NAT SYSLOG",
+							 syslogstr) 
+
 		if syslogstr:find("NAT_ACCT",1,true) then 
 			-- JIO device 
 
 			local bret, mon, day, h,m,s, deviceip, cmd, proto, sip, sport, tsip, tsport, dip, dport = T.re2_JioDeviceNATSyslog:partial_match_n(syslogstr)
 
 			if bret ==false then return;  end
+
+			if sport=="4501" then
+				print(syslogstr)
+			end 
 
 			local tvsec = os.time( {
 				year = tonumber(os.date('%Y')),
@@ -75,6 +86,7 @@ TrisulPlugin = {
 
 			if bret ==false then return; end
 
+
 			local tvsec = os.time( {
 				year = tonumber(os.date('%Y')),
 				month = MONTHNAMES[mon],
@@ -87,6 +99,35 @@ TrisulPlugin = {
 				engine:update_flow_raw( fkey, 0, 1)
 				engine:tag_flow ( fkey, "[natip]"..tsip)
 				engine:tag_flow ( fkey, "[natport]"..tsport)
+				engine:tag_flow ( fkey, "[deviceip]"..sip)
+			elseif cmd == "Deleted" then 
+				engine:terminate_flow ( fkey)
+			end 
+
+		elseif syslogstr:find("%IPNAT-6-NAT",1,true) then 
+
+			-- CISCO device 2 
+			local bret, mon, day, h,m,s, cmd, proto, sip, sport, tsip, tsport, dip, dport = T.re2_CiscoNATSyslog2:partial_match_n(syslogstr)
+
+			if bret ==false then return; end
+
+			if sport=="4501" then
+				print(syslogstr)
+			end 
+
+			local tvsec = os.time( {
+				year = tonumber(os.date('%Y')),
+				month = MONTHNAMES[mon],
+				day = tonumber(day),
+				hour =h, min = m, sec = s
+			})
+			local fkey = Fk.toflow_format_v4( proto, sip,sport, dip, dport)
+
+			if cmd == "Created" then
+				engine:update_flow_raw( fkey, 0, 1)
+				engine:tag_flow ( fkey, "[natip]"..tsip)
+				engine:tag_flow ( fkey, "[natport]"..tsport)
+				engine:tag_flow ( fkey, "[deviceip]"..sip)
 			elseif cmd == "Deleted" then 
 				engine:terminate_flow ( fkey)
 			end 
