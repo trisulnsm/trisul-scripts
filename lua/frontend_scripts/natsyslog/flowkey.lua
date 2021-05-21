@@ -27,14 +27,14 @@ end
 
 -- in trisul: proto keys look like XX - UDP = IP proto 17 = 11 
 FlowKey.toproto_format=function( strkey)
-  if strkey == "tcp" then 
+  if strkey == "tcp" or strkey == "TCP" then 
   	return "06"
-  elseif strkey == "udp" then 
+  elseif strkey == "udp" or strkey == "UDP" then 
   	return "11"
-  elseif strkey == "icmp" then 
+  elseif strkey == "icmp" or strkey == "ICMP" then 
     return "01"
   else 
-    return "00"
+    return string.format("%02X", tonumber(strkey))
   end 
 end
 

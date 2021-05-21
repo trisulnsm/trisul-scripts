@@ -46,10 +46,7 @@ TrisulPlugin = {
     onpacket = function(engine,layer)
 		local syslogstr = layer:rawbytes():tostring()
 
-		engine:add_resource( "{7B431613-9291-49BF-F8D3-73578A445310}", 
-							 layer:packet():flowid():id(),
-							 "NAT SYSLOG",
-							 syslogstr) 
+		-- engine:add_resource( "{7B431613-9291-49BF-F8D3-73578A445310}", layer:packet():flowid():id(), "NAT SYSLOG", syslogstr) 
 
 		if syslogstr:find("NAT_ACCT",1,true) then 
 			-- JIO device 
@@ -57,10 +54,6 @@ TrisulPlugin = {
 			local bret, mon, day, h,m,s, deviceip, cmd, proto, sip, sport, tsip, tsport, dip, dport = T.re2_JioDeviceNATSyslog:partial_match_n(syslogstr)
 
 			if bret ==false then return;  end
-
-			if sport=="4501" then
-				print(syslogstr)
-			end 
 
 			local tvsec = os.time( {
 				year = tonumber(os.date('%Y')),
@@ -86,21 +79,23 @@ TrisulPlugin = {
 
 			if bret ==false then return; end
 
-
 			local tvsec = os.time( {
 				year = tonumber(os.date('%Y')),
 				month = MONTHNAMES[mon],
 				day = tonumber(day),
 				hour =h, min = m, sec = s
 			})
-			local fkey = Fk.toflow_format_v4( proto, sip,sport, dip, dport)
+			local fkey = Fk.toflow_format_v4( proto, tsip,tsport, dip, dport)
 
 			if cmd == "Created" then
 				engine:update_flow_raw( fkey, 0, 1)
-				engine:tag_flow ( fkey, "[natip]"..tsip)
-				engine:tag_flow ( fkey, "[natport]"..tsport)
+				engine:tag_flow ( fkey, "[natip]"..sip)
+				engine:tag_flow ( fkey, "[natport]"..sport)
 				engine:tag_flow ( fkey, "[deviceip]"..sip)
+
+
 			elseif cmd == "Deleted" then 
+				engine:update_flow_raw( fkey, 1, 1)
 				engine:terminate_flow ( fkey)
 			end 
 
@@ -111,10 +106,6 @@ TrisulPlugin = {
 
 			if bret ==false then return; end
 
-			if sport=="4501" then
-				print(syslogstr)
-			end 
-
 			local tvsec = os.time( {
 				year = tonumber(os.date('%Y')),
 				month = MONTHNAMES[mon],
@@ -129,6 +120,7 @@ TrisulPlugin = {
 				engine:tag_flow ( fkey, "[natport]"..tsport)
 				engine:tag_flow ( fkey, "[deviceip]"..sip)
 			elseif cmd == "Deleted" then 
+				engine:update_flow_raw( fkey, 1, 1)
 				engine:terminate_flow ( fkey)
 			end 
 
