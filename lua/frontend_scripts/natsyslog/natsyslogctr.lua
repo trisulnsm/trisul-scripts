@@ -24,6 +24,7 @@ TrisulPlugin = {
   -- 
   -- WHEN CALLED : your LUA script is loaded into Trisul 
   onload = function()
+	T.re2_NetElasticBNGNATSyslog=T.re2('19412\\s(SADD|SDEL)\\s\\[nsess\\sTRIG="(\\w+)"\\sPROTO="(\\d+)"\\sSSUBIX="(\\d)"\\sIATYP="(\\w+)"\\sUSERNAME="(\\w+)"\\sISADDR="(\\S+)"\\sIDADDR="(\\S+)"\\sISPORT="(\\d+)"\\sIDPORT="(\\d+)"\\sXATYP="(\\w+)"\\sXSADDR="(\\S+)"\\sXDADDR="(\\S+)"\\sXSPORT="(\\d+)"\\sXDPORT="(\\d+)"\\]\\stime=\'(\\d{4})-(\\d{2})-(\\d{2}) (\\d{2}):(\\d{2}):(\\d{2})\'')
 
 	T.re2_JioDeviceNATSyslog=T.re2("<141>(\\w+)\\s+(\\d+)\\s+(\\d\\d):(\\d\\d):(\\d\\d)\\s+(\\S+)\\s+NAT_ACCT:(\\w+)\\s+(\\w+)\\s+SourceIp\\s+:(\\S+)\\s+Sourceport:(\\d+)\\s+TransIP\\s+:(\\S+)\\s+TransPort:(\\d+)\\s+DestIp\\s+:(\\S+)\\s+Destport:(\\d+)\\s*")
 
@@ -124,6 +125,52 @@ TrisulPlugin = {
 				engine:terminate_flow ( fkey)
 			end 
 
+		elseif syslogstr:find("TRIG=",1,true) then 
+
+			-- NetElastic BNG 
+			local   bret,
+					adddel,
+					_,
+					proto,
+					_,
+					ipversion,
+					username,
+					sip,
+					dip,
+					sport,
+					dport,
+					_,
+					natip,
+					_,
+					natsport,
+					_,
+					year,
+					mon,
+					day,
+					h,m,s= T.re2_NetElasticBNGNATSyslog:partial_match_n(syslogstr)
+
+
+			if bret ==false then return; end
+
+			local tvsec = os.time( {
+				year =  tonumber(year),
+				month = tonumber(mon),
+				day   = tonumber(day),
+				hour =h, min = m, sec = s
+			})
+			local fkey = Fk.toflow_format_v4( proto, sip,sport, dip, dport)
+
+			-- print(tvsec.." = "..fkey) 
+
+			if adddel == "SADD" then
+				engine:update_flow_raw( fkey, 0, 1)
+				engine:tag_flow ( fkey, "[natip]"..natip)
+				engine:tag_flow ( fkey, "[natport]"..natsport)
+				engine:tag_flow ( fkey, "[username]"..username)
+			elseif cmd == "SDEL" then 
+				engine:update_flow_raw( fkey, 1, 1)
+				engine:terminate_flow ( fkey)
+			end 
 		end 
     end,
   },
