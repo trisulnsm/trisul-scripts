@@ -2,12 +2,19 @@
 -- NAT syslog counter attached to SYSLOG protocol 
 -- 
 local Fk = require'flowkey' 
+local SB=require'sweepbuf'
+
 
 MONTHNAMES = {
   ['Jan'] = 1, ['Feb'] = 2, ['Mar'] = 3,
   ['Apr'] = 4, ['May'] = 5, ['Jun'] = 6,
   ['Jul'] = 7, ['Aug'] = 8, ['Sep'] = 9,
   ['Oct'] = 10, ['Nov'] = 11, ['Dec'] = 12,
+}
+
+PROTOCOl={
+  ['ICMP'] = 1, ['IGMP'] = 2 , ['IPv4']=4,
+  ['TCP'] = 6 , ['UDP'] = 17 , ['IPv6']=41
 }
 
 TrisulPlugin = { 
@@ -34,6 +41,8 @@ TrisulPlugin = {
 
     T.re2_CiscoNATSyslog2=T.re2("(\\w+)\\s+(\\d+)\\s+(\\d\\d):(\\d\\d):(\\d\\d).\\d\\d\\d.*(Created|Deleted)\\s+(\\w+)\\s+(\\S+):(\\d+)\\s+(\\S+):(\\d+)\\s+(\\S+):(\\d+)\\s+(\\S+):(\\d+)")
 
+    --microkit has firwall in that syslog message
+    T.re2_MikroTikNATSyslog=T.re2("firewall,info.*proto\\s(\\w+).*,\\s(\\S+):(\\d+)->(\\S+):(\\d+)")
   end,
 
   -- WHEN CALLED : your LUA script is unloaded  / detached from Trisul 
@@ -48,7 +57,12 @@ TrisulPlugin = {
 
     onpacket = function(engine,layer)
       local syslogstr = layer:rawbytes():tostring()
-
+      --ip_layer protocol
+      local iplayer = layer:packet():find_layer("{0A2C724B-5B9F-4BA6-9C97-B05080558574}");
+      local ip_sb = SB.new(iplayer:rawbytes():tostring())
+      --skip to get ip
+      ip_sb:skip(12)
+      local iplayer_deviceip=ip_sb:next_ipv4()
       -- engine:add_resource( "{7B431613-9291-49BF-F8D3-73578A445310}", layer:packet():flowid():id(), "NAT SYSLOG", syslogstr) 
 
       if syslogstr:find("NAT_ACCT",1,true) then 
@@ -168,9 +182,11 @@ TrisulPlugin = {
           engine:tag_flow ( fkey, "[natport]"..natsport)
           engine:tag_flow ( fkey, "[username]"..username)
           engine:tag_flow ( fkey, "[addts]"..tvsec)
+          engine:tag_flow ( fkey, "[deviceip]"..iplayer_deviceip)
         elseif adddel == "SDEL" then 
           engine:update_flow_raw( fkey, 1, 1)
           engine:tag_flow ( fkey, "[delts]"..tvsec)
+          engine:tag_flow ( fkey, "[deviceip]"..iplayer_deviceip)
           engine:terminate_flow ( fkey)
         end 
 
@@ -187,17 +203,35 @@ TrisulPlugin = {
             dport,
             proto= T.re2_HuaweiNATSyslog:partial_match_n(syslogstr)
         if bret ==false then return; end
-
         local fkey = Fk.toflow_format_v4( proto, natip,sport, dip, dport)
         if adddel == "SessionA" then
           engine:update_flow_raw( fkey, 0, 1)
           engine:tag_flow ( fkey, "[natip]"..sip)
           engine:tag_flow ( fkey, "[addts]"..stvsec)
+          engine:tag_flow ( fkey, "[deviceip]"..iplayer_deviceip)
+
         elseif adddel == "SessionW" then 
           engine:update_flow_raw( fkey, 1, 1)
           engine:tag_flow ( fkey, "[delts]"..etvsec)
+          engine:tag_flow ( fkey, "[deviceip]"..iplayer_deviceip)
           engine:terminate_flow ( fkey)
         end 
+       elseif syslogstr:find("firewall,info",1,true) then 
+
+        -- MikroTik device 
+        local   bret,
+            proto,
+            sip,
+            sport,
+            dip,
+            dport= T.re2_MikroTikNATSyslog:partial_match_n(syslogstr)
+        if bret ==false then return; end
+        proto = PROTOCOl[proto]
+        local fkey = Fk.toflow_format_v4( proto, sip,sport, dip, dport)
+        engine:update_flow_raw( fkey, 0, 1)
+        engine:tag_flow ( fkey, "[deviceip]"..iplayer_deviceip)
+        engine:update_flow_raw( fkey, 1, 1)
+        engine:terminate_flow ( fkey)
 
       end 
     end,
