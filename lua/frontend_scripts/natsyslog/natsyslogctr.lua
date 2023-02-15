@@ -192,8 +192,10 @@ TrisulPlugin = {
         if adddel == "SessionA" then
           engine:update_flow_raw( fkey, 0, 1)
           engine:tag_flow ( fkey, "[natip]"..sip)
+          engine:tag_flow ( fkey, "[addts]"..stvsec)
         elseif adddel == "SessionW" then 
           engine:update_flow_raw( fkey, 1, 1)
+          engine:tag_flow ( fkey, "[delts]"..etvsec)
           engine:terminate_flow ( fkey)
         end 
 
