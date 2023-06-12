@@ -19,6 +19,14 @@ PROTOCOl={
 
 COUNTERID_FLOWGEN = "{2314BB8E-2BCC-4B86-8AA2-677E5554C0FE}" 
 
+-- in trisul: ipv4 keys look like XX.XX.XX.XX 
+function  toip_format( dotted_ip )
+  local b1, b2, b3, b4 =  dotted_ip:match("(%d+).(%d+).(%d+).(%d+)")
+  return string.format("%02X.%02X.%02X.%02X", b1, b2, b3, b4 )
+end
+
+
+
 TrisulPlugin = { 
 
 
@@ -69,9 +77,10 @@ TrisulPlugin = {
 
 
 	  -- sources 
-	  engine:update_counter( COUNTERID_FLOWGEN, iplayer_deviceip, 0, #syslogstr)
-	  engine:update_counter( COUNTERID_FLOWGEN, iplayer_deviceip, 1, #syslogstr)
-	  engine:update_counter( COUNTERID_FLOWGEN, iplayer_deviceip, 2, 1)
+	  local ipkey = toip_format( iplayer_deviceip)
+	  engine:update_counter( COUNTERID_FLOWGEN, ipkey, 0, #syslogstr)
+	  engine:update_counter( COUNTERID_FLOWGEN, ipkey, 1, #syslogstr)
+	  engine:update_counter( COUNTERID_FLOWGEN, ipkey, 2, 1)
 
 
       if syslogstr:find("NAT_ACCT",1,true) then 
