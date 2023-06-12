@@ -37,7 +37,7 @@ TrisulPlugin = {
 
     T.re2_JioDeviceNATSyslog=T.re2("<141>(\\w+)\\s+(\\d+)\\s+(\\d\\d):(\\d\\d):(\\d\\d)\\s+(\\S+)\\s+NAT_ACCT:(\\w+)\\s+(\\w+)\\s+SourceIp\\s+:(\\S+)\\s+Sourceport:(\\d+)\\s+TransIP\\s+:(\\S+)\\s+TransPort:(\\d+)\\s+DestIp\\s+:(\\S+)\\s+Destport:(\\d+)\\s*")
 
-    T.re2_CiscoNATSyslog=T.re2("(\\w+)\\s+(\\d+)\\s+(\\d\\d):(\\d\\d):(\\d\\d).\\d\\d\\d.*(Created|Deleted)\\s+Translation\\s+(\\w+)\\s+(\\S+):(\\S+)\\s+(\\S+):(\\S+)\\s+(\\S+):(\\S+)\\s+(\\S+):(\\S+)\\d+")
+    T.re2_CiscoNATSyslog=T.re2("(\\w+)\\s+(\\d+)\\s+(\\d\\d):(\\d\\d):(\\d\\d).\\d\\d\\d.*(Created|Deleted)\\s+Translation\\s+(\\w+)\\s+(\\S+):(\\S+)\\s+(\\S+):(\\S+)\\s+(\\S+):(\\S+)\\s+(\\S+):(\\S+)\\s*\\d+")
 
     T.re2_CiscoNATSyslog2=T.re2("(\\w+)\\s+(\\d+)\\s+(\\d\\d):(\\d\\d):(\\d\\d).\\d\\d\\d.*(Created|Deleted)\\s+(\\w+)\\s+(\\S+):(\\d+)\\s+(\\S+):(\\d+)\\s+(\\S+):(\\d+)\\s+(\\S+):(\\d+)")
 
@@ -90,10 +90,8 @@ TrisulPlugin = {
         end 
 
       elseif syslogstr:find("LOG_TRANSLATION",1,true) then 
-
         -- CISCO device 
         local bret, mon, day, h,m,s, cmd, proto, sip, sport, tsip, tsport, dip, dport = T.re2_CiscoNATSyslog:partial_match_n(syslogstr)
-
         if bret ==false then return; end
 
         local tvsec = os.time( {
@@ -103,12 +101,11 @@ TrisulPlugin = {
           hour =h, min = m, sec = s
         })
         local fkey = Fk.toflow_format_v4( proto, tsip,tsport, dip, dport)
-
         if cmd == "Created" then
           engine:update_flow_raw( fkey, 0, 1)
           engine:tag_flow ( fkey, "[natip]"..sip)
           engine:tag_flow ( fkey, "[natport]"..sport)
-          engine:tag_flow ( fkey, "[deviceip]"..sip)
+          engine:tag_flow ( fkey, "[deviceip]"..iplayer_deviceip)
 
 
         elseif cmd == "Deleted" then 
@@ -216,7 +213,7 @@ TrisulPlugin = {
           engine:tag_flow ( fkey, "[deviceip]"..iplayer_deviceip)
           engine:terminate_flow ( fkey)
         end 
-       elseif syslogstr:find("firewall,info",1,true) then 
+       elseif syslogstr:find("firewall,info",1,true) then
 
         -- MikroTik device 
         local   bret,
