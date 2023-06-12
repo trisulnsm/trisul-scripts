@@ -17,6 +17,8 @@ PROTOCOl={
   ['TCP'] = 6 , ['UDP'] = 17 , ['IPv6']=41
 }
 
+COUNTERID_FLOWGEN = "{2314BB8E-2BCC-4B86-8AA2-677E5554C0FE}" 
+
 TrisulPlugin = { 
 
 
@@ -64,6 +66,13 @@ TrisulPlugin = {
       ip_sb:skip(12)
       local iplayer_deviceip=ip_sb:next_ipv4()
       -- engine:add_resource( "{7B431613-9291-49BF-F8D3-73578A445310}", layer:packet():flowid():id(), "NAT SYSLOG", syslogstr) 
+
+
+	  -- sources 
+	  engine:update_counter( COUNTERID_FLOWGEN, iplayer_deviceip, 0, #syslogstr)
+	  engine:update_counter( COUNTERID_FLOWGEN, iplayer_deviceip, 1, #syslogstr)
+	  engine:update_counter( COUNTERID_FLOWGEN, iplayer_deviceip, 2, 1)
+
 
       if syslogstr:find("NAT_ACCT",1,true) then 
         -- JIO device 
