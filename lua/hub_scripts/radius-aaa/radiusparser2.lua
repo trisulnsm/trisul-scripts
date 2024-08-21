@@ -19,24 +19,27 @@ function parseline(theline)
 		table.insert(tbl, word) 
 	end
 
+
 	local customer_id = tbl[1]
 	local framedipv4 = tbl[2]
 	local acctstarttime = tbl[5]
-	local acctupdatetime = tbl[7]
-	local acctendtime = tbl[6]
-	if acctendtime == "<EMPTY>" then 
+	local acctupdatetime = tbl[6]
+	local acctendtime = tbl[7]
+	if acctendtime == "<EMPTY>" or acctendtime == nil then 
 		acctendtime = acctupdatetime
 	end 
+
 
 	if framedipv4 == nil or customer_id == 0  or acctendtime == nil then
 		return {} 
 	end 
 
+
 --[[
 	for k,v in ipairs(tbl) do 
 		print (k..'='..v)
 	end 
---]]
+--]] 
 
 	return {
 		customer_id,
