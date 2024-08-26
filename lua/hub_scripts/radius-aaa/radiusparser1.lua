@@ -26,6 +26,7 @@ function parseline(theline)
 --]] 
 
 	local framedipv4 = tbl[12]
+	local framedipv6 = tbl[13]
 	local acctsessiontime = tbl[10] 
 	local customer_id = tbl[4]
 	local acctstarttime = tbl[7]
@@ -33,6 +34,11 @@ function parseline(theline)
 	local acctendtime = tbl[9]
 	if acctendtime == "NULL" then 
 		acctendtime = acctupdatetime
+	end 
+
+	-- Framed v6
+	if framedipv4 == "<EMPTY>" or framedipv4 == nil then
+		framedipv4 = framedipv6
 	end 
 
 	if framedipv4 == nil or customer_id == 0 then
