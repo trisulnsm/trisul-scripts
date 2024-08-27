@@ -4,9 +4,12 @@ function getfileprefix()
 end
 
 -- returns tv_sec
+-- here we do -60 because the filename from fro (t-30 to t), hence upto T
+-- this way the file arriving exactly at 00:00:00 midnight is mapped to he previous day slice 
+-- instead of the current day slice 
 function timestampfromfilename(fn)
 	local ts = fn:match("(%d%d%d%d%d%d%d%d%d%d)")
-    return tonumber(ts) 
+    return tonumber(ts) - 60 
 end
 
 -- return a table privateip, timefrom, timeto, user, subscriberid, fulline
