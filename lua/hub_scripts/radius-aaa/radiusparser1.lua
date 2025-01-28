@@ -7,9 +7,12 @@ end
 -- here we do -60 because the filename from fro (t-30 to t), hence upto T
 -- this way the file arriving exactly at 00:00:00 midnight is mapped to he previous day slice 
 -- instead of the current day slice 
+-- No slice for this time Mon Aug 26 23:59:01 2024-000000 f=pcastaaa_0_1724697001.csv
 function timestampfromfilename(fn)
 	local ts = fn:match("(%d%d%d%d%d%d%d%d%d%d)")
-    return tonumber(ts) - 60 
+        local date=os.date("*t",tonumber(ts)-60)
+	date["sec"]=0
+        return tonumber(os.time(date)) 
 end
 
 -- return a table privateip, timefrom, timeto, user, subscriberid, fulline
