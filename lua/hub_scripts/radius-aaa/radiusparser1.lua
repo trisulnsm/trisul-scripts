@@ -1,21 +1,16 @@
+-- 2906536,0/0/0/1562_67B76806042ECC8B,5c67c53fbac5531edfe53113204c4351,<custid>,<nas-ip>,0/0/0/1562,2025-01-07 09:35:44,2025-01-27 18:24:56,NULL,1759752,7817.352d.1594,<framed-ip>,,
 
 function getfileprefix()
     return 'pcastaaa*';
 end
 
 -- returns tv_sec
--- here we do -60 because the filename from fro (t-30 to t), hence upto T
--- this way the file arriving exactly at 00:00:00 midnight is mapped to he previous day slice 
--- instead of the current day slice 
--- No slice for this time Mon Aug 26 23:59:01 2024-000000 f=pcastaaa_0_1724697001.csv
 function timestampfromfilename(fn)
 	local ts = fn:match("(%d%d%d%d%d%d%d%d%d%d)")
-        local date=os.date("*t",tonumber(ts)-60)
-	date["sec"]=0
-        return tonumber(os.time(date)) 
+    return tonumber(ts) 
 end
 
--- return a table privateip, timefrom, timeto, user, subscriberid, fulline
+-- return a table { privateip, timefrom, timeto, user, subscriberid, fulline, nasip } 
 -- radacctid,acctsessionid,acctuniqueid,customer_id,nasipaddress,nasportid,acctstarttime,acctupdatetime,acctstoptime,acctsessiontime,callingstationid,framed_ipv_4_address,framed_ipv_6_address,delegated_ipv6_prefix
 function parseline(theline)
 
@@ -32,7 +27,6 @@ function parseline(theline)
 --]] 
 
 	local framedipv4 = tbl[12]
-	local framedipv6 = tbl[13]
 	local acctsessiontime = tbl[10] 
 	local customer_id = tbl[4]
 	local acctstarttime = tbl[7]
@@ -41,11 +35,7 @@ function parseline(theline)
 	if acctendtime == "NULL" then 
 		acctendtime = acctupdatetime
 	end 
-
-	-- Framed v6
-	if framedipv4 == "<EMPTY>" or framedipv4 == nil then
-		framedipv4 = framedipv6
-	end 
+	local nasip = tbl[5]
 
 	if framedipv4 == nil or customer_id == 0 then
 		return {} 
@@ -57,7 +47,8 @@ function parseline(theline)
 		tounix(acctstarttime),
 		tounix(acctendtime),
 		"",
-		theline 
+		theline ,
+		nasip
 	}
 end
 

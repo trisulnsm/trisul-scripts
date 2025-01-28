@@ -1,11 +1,24 @@
-# Radius AAA log parsers
+# Radius Parsers 
 
 
-These are various AAA Log formats used by the Trisul AAAING ingestion tool 
+This directory contains RADIUS dump parsers in LUA for use with Trisul IPDR AAAING process. 
 
 
-Format 1
 
-Format 2 
+## Purpose
+
+The purpose of this repository is to make available common parsers for various RADIUS AAA formats.
+
+The AAAING process can use a LUA file to parse each line in any format.  The lua files in this directory
+support various formats.
+
+
+
+
+
+Modify the dump filename pattern as per your choice.
+
+
+
 
 
