@@ -7,6 +7,21 @@ We need to export the full or part of this table. The sample python script does 
 
 
 
+## export-radacct.py 
+
+This python script exports the entire radacct table to a CSV file and SFTP to Trisul IPDR server 
+
+Uses the pandas library to convert the radacct table from a FreeRADIUS database to a CSV file and paramiko for SFTP transfer to a different server.ddkk
+
+```bash
+
+pip install pandas paramiko
+
+```
+
+
+## What is in the radacct table 
+
 The radacct table contains 
 
 | Field Name               | Data Type        | Description                                                                 |
