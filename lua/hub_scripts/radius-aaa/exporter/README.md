@@ -3,7 +3,26 @@
 The session data in FreeRADIUS is stored in the MySQL table called radacct. 
 
 
-We need to export the full or part of this table. The sample python script does that.
+We need to export the full or part of this table. This sample python script exports the full table.
+
+
+> UPDATE:  A full dump can result in a giant database dump.  Hence the script only dumps active sessions in the last ONE hour
+> ISP can customize the script to dump every 3 Hours, 6 Hours, 24 Hours etc
+
+
+```python
+
+one_hour_ago = datetime.now() - timedelta(hours=1)
+
+    # Fetch data from the radacct table
+	query = f"""
+SELECT * FROM radacct
+WHERE acctstarttime >= '{one_hour_ago.strftime('%Y-%m-%d %H:%M:%S')}'
+OR acctstoptime >= '{one_hour_ago.strftime('%Y-%m-%d %H:%M:%S')}'
+OR accttime >= '{one_hour_ago.strftime('%Y-%m-%d %H:%M:%S')}'
+""" 
+
+```
 
 
 

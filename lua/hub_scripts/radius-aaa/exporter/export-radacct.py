@@ -15,8 +15,17 @@ def fetch_and_convert_radacct():
         database="your_db_name"
     )
 
+
+	# Time filter (last one hour)
+	one_hour_ago = datetime.now() - timedelta(hours=1)
+
     # Fetch data from the radacct table
-    query = "SELECT * FROM radacct"
+	query = f"""
+SELECT * FROM radacct
+WHERE acctstarttime >= '{one_hour_ago.strftime('%Y-%m-%d %H:%M:%S')}'
+OR acctstoptime >= '{one_hour_ago.strftime('%Y-%m-%d %H:%M:%S')}'
+OR accttime >= '{one_hour_ago.strftime('%Y-%m-%d %H:%M:%S')}'
+"""
     radacct_df = pd.read_sql(query, db)
 
     # Convert to CSV
