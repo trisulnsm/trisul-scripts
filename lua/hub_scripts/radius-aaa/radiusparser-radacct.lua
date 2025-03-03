@@ -32,8 +32,8 @@ function parseline(theline)
 		table.insert(tbl, word) 
 	end
 
-	-- for k,v in ipairs(tbl) do 
-	--  	print (k..'='..v)
+	--  for k,v in ipairs(tbl) do 
+	--   	print (k..'='..v)
 	--  end 
 
 	local subsciberid = tbl[3]
@@ -42,12 +42,16 @@ function parseline(theline)
 	local acctstarttime = tbl[9]
 	local acctstoptime = tbl[10]
 	local acctsesstime = tbl[11]
+	local acctupdatetime = tbl[21]
 	local framedipv4 = tbl[21]
 
 
+	if acctstoptime == "<EMPTY>" then
+		acctstoptime = acctupdatetime
+	end
+
 	
 
-	local end_time_tvsec = tounix(acctstarttime) + acctsesstime
 
 	-- print('-------------------------------')
 	-- print('customer_id = ' .. customer_id)
@@ -57,7 +61,7 @@ function parseline(theline)
 	-- print('nasip = ' .. nasip)
 	-- print('subsciberid = ' .. subsciberid)
 
-	if framedipv4 == nil or framedipv4=='0' or customer_id == 0 then
+	if framedipv4 == '0'  or framedipv4=='<EMPTY>' or customer_id == 0 then
 		return {} 
 	end 
 
@@ -65,7 +69,7 @@ function parseline(theline)
 		customer_id,
 		framedipv4,
 		tounix(acctstarttime),
-		end_time_tvsec,
+		tounix(acctstoptime),
 		subsciberid,
 		theline ,
 		nasip
