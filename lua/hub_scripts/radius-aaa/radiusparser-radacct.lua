@@ -42,8 +42,8 @@ function parseline(theline)
 	local acctstarttime = tbl[9]
 	local acctstoptime = tbl[10]
 	local acctsesstime = tbl[11]
-	local acctupdatetime = tbl[21]
 	local framedipv4 = tbl[21]
+	local acctupdatetime = tbl[25]
 
 
 	if acctstoptime == "<EMPTY>" then
@@ -51,19 +51,19 @@ function parseline(theline)
 	end
 
 	
+	if framedipv4 == '0'  or framedipv4=='<EMPTY>' or customer_id == 0 then
+		return {} 
+	end 
 
 
 	-- print('-------------------------------')
 	-- print('customer_id = ' .. customer_id)
 	-- print('framedipv4 = ' .. framedipv4)
 	-- print('acctstarttime = ' .. tounix(acctstarttime))
-	-- print('acctendtime = ' .. end_time_tvsec)
+	-- print('acctstoptime = ' .. tounix(acctstoptime))
 	-- print('nasip = ' .. nasip)
 	-- print('subsciberid = ' .. subsciberid)
 
-	if framedipv4 == '0'  or framedipv4=='<EMPTY>' or customer_id == 0 then
-		return {} 
-	end 
 
 	return {
 		customer_id,
