@@ -57,20 +57,15 @@ function parseline(theline)
 
 	
 
-	local end_time_tvsec = tounix(acctstarttime) + accsesstime
-
-	print('-------------------------------')
-	print('customer_id = ' .. customer_id)
-	print('framedipv4 = ' .. framedipv4)
-	print('acctstarttime = ' .. tounix(acctstarttime))
-	print('acctendtime = ' .. end_time_tvsec)
-	print('nasip = ' .. nasip)
-	print('subsciberid = ' .. subsciberid)
+	local end_time_tvsec = tounix(acctupdatetime)
+	local start_time_tvsec = tounix(acctupdatetime) - accsesstime
+	print(start_time_tvsec)
+	print(end_time_tvsec)
 
 	return {
 		customer_id,
 		framedipv4,
-		tounix(acctstarttime),
+		start_time_tvsec,
 		end_time_tvsec,
 		subsciberid,
 		theline ,
