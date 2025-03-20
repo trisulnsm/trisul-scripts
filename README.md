@@ -21,5 +21,5 @@ The LUA API is documented  at https://www.trisul.org/docs/lua
 
 Trisul Remote Protocol use scripts in Ruby, Javascript, or Python to query and hunt through historical data. 
 
-The TRP API is documented  at https://www.trisul.org/docs/trp 
+The TRP API is documented  at https://docs.trisul.org/docs/trp/
 
