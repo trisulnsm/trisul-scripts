@@ -1,3 +1,4 @@
+-- Date,Status-Type,Chargeable-User-Identity,InnerIdentity,Framed-Address-IPv4,NASIP,NAS-Identifier,AcctSessionId,Acct-Terminate-Cause,Session-Time,AcctInputGigawords,AcctOutputGigawords,Input-Octets,Output-Octets,UserSpeed,User ID,UserSpeed,FramedIPv6Address,DelegatedIPv6Prefix
 -- 2906536,0/0/0/1562_67B76806042ECC8B,5c67c53fbac5531edfe53113204c4351,<custid>,<nas-ip>,0/0/0/1562,2025-01-07 09:35:44,2025-01-27 18:24:56,NULL,1759752,7817.352d.1594,<framed-ip>,,
 
 function getfileprefix()
@@ -40,6 +41,7 @@ function parseline(theline)
 	-- end 
 
 	local framedipv4 = tbl[5]
+	local framedipv6 = tbl[18]
 	local customer_id = tbl[4]
 	local acctstarttime = tbl[1]
 	local acctupdatetime = tbl[1]
@@ -50,21 +52,18 @@ function parseline(theline)
 		acctendtime = acctupdatetime
 	end 
 	local nasip = tbl[6]
-
-	if framedipv4 == nil or framedipv4=='0' or customer_id == 0 then
-		return {} 
-	end 
-
+       
+        if ( (framedipv4 == nil or framedipv4 == '0') and (framedipv6 == nil or framedipv6 == '0') or customer_id == 0 or customer_id == nil) then
+	    return {}
+        end
 	
 
 	local end_time_tvsec = tounix(acctupdatetime)
 	local start_time_tvsec = tounix(acctupdatetime) - accsesstime
-	print(start_time_tvsec)
-	print(end_time_tvsec)
-
+        local ip_address = (framedipv4 ~= nil and framedipv4 ~= '0') and framedipv4 or framedipv6
 	return {
 		customer_id,
-		framedipv4,
+		ip_address,
 		start_time_tvsec,
 		end_time_tvsec,
 		subsciberid,

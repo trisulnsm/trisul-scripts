@@ -71,7 +71,8 @@ end
 See the samples 
 File Name | Sanmple Headers
 ---|---|
-radiusparse_jaze_mac.lua|--Username,User ID,Zone Name,Name,Phone,Email,Address,Gender,Age,Login Type,Mac,IP Address,IPV6 Prefix,Delegated IPV6 Prefix,Device Type,Browser,AP Mac,AP IP Address,Download,Upload,Total Data,Social Profile,Start Time,Stop Time
-
+radiusparse_jaze_mac.lua|Username,User ID,Zone Name,Name,Phone,Email,Address,Gender,Age,Login Type,Mac,IP Address,IPV6 Prefix,Delegated IPV6 Prefix,Device Type,Browser,AP Mac,AP IP Address,Download,Upload,Total Data,Social Profile,Start Time,Stop Time
+radiusparser-radacct.lua|radacctid,acctsessionid,acctuniqueid,username,groupname,realm,nasipaddress,nasportid,nasporttype,acctstarttime,acctstoptime,acctsessiontime,acctauthentic,connectinfo_start,connectinfo_stop,acctinputoctets,acctoutputoctets,calledstationid,callingstationid,acctterminatecause,servicetype,framedprotocol,framedipaddress,acctstartdelay,acctstopdelay,xascendsessionsvrkey,_accttime,_srvid,_dailynextsrvactive,_apid
+radiusparse_alepo.lua|Date,Status-Type,Chargeable-User-Identity,InnerIdentity,Framed-Address-IPv4,NASIP,NAS-Identifier,AcctSessionId,Acct-Terminate-Cause,Session-Time,AcctInputGigawords,AcctOutputGigawords,Input-Octets,Output-Octets,UserSpeed,User ID,UserSpeed,FramedIPv6Address,DelegatedIPv6Prefix
 
 
