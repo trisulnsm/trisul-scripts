@@ -69,5 +69,9 @@ end
 
 
 See the samples 
+File Name | Sanmple Headers
+---|---|
+radiusparse_jaze_mac.lua|--Username,User ID,Zone Name,Name,Phone,Email,Address,Gender,Age,Login Type,Mac,IP Address,IPV6 Prefix,Delegated IPV6 Prefix,Device Type,Browser,AP Mac,AP IP Address,Download,Upload,Total Data,Social Profile,Start Time,Stop Time
+
 
 
